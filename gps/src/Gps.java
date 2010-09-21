@@ -28,7 +28,7 @@ import org.json.simple.parser.*;
 
 public class Gps {
 
-	private static final int DEFAULT_UPDATA_INTERVAL = 500;
+	private static final int DEFAULT_UPDATA_INTERVAL = 250;
 	private static final int GPSD_PORT = 2947;
 	
 	/**
