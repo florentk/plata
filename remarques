@@ -1,0 +1,70 @@
+Remarque sur le document des délivrables
+----------------------------------------
+
+- Pourquoi les application p2p utilise la couche multicast IP ? (page 6 d1.3pdf)
+- OpenAir ?
+- Comment un vehicule detect qu'il est dans le mauvais sens de circulation ? (page 20-21 d1.3pdf)
+- Pourquoi un Home Agent est-il necessaire ? (page 24 d1.3pdf)
+
+
+Réunion 15/09
+-------------
+Mohamed, Christophe
+
+- Prochaine réunion le 22 Matin (9h30)
+- SDR : Radio logiciel
+- MapPoint -> OpenStreetMap
+- Radar AICC (à voir)
+- ORBacus (implem de CORBA)
+- Java de préférence , mais autres languages possibles
+
+OpenStreetMap
+-------------
+
+- osm-gps-map : viewer avec GTK
+- mapnik : toolki pour GIS
+
+- osm-gps-map : adapté pour le positionement GPS. MapNik est plus orienté "Rendu", hors on ne veux pas de belles cartes (pour le moment)
+
+osm-gps-map
+-----------
+
+- http://nzjrs.github.com/osm-gps-map/
+- installation à partir du svn. pas oublié d'installer gnome-common,gtk-doc-tools,libglib-dev,libgtk2.0-dev,libsoup2.4-dev,python-dev,python-gtk2-dev   avec aptitude
+- ./configure --prefix=/usr
+- sudo checkinstall make install
+- miroir (cache) : http://www.geofabrik.de/
+- passé outre le filtre du user-agent du proxy :
+
+diff --git a/src/osm-gps-map-widget.c b/src/osm-gps-map-widget.c
+index 20e0594..d79e5c5 100644
+--- a/src/osm-gps-map-widget.c
++++ b/src/osm-gps-map-widget.c
+@@ -144,7 +144,8 @@
+ #define ENABLE_DEBUG                (0)
+ #define EXTRA_BORDER                (TILESIZE / 2)
+ #define OSM_GPS_MAP_SCROLL_STEP     (10)
+-#define USER_AGENT                  "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11"
++//#define USER_AGENT                  "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11"
++#define USER_AGENT "Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/534.3 (KHTML, like Gecko) Ubuntu/10.04 Chromium/6.0.472.53 Chrome/6.0.472.53 Safari/534.3"
+ #define DOWNLOAD_RETRIES            3
+ #define MAX_DOWNLOAD_TILES          10000
+ 
+- tile généré pour le nord pas de calais -> instalation de mapnik (base pgsql et lib python), puis generate_tile.py
+ 
+ 
+ 
+ 
+multi-hop beaconing message
+---------------------------
+
+- IPv6 neigborhood discovery
+- D31 European ITS Communication Architecture p96
+- C2C layer between IEEE 802.11p and IPv6
+- AirPlug (Bertrand) beaucoup d'applications
+- GeoNet 2.5C : Location Management Beaconing
+- implementation de la C2C layer par thouraya.toukabri@inria.fr 
+
+- quel frequence ? (vanEenennaam_ERCIM_eMobility2010_final)
+- Choisir un sous ensemble de voisin pour transmetre
+

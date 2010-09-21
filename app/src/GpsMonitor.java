@@ -7,7 +7,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import com.roots.swtmap.MapWidget;
-import com.roots.swtmap.MapWidget.OverImage;
 
 
 public class GpsMonitor {
