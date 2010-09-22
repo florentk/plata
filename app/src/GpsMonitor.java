@@ -10,6 +10,8 @@ import com.roots.swtmap.MapWidget;
 
 /**
  * Create a window with a map and follow the current position
+ * 
+ * link between Gps and MapWidget
  * @author florent
  *
  */

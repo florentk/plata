@@ -65,6 +65,8 @@ multi-hop beaconing message
 - AirPlug (Bertrand) beaucoup d'applications
 - GeoNet 2.5C : Location Management Beaconing
 - implementation de la C2C layer par thouraya.toukabri@inria.fr 
+- multi- hop vehicular broadcast : Mariyasagayam07a, Mariyasagayam07b
+
 
 - quel frequence ? (vanEenennaam_ERCIM_eMobility2010_final)
 - Choisir un sous ensemble de voisin pour transmetre
@@ -75,4 +77,12 @@ systeme d'information géographique
 - avec java : MapWidget pour SWT (projet MapPanel)
 - lien avec gpsd : client avec socket, avec connection par écouteur.
 
+Ethernet RAW avec java
+----------------------
 
+- Source : http://stackoverflow.com/questions/3574036/java-library-for-raw-ethernet
+- Solutions : 
+	- C + JNI
+	- Jpcap :
+		- installation sous linux : ancienne version avec dépendance sun-java6-jdk incorecte.
+		- compilation : définir JAVA_HOME avant make
