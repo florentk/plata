@@ -34,25 +34,26 @@ osm-gps-map
 - ./configure --prefix=/usr
 - sudo checkinstall make install
 - miroir (cache) : http://www.geofabrik.de/
-- passé outre le filtre du user-agent du proxy :
+- passé outre le filtre du user-agent du proxy : ::
 
-diff --git a/src/osm-gps-map-widget.c b/src/osm-gps-map-widget.c
-index 20e0594..d79e5c5 100644
---- a/src/osm-gps-map-widget.c
-+++ b/src/osm-gps-map-widget.c
-@@ -144,7 +144,8 @@
- #define ENABLE_DEBUG                (0)
- #define EXTRA_BORDER                (TILESIZE / 2)
- #define OSM_GPS_MAP_SCROLL_STEP     (10)
--#define USER_AGENT                  "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11"
-+//#define USER_AGENT                  "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11"
-+#define USER_AGENT "Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/534.3 (KHTML, like Gecko) Ubuntu/10.04 Chromium/6.0.472.53 Chrome/6.0.472.53 Safari/534.3"
- #define DOWNLOAD_RETRIES            3
- #define MAX_DOWNLOAD_TILES          10000
+
+	diff --git a/src/osm-gps-map-widget.c b/src/osm-gps-map-widget.c
+	index 20e0594..d79e5c5 100644
+	--- a/src/osm-gps-map-widget.c
+	+++ b/src/osm-gps-map-widget.c
+	@@ -144,7 +144,8 @@
+	 #define ENABLE_DEBUG                (0)
+	 #define EXTRA_BORDER                (TILESIZE / 2)
+	 #define OSM_GPS_MAP_SCROLL_STEP     (10)
+	-#define USER_AGENT                  "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11"
+	+//#define USER_AGENT                  "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11"
+	+#define USER_AGENT "Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/534.3 (KHTML, like Gecko) Ubuntu/10.04 Chromium/6.0.472.53 Chrome/6.0.472.53 Safari/534.3"
+	 #define DOWNLOAD_RETRIES            3
+	 #define MAX_DOWNLOAD_TILES          10000
  
 - tile généré pour le nord pas de calais -> instalation de mapnik (base pgsql et lib python), puis generate_tile.py
  
- 
+
  
  
 multi-hop beaconing message
@@ -67,4 +68,11 @@ multi-hop beaconing message
 
 - quel frequence ? (vanEenennaam_ERCIM_eMobility2010_final)
 - Choisir un sous ensemble de voisin pour transmetre
+
+
+systeme d'information géographique
+----------------------------------
+- avec java : MapWidget pour SWT (projet MapPanel)
+- lien avec gpsd : client avec socket, avec connection par écouteur.
+
 

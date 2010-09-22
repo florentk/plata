@@ -8,7 +8,11 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.roots.swtmap.MapWidget;
 
-
+/**
+ * Create a window with a map and follow the current position
+ * @author florent
+ *
+ */
 public class GpsMonitor {
 	static MapWidget map;
 	static Display display;
