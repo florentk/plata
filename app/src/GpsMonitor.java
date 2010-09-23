@@ -47,7 +47,7 @@ public class GpsMonitor {
       gps = new Gps();
       gps.addPositionListener(new GpsListener() {
 
-    	  public void positionChanged(WGS84 position) {
+    	  public void positionChanged(WGS84 position, Double speed, Double track) {
     		  display.syncExec(
 				  new Runnable(){
 				      public void run(){

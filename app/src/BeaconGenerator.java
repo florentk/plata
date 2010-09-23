@@ -4,12 +4,13 @@ import java.net.InetAddress;
 
 import jpcap.*;
 import jpcap.packet.EthernetPacket;
-import jpcap.packet.IPPacket;
-import jpcap.packet.TCPPacket;
-
+import jpcap.packet.Packet;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 
 public class BeaconGenerator {
 
+	public static final short ETHERTYPE_CMO = 0x0870;
 	/**
 	 * @param args
 	 */
@@ -24,8 +25,25 @@ public class BeaconGenerator {
 		int index=Integer.parseInt(args[0]);
 		JpcapSender sender=JpcapSender.openDevice(devices[index]);
 		
+		Packet p = new Packet();
 		
-
+		CMOHeader cmo_header = new CMOHeader((byte)0, 1, 5000, "AB-123-CD", (short)CMOHeader.CMO_TYPE_CAR);
+		
+		CMOState cmo_stat = new CMOState (cmo_header,5.54f,28.78f,147.0f,1.68f,54.0f);
+		
+		EthernetPacket ether=new EthernetPacket();
+		ether.frametype=ETHERTYPE_CMO;
+		//set source and destination MAC addresses
+		ether.src_mac=new byte[]{(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0};
+		ether.dst_mac=new byte[]{(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF};		
+		
+		
+		p.datalink = ether;
+		p.data = cmo_stat.toByteArray();
+		
+		System.out.println(p.data.length);
+		
+		sender.sendPacket(p);
 	}
 
 }

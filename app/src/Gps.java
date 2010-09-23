@@ -37,25 +37,23 @@ public class Gps {
 	private static final int DEFAULT_UPDATA_INTERVAL = 250;
 	private static final int GPSD_PORT = 2947;
 	
-	/**
-	 * interval (in ms) between two gpsd request
-	 */
+	/** interval (in ms) between two gpsd request*/
 	private int updateInterval;
 
-	/**
-	 * reader buffer for read the data from gpsd
-	 */
+	/** reader buffer for read the data from gpsd*/
 	private BufferedReader gpsBR;
 	
-	/**
-	 * current position in WGC84 format
-	 */
+	/** current position in WGC84 format */
 	private WGS84 currentPos;
+	
+	/** current speed in meter per second */
+	private Double currentSpeed;
+	
+	/** current orientation in degree (0 to 360) */
+	private Double currentTrack;
+	
 
-
-	/**
-	 * Set of listener for receive a event on position changing
-	 */
+	/** collection of listener for receive a event on position changing*/
 	private final Collection<GpsListener> gpsListeners = new ArrayList<GpsListener>();
 
 
@@ -92,11 +90,20 @@ public class Gps {
 	}	
 	
 	/**
+	 * convert a speed in knot unit to SI unit
+	 * @param speed in knot
+	 * @return speed in meter per second
+	 */
+	static private Double knotToSI(Double speed){
+		return new Double (0.514444 * speed.doubleValue());
+	}
+	
+	/**
 	 * decode a json gps data.
 	 * @param str json string
 	 * @return the geographical position in WGS84 format
 	 */
-	static private WGS84 decodeGPSPositionJson(String str){
+	static private GpsData decodeGPSDataJson(String str){
 		
 		
 		try{
@@ -105,16 +112,19 @@ public class Gps {
 			
 			//System.out.println(dict);
 			
-			//TPV class for get position (see gpsd spec)
+			//TPV class for get position, speed and track (see gpsd spec)
 			String fClass = (String)dict.get("class");
 			if (fClass.compareToIgnoreCase("TPV") == 0){
 				
 				//get the geographical position
-				Double lat = (Double)dict.get("lat");
-				Double lon = (Double)dict.get("lon");		
-				Double alt = (Double)dict.get("alt");	
+				Double lat   = (Double)dict.get("lat");
+				Double lon   = (Double)dict.get("lon");		
+				Double alt   = (Double)dict.get("alt");	
+				Double speed = knotToSI((Double)dict.get("speed"));		
+				Double track = (Double)dict.get("track");					
 				
-				return new WGS84(lon,lat,alt);
+				
+				return new GpsData(new WGS84(lon,lat,alt),speed,track);
 			}
 		}
 		catch(ParseException pe){
@@ -181,7 +191,7 @@ public class Gps {
 		//call the method positionChanged of each registered listener
 		for (Iterator<GpsListener> i=gpsListeners.iterator();i.hasNext();){
 			GpsListener l=  i.next();
-			l.positionChanged(getCurrentPos());
+			l.positionChanged(getCurrentPos(),getCurrentSpeed(),getCurrentTrack());
 		}
 	}
 	
@@ -195,11 +205,17 @@ public class Gps {
 		try {
 			while  (gpsBR.ready()) {
 				//decode the data
-				WGS84 pos = decodeGPSPositionJson(gpsBR.readLine());
+				GpsData data = decodeGPSDataJson(gpsBR.readLine());
 				
 				//if needed, update the current position
-				if(pos!= null && !currentPos.equals(pos))
-					setCurrentPos(pos);
+				if(data!= null  && (   !getCurrentPos().equals(data.getPosition())
+									|| !getCurrentSpeed().equals(data.getSpeed())
+									|| !getCurrentTrack().equals(data.getTrack())))
+				{
+					setCurrentPos(data.getPosition());
+					setCurrentSpeed(data.getSpeed());	
+					setCurrentTrack(data.getTrack());						
+				}
 				
 			}
 		} catch(IOException ioe) {
@@ -258,6 +274,36 @@ public class Gps {
 	}
 	
 	
+	/**
+	 *  get current speed 
+	 *  @return speed in meter per second 
+	*/
+	public Double getCurrentSpeed() {
+		return currentSpeed;
+	}
+
+	/**
+	 *  set current speed 
+	 *  @param currentSpeed in meter per second 
+	*/	
+	private void setCurrentSpeed(Double currentSpeed) {
+		this.currentSpeed = currentSpeed;
+	}
+
+	/** get current orientation 
+	 *  @return orientation in degree (0 to 360)
+	 */
+	public Double getCurrentTrack() {
+		return currentTrack;
+	}
+
+	/** set current orientation
+	 *  @param currentTrack orientation in degree (0 to 360) 
+	*/
+	private void setCurrentTrack(Double currentTrack) {
+		this.currentTrack = currentTrack;
+	}	
+	
 
 	/**
 	 * call when the timer expire (every update interval value)
@@ -270,18 +316,52 @@ public class Gps {
 		}
 	}	
 	
+	
+	/**
+	 * GpsData for return type of decodeGPSDataJson
+	 */
+	private static final class GpsData{
+		
+		private WGS84 position;
+		private Double speed;
+		private Double track;
 
+		public GpsData(WGS84 position, Double speed, Double track) {
+			super();
+			this.position = position;
+			this.speed = speed;
+			this.track = track;
+		}	
+		
+		/** current position in WGC84 format */
+		private WGS84 getPosition() {
+			return position;
+		}
+		
+		/** current speed in meter per second */
+		private Double getSpeed() {
+			return speed;
+		}
+		
+		/** current orientation in degree (0 to 360) */
+		private Double getTrack() {
+			return track;
+		}		
+	}
+	
 	public static void main (String[] args) throws IOException{
 		Gps gps = new Gps();
 		
 		gps.addPositionListener(new GpsListener() {
 
-			public void positionChanged(WGS84 position) {
-				System.out.println(position);
+			public void positionChanged(WGS84 position, Double speed, Double track) {
+				System.out.println(position + " Speed : " + speed + " Track : " + track);
 			}
 
 		});
 		
 	}
+
+
 
 }

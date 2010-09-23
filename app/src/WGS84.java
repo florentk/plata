@@ -7,11 +7,11 @@
  */
 public class WGS84 {
 	/**
-	 * longitude (in radian)
+	 * longitude (in ddmm.mmmm)
 	 */
 	private Double longitude;
 	/**
-	 * latitude (in radian)
+	 * latitude (in ddmm.mmmm)
 	 */
 	private Double latitude;
 	/**
