@@ -21,7 +21,12 @@ public class CMOHeader {
 	//CMO with energy sufficient but static
 	public static final short CMO_TYPE_SPOT = 0x0081;
 	
+	public static final short ETHERTYPE_CMO = 0x0870;
+	
+	public static final short CMO_HEADER_LENGTH = 27;	
 	private static final short CMO_IDENTITY_LENGHT = 16;	
+	
+	
 	
 	/** number of hop */
 	private byte hopCount;
@@ -54,6 +59,17 @@ public class CMOHeader {
 				this.cmoID[i] = 0;
 		
 		this.cmoType = cmoType;
+
+	}
+	
+	public CMOHeader(byte[] data){
+		int i=0;
+		
+		hopCount = ByteArrayConvertTool.toByte(ByteArrayConvertTool.memcpy(data, i, 1));i+=1;
+		seq = ByteArrayConvertTool.toInt(ByteArrayConvertTool.memcpy(data, i, 4));i+=4;
+		lifetime = ByteArrayConvertTool.toInt(ByteArrayConvertTool.memcpy(data, i, 4));i+=4;	
+		cmoID = ByteArrayConvertTool.toCharA(ByteArrayConvertTool.memcpy(data, i, CMO_IDENTITY_LENGHT));i+=CMO_IDENTITY_LENGHT;
+		cmoType = ByteArrayConvertTool.toShort(ByteArrayConvertTool.memcpy(data, i, 2));i+=2;		
 
 	}
 
@@ -104,5 +120,16 @@ public class CMOHeader {
 		return b;
 	}	
 	
+	public String toString(){
+		String s="";
+		
+		s+="HopCount : "+getHopCount()+"\n";
+		s+="Sequence number : "+getSeq()+"\n";
+		s+="Lifetime : "+getLifetime()+"\n";
+		s+="Identity : "+getCmoID()+"\n";
+		s+="Type : "+getCmoType()+"\n";
+		
+		return s;
+	}
 	
 }

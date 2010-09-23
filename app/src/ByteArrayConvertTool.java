@@ -254,12 +254,9 @@ public final class ByteArrayConvertTool {
 	public static char[] toCharA(byte[] data) {
 	    if (data == null || data.length % 2 != 0) return null;
 	    // ----------
-	    char[] chrs = new char[data.length / 2];
+	    char[] chrs = new char[data.length];
 	    for (int i = 0; i < chrs.length; i++) {
-	        chrs[i] = toChar( new byte[] {
-	            data[(i*2)],
-	            data[(i*2)+1],
-	        } );
+	        chrs[i] = (char)data[i];
 	    }
 	    return chrs;
 	}
@@ -449,5 +446,13 @@ public final class ByteArrayConvertTool {
 		   System.arraycopy(B, 0, C, A.length, B.length);
 
 		   return C;
+		}	
+	
+
+	public static byte[] memcpy(byte[] A, int off, int size) {
+		   byte B[] = new byte[size];   
+		
+		   System.arraycopy(A, off, B, 0, size);
+		   return B;
 		}	
 }

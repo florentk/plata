@@ -10,7 +10,7 @@ import java.io.ObjectOutputStream;
 
 public class BeaconGenerator {
 
-	public static final short ETHERTYPE_CMO = 0x0870;
+
 	/**
 	 * @param args
 	 */
@@ -32,7 +32,7 @@ public class BeaconGenerator {
 		CMOState cmo_stat = new CMOState (cmo_header,5.54f,28.78f,147.0f,1.68f,54.0f);
 		
 		EthernetPacket ether=new EthernetPacket();
-		ether.frametype=ETHERTYPE_CMO;
+		ether.frametype=CMOHeader.ETHERTYPE_CMO;
 		//set source and destination MAC addresses
 		ether.src_mac=new byte[]{(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0};
 		ether.dst_mac=new byte[]{(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF};		

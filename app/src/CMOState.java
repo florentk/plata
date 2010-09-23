@@ -34,6 +34,19 @@ public final class CMOState extends CMOHeader{
 		this.speed = speed;
 		this.track = track;
 	}
+	
+	public CMOState(byte data[]){
+		super(data);
+		int i=CMO_HEADER_LENGTH;
+		
+		longitude = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
+		latitude = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
+		h = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
+		speed = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
+		track = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
+		
+		
+	}
 
 	/**
 	 * @return the longitude (in ddmm.mmmm)
@@ -86,4 +99,15 @@ public final class CMOState extends CMOHeader{
 		return b;
 	}
 	
+	public String toString(){
+		String s=super.toString();
+	
+		s+="Longitude : "+getLongitude()+"\n";
+		s+="Latitude : "+getLatitude()+"\n";
+		s+="Altitude : "+getH()+"\n";
+		s+="Speed : "+getSpeed()+"\n";
+		s+="Orientation : "+getTrack()+"\n";
+		
+		return s;
+	}
 }
