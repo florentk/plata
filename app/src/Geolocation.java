@@ -9,7 +9,7 @@
  * @author Florent Kaisser <florent.kaisser@free.fr>
  */
 
-public interface Geolocation {
+public interface Geolocation extends Runnable {
 	
 	/**
 	 * init the geolocation system

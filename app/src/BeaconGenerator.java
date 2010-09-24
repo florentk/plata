@@ -165,9 +165,9 @@ public class BeaconGenerator extends Thread{
 	    int beaconInter = Integer.parseInt(strBeaconInter);
 	    
 		try{
-			Gps loc = new Gps();
+			Geolocation loc = new Gps();
 			loc.setUpdateInterval((int)((float)beaconInter/2.0));
-			loc.start();
+			new Thread(loc).start();
 			
 	    	BeaconGenerator gen = new BeaconGenerator(sender, loc, strId,type,beaconInter);
 	    	gen.run();	  

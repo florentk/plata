@@ -43,7 +43,7 @@ public class GpsMonitor {
       map = new MapWidget(shell, SWT.NONE);
       map.addOverImage( map.new OverImage(0, 0, loadCarImage()) ); 
 
-      Gps gps =new Gps();
+      Geolocation gps =new Gps();
       
       geo = gps;
       geo.addPositionListener(new GeolocationListener() {
@@ -63,7 +63,7 @@ public class GpsMonitor {
 
       });
       
-      gps.start();
+      new Thread(geo).start();
 
       shell.open ();
       while (!shell.isDisposed ()) {

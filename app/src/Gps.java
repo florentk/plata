@@ -34,7 +34,7 @@ import org.json.simple.parser.*;
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
  */
-public class Gps extends Thread  implements Geolocation  {
+public class Gps  implements Geolocation  {
 
 	public static final int DEFAULT_UPDATA_INTERVAL = 250;
 	public static final int GPSD_PORT = 2947;
@@ -348,9 +348,9 @@ public class Gps extends Thread  implements Geolocation  {
 	
 	//Unit testing
 	public static void main (String[] args) throws IOException{
-		Gps gps = new Gps();
+		Geolocation geo = new Gps();
 		
-		gps.addPositionListener(new GeolocationListener() {
+		geo.addPositionListener(new GeolocationListener() {
 
 			public void positionChanged(WGS84 position, Double speed, Double track) {
 				System.out.println(position + " Speed : " + speed + " Track : " + track);
@@ -358,7 +358,9 @@ public class Gps extends Thread  implements Geolocation  {
 
 		});
 		
-		gps.run();
+		geo.run();
+		
+		//new Thread(geo).start();
 		
 	}
 
