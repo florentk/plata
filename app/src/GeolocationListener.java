@@ -5,7 +5,7 @@
  * @author florent
  *
  */
-public interface GpsListener {
+public interface GeolocationListener {
 	/**
 	 * the geographical position has changed
 	 * @param position geographical position in WGS84 format

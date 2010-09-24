@@ -18,7 +18,7 @@ import com.roots.swtmap.MapWidget;
 public class GpsMonitor {
 	static MapWidget map;
 	static Display display;
-	static Gps gps;
+	static Geolocation geo;
 	static Image car;
 	
 	public static Point WGS84toPoint(WGS84 position,int z){
@@ -43,15 +43,16 @@ public class GpsMonitor {
       map = new MapWidget(shell, SWT.NONE);
       map.addOverImage( map.new OverImage(0, 0, loadCarImage()) ); 
 
-    		  
-      gps = new Gps();
-      gps.addPositionListener(new GpsListener() {
+      Gps gps =new Gps();
+      
+      geo = gps;
+      geo.addPositionListener(new GeolocationListener() {
 
     	  public void positionChanged(WGS84 position, Double speed, Double track) {
     		  display.syncExec(
 				  new Runnable(){
 				      public void run(){
-				    	  map.setCenterPosition( WGS84toPoint(gps.getCurrentPos(), map.getZoom()) );
+				    	  map.setCenterPosition( WGS84toPoint(geo.getCurrentPos(), map.getZoom()) );
 				    	  //map.setCenterPosition(new Point(45,78));
 				    	  map.redraw();
 				      }
@@ -62,7 +63,8 @@ public class GpsMonitor {
 
       });
       
-      
+      gps.start();
+
       shell.open ();
       while (!shell.isDisposed ()) {
           if (!display.readAndDispatch ()) display.sleep ();

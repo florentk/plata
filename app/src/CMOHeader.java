@@ -72,6 +72,38 @@ public class CMOHeader {
 		cmoType = ByteArrayConvertTool.toShort(ByteArrayConvertTool.memcpy(data, i, 2));i+=2;		
 
 	}
+	
+	//TODO plutot utilisé a map : http://stackoverflow.com/questions/507602/how-to-initialise-a-static-map-in-java
+	public static String getTypeAvailable(){
+		return "car, truck, bus, motorbike, walker, bike, spot";
+	}
+	
+	public static short typeFromString(String str){
+
+		if (str.compareToIgnoreCase("car")==0)
+			return CMO_TYPE_CAR;
+		
+		if (str.compareToIgnoreCase("truck")==0)
+			return CMO_TYPE_TRUCK;
+
+		if (str.compareToIgnoreCase("bus")==0)
+			return CMO_TYPE_BUS;
+
+		if (str.compareToIgnoreCase("motorbike")==0)
+			return CMO_TYPE_MOTORBIKE;
+
+		if (str.compareToIgnoreCase("walker")==0)
+			return CMO_TYPE_WALKER;
+
+		if (str.compareToIgnoreCase("bike")==0)
+			return CMO_TYPE_BIKE;
+
+		if (str.compareToIgnoreCase("spot")==0)
+			return CMO_TYPE_SPOT;		
+		
+
+		return -1;
+	}
 
 	/**
 	 * @return the hopCount

@@ -28,14 +28,16 @@ import org.json.simple.parser.*;
  * The position coordinate use the WGS84 representation 
  * commonly used by the GPS <br><br>
  * 
+ * Gpsd --- Json data ---> Gps ---> GeoLocationListener
+ * 
  * [1] http://gpsd.berlios.de/
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
  */
-public class Gps {
+public class Gps extends Thread  implements Geolocation  {
 
-	private static final int DEFAULT_UPDATA_INTERVAL = 250;
-	private static final int GPSD_PORT = 2947;
+	public static final int DEFAULT_UPDATA_INTERVAL = 250;
+	public static final int GPSD_PORT = 2947;
 	
 	/** interval (in ms) between two gpsd request*/
 	private int updateInterval;
@@ -54,7 +56,7 @@ public class Gps {
 	
 
 	/** collection of listener for receive a event on position changing*/
-	private final Collection<GpsListener> gpsListeners = new ArrayList<GpsListener>();
+	private final Collection<GeolocationListener> gpsListeners = new ArrayList<GeolocationListener>();
 
 
 	/**
@@ -98,6 +100,13 @@ public class Gps {
 		return new Double (0.514444 * speed.doubleValue());
 	}
 	
+	static private Double checkDoubleNull(Double val){
+		if (val == null)
+			return new Double(0.0);
+		
+		return val;
+	}
+	
 	/**
 	 * decode a json gps data.
 	 * @param str json string
@@ -107,7 +116,7 @@ public class Gps {
 		
 		
 		try{
-			//convert JSON string in Java Map (in true language term : dictionary)
+			//convert JSON string in Java Map
 			Map dict=(Map)(new JSONParser()).parse(str);
 			
 			//System.out.println(dict);
@@ -117,11 +126,11 @@ public class Gps {
 			if (fClass.compareToIgnoreCase("TPV") == 0){
 				
 				//get the geographical position
-				Double lat   = (Double)dict.get("lat");
-				Double lon   = (Double)dict.get("lon");		
-				Double alt   = (Double)dict.get("alt");	
-				Double speed = knotToSI((Double)dict.get("speed"));		
-				Double track = (Double)dict.get("track");					
+				Double lat   = checkDoubleNull((Double)dict.get("lat"));
+				Double lon   = checkDoubleNull((Double)dict.get("lon"));		
+				Double alt   = checkDoubleNull((Double)dict.get("alt"));	
+				Double speed = knotToSI(checkDoubleNull((Double)dict.get("speed")));		
+				Double track = checkDoubleNull((Double)dict.get("track"));					
 				
 				
 				return new GpsData(new WGS84(lon,lat,alt),speed,track);
@@ -148,18 +157,12 @@ public class Gps {
 		//init the variable
 		setUpdateInterval(DEFAULT_UPDATA_INTERVAL);
 		setCurrentPos(new WGS84());
-		
-		//init the timer
-		initTimer();
+		setCurrentSpeed(0.0);
+		setCurrentTrack(0.0);		
+
 	}
 	
-	/**
-	 * init the timer 
-	 */
-	private void initTimer(){
-		Timer timer = new Timer();
-	    timer.schedule(new RequestGPS(), 0, getUpdateInterval());
-	}
+
 	
 
 	/**
@@ -189,8 +192,8 @@ public class Gps {
 	 */
 	private void positionChanged(){
 		//call the method positionChanged of each registered listener
-		for (Iterator<GpsListener> i=gpsListeners.iterator();i.hasNext();){
-			GpsListener l=  i.next();
+		for (Iterator<GeolocationListener> i=gpsListeners.iterator();i.hasNext();){
+			GeolocationListener l=  i.next();
 			l.positionChanged(getCurrentPos(),getCurrentSpeed(),getCurrentTrack());
 		}
 	}
@@ -198,28 +201,32 @@ public class Gps {
 	/**
 	 * read a line from gpsd and decode the data
 	 */
-	private void pollGPS() {
+	public void run() {
 		if (gpsBR == null) return;
 
-		// for each line in the buffer
-		try {
-			while  (gpsBR.ready()) {
-				//decode the data
+		
+		for (;;) {
+			// for each line in the buffer
+			try {
+				//reads a line (passive wait) and decodes
 				GpsData data = decodeGPSDataJson(gpsBR.readLine());
+
+				//System.out.println("Read a line : " + data);
 				
 				//if needed, update the current position
 				if(data!= null  && (   !getCurrentPos().equals(data.getPosition())
-									|| !getCurrentSpeed().equals(data.getSpeed())
-									|| !getCurrentTrack().equals(data.getTrack())))
+						|| !getCurrentSpeed().equals(data.getSpeed())
+						|| !getCurrentTrack().equals(data.getTrack())))
 				{
 					setCurrentPos(data.getPosition());
 					setCurrentSpeed(data.getSpeed());	
 					setCurrentTrack(data.getTrack());						
 				}
-				
+
+
+			} catch(IOException ioe) {
+				System.err.println("Connection error with gps service");
 			}
-		} catch(IOException ioe) {
-			System.err.println("Connection error with gps service");
 		}
 		
 	}
@@ -261,7 +268,7 @@ public class Gps {
 	 * register a new listener
 	 * @param l
 	 */
-	public void addPositionListener(GpsListener l){
+	public void addPositionListener(GeolocationListener l){
 		gpsListeners.add(l);
 	}
 	
@@ -269,7 +276,7 @@ public class Gps {
 	 * remove a registered listener
 	 * @param l
 	 */
-	public void removePositionListener(GpsListener l){
+	public void removePositionListener(GeolocationListener l){
 		gpsListeners.remove(l);
 	}
 	
@@ -304,17 +311,6 @@ public class Gps {
 		this.currentTrack = currentTrack;
 	}	
 	
-
-	/**
-	 * call when the timer expire (every update interval value)
-	 * @author florent
-	 *
-	 */
-	class RequestGPS extends TimerTask {
-		public void run() {
-			pollGPS();
-		}
-	}	
 	
 	
 	/**
@@ -349,16 +345,20 @@ public class Gps {
 		}		
 	}
 	
+	
+	//Unit testing
 	public static void main (String[] args) throws IOException{
 		Gps gps = new Gps();
 		
-		gps.addPositionListener(new GpsListener() {
+		gps.addPositionListener(new GeolocationListener() {
 
 			public void positionChanged(WGS84 position, Double speed, Double track) {
 				System.out.println(position + " Speed : " + speed + " Track : " + track);
 			}
 
 		});
+		
+		gps.run();
 		
 	}
 
