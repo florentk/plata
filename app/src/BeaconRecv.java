@@ -65,6 +65,47 @@ public class BeaconRecv  implements PacketReceiver {
 	
 
 	
+	/* BeaconRecv factory */
+	
+	/**
+	 * BeaconRecv factory. Create a BeaconRecv from a device
+	 * @param strDevice interface name
+	 * @return
+	 */
+	public static BeaconRecv loopPacketFromDevice(String strDevice){
+	    NetworkInterface device = PcapsTool.toNetworkInterface(strDevice);
+	    
+	    if(device==null){
+	    	System.out.println("The interface " + strDevice + " doesn't exist");
+	    	PcapsTool.printDevice();
+	    	return null;
+	    }
+		
+	    try{
+	    	return new BeaconRecv(JpcapCaptor.openDevice(device, 2000, false, 20));
+	    }catch (java.io.IOException e){
+	    	System.out.println("Cannot open network interface : "+e);
+	    	return null;
+	    }
+	}
+	
+	/**
+	 * BeaconRecv factory. Create a BeaconRecv from a pcaps file
+	 * @param path file name
+	 * @return
+	 */
+	public static BeaconRecv loopPacketFromFile(String path){
+
+	    
+	    try{
+	    	return new BeaconRecv(JpcapCaptor.openFile(path));
+	    }catch (java.io.IOException e){
+	    	System.out.println("Cannot open file : "+e);
+	    	return null;
+	    }
+	}
+	
+	
 	/*--------------------------------------------------------------------------------
 	 * Unit testing
 	 */
@@ -77,40 +118,6 @@ public class BeaconRecv  implements PacketReceiver {
 			}
 
 		};
-	}
-	
-	private static void loopPacketFromDevice(String strDevice){
-	    NetworkInterface device = PcapsTool.toNetworkInterface(strDevice);
-	    
-	    if(device==null){
-	    	System.out.println("The interface " + strDevice + " doesn't exist");
-	    	PcapsTool.printDevice();
-	    	return;
-	    }
-		
-	    try{
-	    	BeaconRecv bRecv = new BeaconRecv(JpcapCaptor.openDevice(device, 2000, false, 20));
-	    	bRecv.addListener(createPrintListener());
-	    	bRecv.init();   
-	    	
-	    }catch (java.io.IOException e){
-	    	System.out.println("Cannot open network interface : "+e);
-	    	return;
-	    }
-	}
-	
-	private static void loopPacketFromFile(String path){
-
-	    
-	    try{
-	    	BeaconRecv bRecv = new BeaconRecv(JpcapCaptor.openFile(path));
-	    	bRecv.addListener(createPrintListener());
-	    	bRecv.init();      	
-	    	
-	    }catch (java.io.IOException e){
-	    	System.out.println("Cannot open file : "+e);
-	    	return;
-	    }
 	}	
 	
 	private static void printUsage(){
@@ -127,9 +134,13 @@ public class BeaconRecv  implements PacketReceiver {
 		}
 		
 		if(args[0].compareTo("-i")==0){
-			loopPacketFromDevice(args[1]);
+			BeaconRecv bRecv = loopPacketFromDevice(args[1]);
+	    	bRecv.addListener(createPrintListener());
+	    	bRecv.init();   
 		}else if(args[0].compareTo("-f")==0){
-			loopPacketFromFile(args[1]);
+			BeaconRecv bRecv = loopPacketFromFile(args[1]);
+	    	bRecv.addListener(createPrintListener());
+	    	bRecv.init();   
 		}else{
 			System.out.println("Bad argument");
 			printUsage();
