@@ -64,14 +64,15 @@ public class CMOManagement implements CMOStateListener {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		
 		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(args[0]);
 		
 		CMOManagement m = new CMOManagement();
 		
 		recv.addListener(m);
-		recv.init();
+		recv.start();
+		recv.join();
 	}
 
 

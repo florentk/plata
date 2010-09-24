@@ -15,7 +15,7 @@ import jpcap.packet.EthernetPacket;
  *
  */
 
-public class BeaconRecv  implements PacketReceiver {
+public class BeaconRecv extends Thread implements PacketReceiver {
 	
 	JpcapCaptor jpcap;
 	
@@ -59,7 +59,7 @@ public class BeaconRecv  implements PacketReceiver {
 	}
 	
 
-	public void init(){
+	public void run(){
 		jpcap.loopPacket(-1, this);	
 	}
 	
@@ -133,19 +133,22 @@ public class BeaconRecv  implements PacketReceiver {
 			System.exit(1);			
 		}
 		
-		if(args[0].compareTo("-i")==0){
-			BeaconRecv bRecv = loopPacketFromDevice(args[1]);
-	    	bRecv.addListener(createPrintListener());
-	    	bRecv.init();   
-		}else if(args[0].compareTo("-f")==0){
-			BeaconRecv bRecv = loopPacketFromFile(args[1]);
-	    	bRecv.addListener(createPrintListener());
-	    	bRecv.init();   
-		}else{
+		BeaconRecv bRecv=null;
+		
+		if(args[0].compareTo("-i")==0)
+			bRecv = loopPacketFromDevice(args[1]);
+		else if(args[0].compareTo("-f")==0)
+			bRecv = loopPacketFromFile(args[1]);
+		else{
 			System.out.println("Bad argument");
 			printUsage();
 			System.exit(1);					
 		}
+		
+    	bRecv.addListener(createPrintListener());
+    	bRecv.start();  
+    	bRecv.join();
+    	 	
 		
 	}
 
