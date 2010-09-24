@@ -1,6 +1,8 @@
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TimerTask;
 import java.util.Timer;
+import java.util.Collection;
 
 
 /**
@@ -22,6 +24,11 @@ public class CMOManagement implements CMOStateListener {
 	
 	CMOStateTable table;
 	
+
+	private final Collection<CMOStateTableListener> listerners = new ArrayList<CMOStateTableListener>();
+
+	
+	
 	public CMOManagement(){
 		table = new CMOStateTable();
 		
@@ -39,7 +46,11 @@ public class CMOManagement implements CMOStateListener {
 		
 		table.put(newStat.getCmoID(), new CMOStateTableEntry (newStat));
 
-		System.out.println(table);
+		//notify the listerners
+		for (Iterator<CMOStateTableListener> i=listerners.iterator();i.hasNext();){
+			CMOStateTableListener l=  i.next();
+			l.tableChanged(newStat.getCmoID(),table);
+		}		
 	}
 	
 	public void deleteExpiredEntry(){
@@ -57,6 +68,14 @@ public class CMOManagement implements CMOStateListener {
 		return table;
 	}	
 	
+	public void addListener(CMOStateTableListener l){
+		listerners.add(l);
+	}
+	
+	public void removeListener(CMOStateTableListener l){
+		listerners.remove(l);
+	}	
+	
 	class RemoveExpiredEntry extends TimerTask{
 
 		public void run() {
@@ -69,6 +88,13 @@ public class CMOManagement implements CMOStateListener {
 		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(args[0]);
 		
 		CMOManagement m = new CMOManagement();
+		
+		m.addListener(new CMOStateTableListener() {
+			@Override
+			public void tableChanged(String cmoId, CMOStateTable table) {
+				System.out.println(table);
+			}
+		});		
 		
 		recv.addListener(m);
 		recv.start();
