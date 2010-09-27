@@ -14,22 +14,22 @@ public class CMOTableEntry {
 	/**
 	 * longitude (in ddmm.mmmm)
 	 */
-	private Float longitude;
+	private Double longitude;
 	/**
 	 * latitude (in ddmm.mmmm)
 	 */
-	private Float latitude;
+	private Double latitude;
 	
 	/**
 	 * altitude (in meters)
 	 */
-	private Float altitude;
+	private Double altitude;
 	
 	/** speed in meter per second*/
-	private Float speed;
+	private Double speed;
 
 	/** orientation in degree (0 to 360) */
-	private Float track;	
+	private Double track;	
 	
 	/**  the time for which CMO considere not accessible  */
 	private int lifetime;
@@ -37,8 +37,8 @@ public class CMOTableEntry {
 	private Date dateEntry;
 	
 
-	public CMOTableEntry(String cmoID, short cmoType, Float longitude,
-			Float latitude, Float altitude, Float speed, Float track,
+	public CMOTableEntry(String cmoID, short cmoType, Double longitude,
+			Double latitude, Double altitude, Double speed, Double track,
 			int lifetime) {
 		super();
 		this.cmoID = cmoID;
@@ -76,35 +76,35 @@ public class CMOTableEntry {
 	/**
 	 * @return the longitude (in ddmm.mmmm)
 	 */
-	public Float getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
 
 	/**
 	 * @return the latitude (in ddmm.mmmm)
 	 */
-	public Float getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
 
 	/**
 	 * @return  altitude (in metter)
 	 */
-	public Float getAltitude() {
+	public Double getAltitude() {
 		return altitude;
 	}
 
 	/**
 	 * @return the speed in metter per second)
 	 */
-	public Float getSpeed() {
+	public Double getSpeed() {
 		return speed;
 	}
 
 	/**
 	 * @return orientation in degree (0 to 360)
 	 */
-	public Float getTrack() {
+	public Double getTrack() {
 		return track;
 	}
 

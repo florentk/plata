@@ -23,6 +23,8 @@ import fr.inrets.leost.cmo.beaconning.packet.CMOState;;
  *
  */
 public class CMOManagement implements BeaconRecvListener {
+	
+	public static final float MAX_ANGLE_SAME_DIRECTION = 90f; 
 
 	/** interval between two expired entry check (in ms) */
 	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;
@@ -54,11 +56,12 @@ public class CMOManagement implements BeaconRecvListener {
 				new CMOTableEntry(
 						newStat.getCmoID(),
 						newStat.getCmoType(),
-						newStat.getLongitude(),
-						newStat.getLatitude(),
-						newStat.getH(),
-						newStat.getSpeed(),
-						newStat.getTrack(),
+						
+						new Double (newStat.getLongitude().doubleValue()),
+						new Double (newStat.getLatitude()),
+						new Double (newStat.getH()),
+						new Double (newStat.getSpeed()),
+						new Double (newStat.getTrack()),
 						newStat.getLifetime()
 					));
 
@@ -76,21 +79,28 @@ public class CMOManagement implements BeaconRecvListener {
 		}
 	}
 	
+	private boolean inSameDirection(Double track1, Double track2){
+		return Math.abs( track1.floatValue() - track2.floatValue() ) < MAX_ANGLE_SAME_DIRECTION;
+	}
 	
-	public CMOTableEntry closestCMO(Double longitude, Double latitude){
+	public CMOTableEntry closestCMOInFront(Double longitude, Double latitude, Double track){
 		CMOTableEntry closest=null;
 		Double closestDist= null;
 		double lg=longitude.doubleValue(),lt=latitude.doubleValue();
-		double dx,dy,dist;
+		double  dx,dy,dist;
 		
 		for ( CMOTableEntry e : table.values() ){
-			dx = (lg -  e.getLongitude().doubleValue());
-			dy = (lt -  e.getLatitude().doubleValue());
-			dist = Math.sqrt( dx*dx + dy*dy  );		
-
-			if(closest == null || closestDist.compareTo( dist ) > 0 ){
-				closest = e;
-				closestDist = dist;
+			
+			if ( inSameDirection(track, e.getTrack()) ){
+			
+				dx = (lg -  e.getLongitude().doubleValue());
+				dy = (lt -  e.getLatitude().doubleValue());
+				dist = (float) Math.sqrt(  dx*dx + dy*dy  );		
+	
+				if(closest == null || closestDist.compareTo( dist ) > 0 ){
+					closest = e;
+					closestDist = dist;
+				}
 			}
 		}
 		

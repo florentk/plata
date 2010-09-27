@@ -48,21 +48,21 @@ public class WGS84 {
 	/**
 	 * returns longitude angle in radian
 	 */
-	public double longitude() {
+	public Double longitude() {
 		return longitude;
 	}
 
 	/**
 	 * returns latitude angle in radian
 	 */
-	public double latitude() {
+	public Double latitude() {
 		return latitude;
 	}
 
 	/**
 	 * returns ellipsoidal elevation in meters
 	 */
-	public double h() {
+	public Double h() {
 		return h;
 	}
 	
