@@ -115,7 +115,7 @@ public class BeaconGenerator extends Thread{
 	
 	public void run() {
 
-	    for (;;) {
+	    while(true) {
 	        try {
 	        	sleep(beaconFreq);
 
@@ -173,7 +173,8 @@ public class BeaconGenerator extends Thread{
 		try{
 			Geolocation loc = new Gps();
 			loc.setUpdateInterval((int)((float)beaconInter/2.0));
-			new Thread(loc).start();
+			loc.start();
+
 			
 	    	BeaconGenerator gen = new BeaconGenerator(sender, loc, strId,type,beaconInter);
 	    	gen.run();	  

@@ -63,10 +63,9 @@ public class CMOManagement implements BeaconRecvListener {
 					));
 
 		//notify the listerners
-		for (Iterator<CMOTableListener> i=listerners.iterator();i.hasNext();){
-			CMOTableListener l=  i.next();
+		for (CMOTableListener l : listerners)
 			l.tableChanged(newStat.getCmoID(),table);
-		}		
+			
 	}
 	
 	public void deleteExpiredEntry(){
@@ -76,6 +75,29 @@ public class CMOManagement implements BeaconRecvListener {
 				i.remove();
 		}
 	}
+	
+	
+	public CMOTableEntry closestCMO(Double longitude, Double latitude){
+		CMOTableEntry closest=null;
+		Double closestDist= null;
+		double lg=longitude.doubleValue(),lt=latitude.doubleValue();
+		double dx,dy,dist;
+		
+		for ( CMOTableEntry e : table.values() ){
+			dx = (lg -  e.getLongitude().doubleValue());
+			dy = (lt -  e.getLatitude().doubleValue());
+			dist = Math.sqrt( dx*dx + dy*dy  );		
+
+			if(closest == null || closestDist.compareTo( dist ) > 0 ){
+				closest = e;
+				closestDist = dist;
+			}
+		}
+		
+		
+		return closest;
+	}
+	
 	
 	/**
 	 * @return the table

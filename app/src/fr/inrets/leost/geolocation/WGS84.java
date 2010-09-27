@@ -67,7 +67,7 @@ public class WGS84 {
 	}
 	
 	public String toString(){
-		return "Longitude : " + longitude + " Latitude : "+ latitude + " Altitude : " + h;
+		return String.format("%01.6f %01.6f %01.6f m", longitude, latitude, h);
 	}
 	
 	public boolean equals(WGS84 a, WGS84 b){

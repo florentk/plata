@@ -9,7 +9,7 @@ package fr.inrets.leost.geolocation;
  * @author Florent Kaisser <florent.kaisser@free.fr>
  */
 
-public interface Geolocation extends Runnable {
+public abstract class  Geolocation extends Thread {
 	
 	/**
 	 * init the geolocation system
@@ -20,44 +20,44 @@ public interface Geolocation extends Runnable {
 	 * get the interval update value of position 
 	 * @return interval in ms
 	 */
-	public int getUpdateInterval();
+	abstract public int getUpdateInterval();
 
 	/**
 	 * set the interval update value of position  
 	 * @param updateInterval interval in ms
 	 */
-	public void setUpdateInterval(int updateInterval);
+	abstract public void setUpdateInterval(int updateInterval);
 	
 	/**
 	 * get the current position
 	 * @return the current position in WGS84 format
 	 */
-	public WGS84 getCurrentPos();
+	abstract public WGS84 getCurrentPos();
 
 
 	/**
 	 * register a new listener
 	 * @param l
 	 */
-	public void addPositionListener(GeolocationListener l);
+	abstract public void addPositionListener(GeolocationListener l);
 	
 	/**
 	 * remove a registered listener
 	 * @param l
 	 */
-	public void removePositionListener(GeolocationListener l);
+	abstract public void removePositionListener(GeolocationListener l);
 	
 	
 	/**
 	 *  get current speed 
 	 *  @return speed in meter per second 
 	*/
-	public Double getCurrentSpeed();
+	abstract public Double getCurrentSpeed();
 
 
 	/** get current orientation 
 	 *  @return orientation in degree (0 to 360)
 	 */
-	public Double getCurrentTrack();
+	abstract public Double getCurrentTrack();
 
 }

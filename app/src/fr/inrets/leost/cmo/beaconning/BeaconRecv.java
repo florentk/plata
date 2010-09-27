@@ -53,10 +53,9 @@ public class BeaconRecv extends Thread implements PacketReceiver {
 				
 				
 				//notify the listerners
-				for (Iterator<BeaconRecvListener> i=listerners.iterator();i.hasNext();){
-					BeaconRecvListener l=  i.next();
+				for ( BeaconRecvListener l : listerners )
 					l.cmoStatChanged(cmo);
-				}				
+							
 			}
 				
 		}

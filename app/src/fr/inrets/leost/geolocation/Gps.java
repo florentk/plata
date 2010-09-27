@@ -32,7 +32,7 @@ import org.json.simple.parser.*;
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
  */
-public class Gps  implements Geolocation  {
+public class Gps  extends Geolocation  {
 
 	public static final int DEFAULT_UPDATA_INTERVAL = 250;
 	public static final int GPSD_PORT = 2947;
@@ -190,10 +190,9 @@ public class Gps  implements Geolocation  {
 	 */
 	private void positionChanged(){
 		//call the method positionChanged of each registered listener
-		for (Iterator<GeolocationListener> i=gpsListeners.iterator();i.hasNext();){
-			GeolocationListener l=  i.next();
+		for (GeolocationListener l : gpsListeners)
 			l.positionChanged(getCurrentPos(),getCurrentSpeed(),getCurrentTrack());
-		}
+		
 	}
 	
 	/**
@@ -203,7 +202,7 @@ public class Gps  implements Geolocation  {
 		if (gpsBR == null) return;
 
 		
-		for (;;) {
+		while(true) {
 			// for each line in the buffer
 			try {
 				//reads a line (passive wait) and decodes
@@ -356,9 +355,8 @@ public class Gps  implements Geolocation  {
 
 		});
 		
-		geo.run();
+		geo.start();
 		
-		//new Thread(geo).start();
 		
 	}
 

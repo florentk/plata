@@ -46,9 +46,8 @@ public class GpsMonitor {
       map = new MapWidget(shell, SWT.NONE);
       map.addOverImage( map.new OverImage(0, 0, loadCarImage()) ); 
 
-      Geolocation gps =new Gps();
+      geo =new Gps();
       
-      geo = gps;
       geo.addPositionListener(new GeolocationListener() {
 
     	  public void positionChanged(WGS84 position, Double speed, Double track) {
@@ -66,7 +65,7 @@ public class GpsMonitor {
 
       });
       
-      new Thread(geo).start();
+      geo.start();
 
       shell.open ();
       while (!shell.isDisposed ()) {
