@@ -10,7 +10,7 @@ import jpcap.packet.EthernetPacket;
 
 
 import fr.inrets.leost.cmo.utils.PcapsTool;
-import fr.inrets.leost.cmo.packet.*;
+import fr.inrets.leost.cmo.beaconning.packet.*;
 
 /**
  * 

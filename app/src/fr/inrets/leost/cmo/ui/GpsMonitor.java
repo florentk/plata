@@ -28,8 +28,8 @@ public class GpsMonitor {
 		return new Point(MapWidget.lon2position(position.longitude(), z), MapWidget.lat2position(position.latitude(), z));
 	}
 	
-	public static Image loadCarImage(){
-		return new Image(display, "res/twingo.png");
+	public static Image loadCarImage()  throws ClassNotFoundException {
+		return new Image(display, Class.forName("fr.inrets.leost.cmo.ui.GpsMonitor").getResourceAsStream("resources/twingo.png"));
 	}
 
     public static void main (String [] args) throws Exception {

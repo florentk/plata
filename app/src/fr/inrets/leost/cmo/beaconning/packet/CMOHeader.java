@@ -1,4 +1,4 @@
-package fr.inrets.leost.cmo.packet;
+package fr.inrets.leost.cmo.beaconning.packet;
 
 import fr.inrets.leost.cmo.utils.ByteArrayConvert;
 

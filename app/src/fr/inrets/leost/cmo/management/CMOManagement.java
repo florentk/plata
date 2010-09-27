@@ -8,7 +8,7 @@ import java.util.Collection;
 
 import fr.inrets.leost.cmo.beaconning.BeaconRecv;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
-import fr.inrets.leost.cmo.packet.CMOState;
+import fr.inrets.leost.cmo.beaconning.packet.CMOState;;
 
 /**
  * 
@@ -27,15 +27,15 @@ public class CMOManagement implements BeaconRecvListener {
 	/** interval between two expired entry check (in ms) */
 	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;
 	
-	CMOStateTable table;
+	private CMOTable table;
 	
 
-	private final Collection<CMOStateTableListener> listerners = new ArrayList<CMOStateTableListener>();
+	private final Collection<CMOTableListener> listerners = new ArrayList<CMOTableListener>();
 
 	
 	
 	public CMOManagement(){
-		table = new CMOStateTable();
+		table = new CMOTable();
 		
 		new Timer().schedule(new RemoveExpiredEntry() , 0, CHECK_EXPIRED_ENTRY_INTERVAL);
 	}
@@ -49,18 +49,29 @@ public class CMOManagement implements BeaconRecvListener {
 		if( table.containsKey(newStat.getCmoID()))
 			table.remove(newStat.getCmoID());
 		
-		table.put(newStat.getCmoID(), new CMOStateTableEntry (newStat));
+
+		table.put(newStat.getCmoID(), 
+				new CMOTableEntry(
+						newStat.getCmoID(),
+						newStat.getCmoType(),
+						newStat.getLongitude(),
+						newStat.getLatitude(),
+						newStat.getH(),
+						newStat.getSpeed(),
+						newStat.getTrack(),
+						newStat.getLifetime()
+					));
 
 		//notify the listerners
-		for (Iterator<CMOStateTableListener> i=listerners.iterator();i.hasNext();){
-			CMOStateTableListener l=  i.next();
+		for (Iterator<CMOTableListener> i=listerners.iterator();i.hasNext();){
+			CMOTableListener l=  i.next();
 			l.tableChanged(newStat.getCmoID(),table);
 		}		
 	}
 	
 	public void deleteExpiredEntry(){
-		for(Iterator<CMOStateTableEntry> i = table.values().iterator();i.hasNext();){
-			CMOStateTableEntry entry = i.next();
+		for(Iterator<CMOTableEntry> i = table.values().iterator();i.hasNext();){
+			CMOTableEntry entry = i.next();
 			if(entry.isExpired())
 				i.remove();
 		}
@@ -69,15 +80,15 @@ public class CMOManagement implements BeaconRecvListener {
 	/**
 	 * @return the table
 	 */
-	public CMOStateTable getTable() {
+	public CMOTable getTable() {
 		return table;
 	}	
 	
-	public void addListener(CMOStateTableListener l){
+	public void addListener(CMOTableListener l){
 		listerners.add(l);
 	}
 	
-	public void removeListener(CMOStateTableListener l){
+	public void removeListener(CMOTableListener l){
 		listerners.remove(l);
 	}	
 	
@@ -94,9 +105,9 @@ public class CMOManagement implements BeaconRecvListener {
 		
 		CMOManagement m = new CMOManagement();
 		
-		m.addListener(new CMOStateTableListener() {
+		m.addListener(new CMOTableListener() {
 			@Override
-			public void tableChanged(String cmoId, CMOStateTable table) {
+			public void tableChanged(String cmoId, CMOTable table) {
 				System.out.println(table);
 			}
 		});		

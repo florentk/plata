@@ -1,6 +1,6 @@
 package fr.inrets.leost.cmo.beaconning;
 
-import fr.inrets.leost.cmo.packet.*;
+import fr.inrets.leost.cmo.beaconning.packet.*;
 
 /**
  * 

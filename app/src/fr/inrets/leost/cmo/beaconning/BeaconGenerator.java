@@ -9,7 +9,7 @@ import fr.inrets.leost.geolocation.Geolocation;
 import fr.inrets.leost.geolocation.Gps;
 import fr.inrets.leost.geolocation.WGS84;
 import fr.inrets.leost.cmo.utils.PcapsTool;
-import fr.inrets.leost.cmo.packet.*;
+import fr.inrets.leost.cmo.beaconning.packet.*;
 
 /**
  * 
