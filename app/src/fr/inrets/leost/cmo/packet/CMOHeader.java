@@ -1,4 +1,6 @@
+package fr.inrets.leost.cmo.packet;
 
+import fr.inrets.leost.cmo.utils.ByteArrayConvert;
 
 /**
  * Packet for exchange between Communicating Mobile Object (CMO)
@@ -65,11 +67,11 @@ public class CMOHeader {
 	public CMOHeader(byte[] data){
 		int i=0;
 		
-		hopCount = ByteArrayConvertTool.toByte(ByteArrayConvertTool.memcpy(data, i, 1));i+=1;
-		seq = ByteArrayConvertTool.toInt(ByteArrayConvertTool.memcpy(data, i, 4));i+=4;
-		lifetime = ByteArrayConvertTool.toInt(ByteArrayConvertTool.memcpy(data, i, 4));i+=4;	
-		cmoID = ByteArrayConvertTool.toCharA(ByteArrayConvertTool.memcpy(data, i, CMO_IDENTITY_LENGHT));i+=CMO_IDENTITY_LENGHT;
-		cmoType = ByteArrayConvertTool.toShort(ByteArrayConvertTool.memcpy(data, i, 2));i+=2;		
+		hopCount = ByteArrayConvert.toByte(ByteArrayConvert.memcpy(data, i, 1));i+=1;
+		seq = ByteArrayConvert.toInt(ByteArrayConvert.memcpy(data, i, 4));i+=4;
+		lifetime = ByteArrayConvert.toInt(ByteArrayConvert.memcpy(data, i, 4));i+=4;	
+		cmoID = ByteArrayConvert.toCharA(ByteArrayConvert.memcpy(data, i, CMO_IDENTITY_LENGHT));i+=CMO_IDENTITY_LENGHT;
+		cmoType = ByteArrayConvert.toShort(ByteArrayConvert.memcpy(data, i, 2));i+=2;		
 
 	}
 	
@@ -143,11 +145,11 @@ public class CMOHeader {
 	public byte[] toByteArray(){
 		byte b[];
 		
-		b = ByteArrayConvertTool.toByta(getHopCount());
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getSeq()));
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getLifetime()));
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getCmoID()));
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getCmoType()));
+		b = ByteArrayConvert.toByta(getHopCount());
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getSeq()));
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getLifetime()));
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getCmoID()));
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getCmoType()));
 		
 		return b;
 	}	

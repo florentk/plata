@@ -1,3 +1,5 @@
+package fr.inrets.leost.cmo.management;
+
 import java.util.HashMap;
 
 

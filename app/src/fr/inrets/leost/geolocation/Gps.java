@@ -1,4 +1,4 @@
-
+package fr.inrets.leost.geolocation;
 
 
 import java.net.Socket;
@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Map;
 import java.util.Collection;
 import java.util.ArrayList;

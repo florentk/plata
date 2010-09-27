@@ -1,3 +1,6 @@
+package fr.inrets.leost.cmo.packet;
+
+import fr.inrets.leost.cmo.utils.ByteArrayConvert;
 
 public final class CMOState extends CMOHeader{
 
@@ -39,11 +42,11 @@ public final class CMOState extends CMOHeader{
 		super(data);
 		int i=CMO_HEADER_LENGTH;
 		
-		longitude = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
-		latitude = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
-		h = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
-		speed = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
-		track = new Float(ByteArrayConvertTool.toFloat(ByteArrayConvertTool.memcpy(data, i, 4)));i+=4;
+		longitude = new Float(ByteArrayConvert.toFloat(ByteArrayConvert.memcpy(data, i, 4)));i+=4;
+		latitude = new Float(ByteArrayConvert.toFloat(ByteArrayConvert.memcpy(data, i, 4)));i+=4;
+		h = new Float(ByteArrayConvert.toFloat(ByteArrayConvert.memcpy(data, i, 4)));i+=4;
+		speed = new Float(ByteArrayConvert.toFloat(ByteArrayConvert.memcpy(data, i, 4)));i+=4;
+		track = new Float(ByteArrayConvert.toFloat(ByteArrayConvert.memcpy(data, i, 4)));i+=4;
 		
 		
 	}
@@ -89,11 +92,11 @@ public final class CMOState extends CMOHeader{
 		byte b[];
 		
 		b = super.toByteArray();
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getLongitude().floatValue()));		
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getLatitude().floatValue()));
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getH().floatValue()));
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getSpeed().floatValue()));
-		b = ByteArrayConvertTool.concat(b, ByteArrayConvertTool.toByta(getTrack().floatValue()));
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getLongitude().floatValue()));		
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getLatitude().floatValue()));
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getH().floatValue()));
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getSpeed().floatValue()));
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getTrack().floatValue()));
 
 		
 		return b;

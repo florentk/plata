@@ -1,3 +1,4 @@
+package fr.inrets.leost.cmo.beaconning;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,6 +7,10 @@ import java.util.Iterator;
 import jpcap.*;
 import jpcap.packet.Packet;
 import jpcap.packet.EthernetPacket;
+
+
+import fr.inrets.leost.cmo.utils.PcapsTool;
+import fr.inrets.leost.cmo.packet.*;
 
 /**
  * 
@@ -19,7 +24,7 @@ public class BeaconRecv extends Thread implements PacketReceiver {
 	
 	JpcapCaptor jpcap;
 	
-	private final Collection<CMOStateListener> listerners = new ArrayList<CMOStateListener>();
+	private final Collection<BeaconRecvListener> listerners = new ArrayList<BeaconRecvListener>();
 	
 
 	public BeaconRecv(JpcapCaptor jpcap){
@@ -27,11 +32,11 @@ public class BeaconRecv extends Thread implements PacketReceiver {
 	}
 	
 	
-	public void addListener(CMOStateListener l){
+	public void addListener(BeaconRecvListener l){
 		listerners.add(l);
 	}
 	
-	public void removeListener(CMOStateListener l){
+	public void removeListener(BeaconRecvListener l){
 		listerners.remove(l);
 	}
 	
@@ -48,8 +53,8 @@ public class BeaconRecv extends Thread implements PacketReceiver {
 				
 				
 				//notify the listerners
-				for (Iterator<CMOStateListener> i=listerners.iterator();i.hasNext();){
-					CMOStateListener l=  i.next();
+				for (Iterator<BeaconRecvListener> i=listerners.iterator();i.hasNext();){
+					BeaconRecvListener l=  i.next();
 					l.cmoStatChanged(cmo);
 				}				
 			}
@@ -110,8 +115,8 @@ public class BeaconRecv extends Thread implements PacketReceiver {
 	 * Unit testing
 	 */
 
-	private static CMOStateListener createPrintListener(){
-		return new CMOStateListener() {
+	private static BeaconRecvListener createPrintListener(){
+		return new BeaconRecvListener() {
 
 			public void cmoStatChanged(CMOState stat) {
 				System.out.println(stat);

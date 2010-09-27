@@ -1,4 +1,4 @@
-
+package fr.inrets.leost.geolocation;
 
 /**
  * Geolocation system interface <br><br>

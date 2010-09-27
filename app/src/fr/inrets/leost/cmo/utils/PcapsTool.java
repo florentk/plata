@@ -1,3 +1,5 @@
+package fr.inrets.leost.cmo.utils;
+
 import jpcap.JpcapCaptor;
 import jpcap.NetworkInterface;
 

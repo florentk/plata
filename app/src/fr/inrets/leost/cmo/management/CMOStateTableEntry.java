@@ -1,5 +1,8 @@
+package fr.inrets.leost.cmo.management;
 
 import java.util.Date;
+
+import fr.inrets.leost.cmo.packet.CMOState;
 
 public class CMOStateTableEntry {
 	private CMOState state;

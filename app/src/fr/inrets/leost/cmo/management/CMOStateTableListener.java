@@ -1,3 +1,4 @@
+package fr.inrets.leost.cmo.management;
 
 public interface CMOStateTableListener {
 	/**

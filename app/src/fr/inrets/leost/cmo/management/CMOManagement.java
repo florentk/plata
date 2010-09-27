@@ -1,9 +1,14 @@
+package fr.inrets.leost.cmo.management;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TimerTask;
 import java.util.Timer;
 import java.util.Collection;
 
+import fr.inrets.leost.cmo.beaconning.BeaconRecv;
+import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
+import fr.inrets.leost.cmo.packet.CMOState;
 
 /**
  * 
@@ -17,9 +22,9 @@ import java.util.Collection;
  * @author Florent Kaisser <florent.kaisser@free.fr>
  *
  */
-public class CMOManagement implements CMOStateListener {
+public class CMOManagement implements BeaconRecvListener {
 
-	/** interval betwwen two expired entry check (in ms) */
+	/** interval between two expired entry check (in ms) */
 	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;
 	
 	CMOStateTable table;

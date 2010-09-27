@@ -1,0 +1,5 @@
+jdk >= 5
+org.eclipse.swt
+org.json.simple
+jpcap
+

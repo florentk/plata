@@ -1,3 +1,5 @@
+package fr.inrets.leost.geolocation;
+
 /**
  * The WGS84 international system is a geographic coordinate system
  * that is used by GPS and coverts the whole earth. It is used as

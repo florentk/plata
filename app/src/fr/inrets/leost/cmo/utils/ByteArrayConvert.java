@@ -1,9 +1,10 @@
+package fr.inrets.leost.cmo.utils;
 
 /**
  * Source:  http://www.daniweb.com/code/snippet216874.html
  *
  */
-public final class ByteArrayConvertTool {
+public final class ByteArrayConvert {
 
 	/* ========================= */
 	/* "primitive type --> byte[] data" Methods */

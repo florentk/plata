@@ -1,3 +1,4 @@
+package fr.inrets.leost.geolocation;
 
 /**
  * Listener for receive a event when the geographical position change 
