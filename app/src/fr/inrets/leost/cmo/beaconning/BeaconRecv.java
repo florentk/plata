@@ -2,7 +2,6 @@ package fr.inrets.leost.cmo.beaconning;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import jpcap.*;
 import jpcap.packet.Packet;

@@ -91,17 +91,17 @@ public class CMOManagement implements BeaconRecvListener {
 		
 		for ( CMOTableEntry e : table.values() ){
 			
-			if ( inSameDirection(track, e.getTrack()) ){
+			//if ( inSameDirection(track, e.getTrack()) ){
 			
 				dx = (lg -  e.getLongitude().doubleValue());
 				dy = (lt -  e.getLatitude().doubleValue());
-				dist = (float) Math.sqrt(  dx*dx + dy*dy  );		
+				dist = (float) Math.sqrt(  dx*dx + dy*dy  );
 	
 				if(closest == null || closestDist.compareTo( dist ) > 0 ){
 					closest = e;
 					closestDist = dist;
 				}
-			}
+			//}
 		}
 		
 		
