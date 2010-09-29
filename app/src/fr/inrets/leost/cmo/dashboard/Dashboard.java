@@ -77,7 +77,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 
 	static final Dashboard db = new Dashboard();
 	public static void main(String[] args) throws IOException,InterruptedException {
-		Geolocation geo = new Gps();
+		Geolocation geo = new Fixe(new WGS84(3.0,50.0),1.0,0.0);
 		BeaconRecvFake recv = new BeaconRecvFake();
 		recv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "GR-487-AZ",CMOHeader.CMO_TYPE_CAR ),

@@ -79,29 +79,36 @@ public class CMOManagement implements BeaconRecvListener {
 		}
 	}
 	
-	private boolean inSameDirection(Double track1, Double track2){
-		return Math.abs( track1.floatValue() - track2.floatValue() ) < MAX_ANGLE_SAME_DIRECTION;
+	static public boolean inSameDirection(double track1, double track2){
+		return Double(Math.abs( track1 - track2 )).compareTo(MAX_ANGLE_SAME_DIRECTION) < 0;
+	}
+
+	static public boolean inFront(double dx, double dy, double track){
+		return dx*Math.cos(track) + dy*Math.sin(track) > 0.0;
 	}
 	
 	public CMOTableEntry closestCMOInFront(Double longitude, Double latitude, Double track){
 		CMOTableEntry closest=null;
 		Double closestDist= null;
-		double lg=longitude.doubleValue(),lt=latitude.doubleValue();
+		double lg=longitude.doubleValue(),lt=latitude.doubleValue(),t=track.doubleValue();
 		double  dx,dy,dist;
 		
 		for ( CMOTableEntry e : table.values() ){
 			
-			//if ( inSameDirection(track, e.getTrack()) ){
+			if ( inSameDirection(t, e.getTrack().floatValue()) ){
 			
-				dx = (lg -  e.getLongitude().doubleValue());
-				dy = (lt -  e.getLatitude().doubleValue());
-				dist = (float) Math.sqrt(  dx*dx + dy*dy  );
+				dx = (e.getLongitude().doubleValue() - lt);
+				dy = (e.getLatitude().doubleValue() - lg);
+
+				if(inFront(dx,dy,t))
+					dist = (float) Math.sqrt(  dx*dx + dy*dy  );
 	
-				if(closest == null || closestDist.compareTo( dist ) > 0 ){
-					closest = e;
-					closestDist = dist;
+					if(closest == null || closestDist.compareTo( dist ) > 0 ){
+						closest = e;
+						closestDist = dist;
+					}
 				}
-			//}
+			}
 		}
 		
 		
