@@ -8,6 +8,9 @@ package fr.inrets.leost.geolocation;
  * @author Johan Montagnat <johan@creatis.insa-lyon.fr>
  */
 public class WGS84 {
+	
+	public static final double a=6378137;
+	
 	/**
 	 * longitude (in ddmm.mmmm)
 	 */
@@ -67,7 +70,7 @@ public class WGS84 {
 	}
 	
 	public String toString(){
-		return String.format("%01.6f %01.6f %01.6f m", longitude, latitude, h);
+		return String.format("%01.6f %01.6f %01.1f m", longitude, latitude, h);
 	}
 	
 	public boolean equals(WGS84 a, WGS84 b){

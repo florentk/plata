@@ -33,29 +33,13 @@ import org.json.simple.parser.*;
  */
 public class Gps  extends Geolocation  {
 
-	public static final int DEFAULT_UPDATA_INTERVAL = 250;
+
 	public static final int GPSD_PORT = 2947;
 	
-	/** interval (in ms) between two gpsd request*/
-	private int updateInterval;
 
 	/** reader buffer for read the data from gpsd*/
 	private BufferedReader gpsBR;
 	
-	/** current position in WGC84 format */
-	private WGS84 currentPos;
-	
-	/** current speed in meter per second */
-	private Double currentSpeed;
-	
-	/** current orientation in degree (0 to 360) */
-	private Double currentTrack;
-	
-
-	/** collection of listener for receive a event on position changing*/
-	private final Collection<GeolocationListener> gpsListeners = new ArrayList<GeolocationListener>();
-
-
 	/**
 	 * 
 	 * configure gpsd session in json data format
@@ -142,23 +126,15 @@ public class Gps  extends Geolocation  {
 		return null;
 	}
 	
-
-	/**
-	 * Connect to gpsd in localhost with 2947  port
-	 * @throws IOException
-	 */
-	public Gps() throws IOException {
+	public Gps()  throws IOException{
+		super();
+		
 		//connection to gpsd
 		connectGPS();
-		
-		//init the variable
-		setUpdateInterval(DEFAULT_UPDATA_INTERVAL);
-		setCurrentPos(new WGS84());
-		setCurrentSpeed(0.0);
-		setCurrentTrack(0.0);		
 
 	}
-	
+
+
 
 	
 
@@ -184,15 +160,7 @@ public class Gps  extends Geolocation  {
 
 	}
 	
-	/**
-	 * must be call when the current position change
-	 */
-	private void positionChanged(){
-		//call the method positionChanged of each registered listener
-		for (GeolocationListener l : gpsListeners)
-			l.positionChanged(getCurrentPos(),getCurrentSpeed(),getCurrentTrack());
-		
-	}
+
 	
 	/**
 	 * read a line from gpsd and decode the data
@@ -227,86 +195,6 @@ public class Gps  extends Geolocation  {
 		
 	}
 
-	/**
-	 * get the interval update value of position 
-	 * @return interval in ms
-	 */
-	public int getUpdateInterval() {
-		return updateInterval;
-	}
-
-	/**
-	 * set the interval update value of position  
-	 * @param updateInterval interval in ms
-	 */
-	public void setUpdateInterval(int updateInterval) {
-		this.updateInterval = updateInterval;
-	}  
-	
-	/**
-	 * get the current position
-	 * @return the current position in WGS84 format
-	 */
-	public WGS84 getCurrentPos() {
-		return currentPos;
-	}
-
-	/**
-	 * set the current position
-	 * @param currentPos the current position in WGS84 format
-	 */
-	private void setCurrentPos(WGS84 currentPos) {
-		this.currentPos = currentPos;
-		positionChanged();
-	}	
-	
-	/**
-	 * register a new listener
-	 * @param l
-	 */
-	public void addPositionListener(GeolocationListener l){
-		gpsListeners.add(l);
-	}
-	
-	/**
-	 * remove a registered listener
-	 * @param l
-	 */
-	public void removePositionListener(GeolocationListener l){
-		gpsListeners.remove(l);
-	}
-	
-	
-	/**
-	 *  get current speed 
-	 *  @return speed in meter per second 
-	*/
-	public Double getCurrentSpeed() {
-		return currentSpeed;
-	}
-
-	/**
-	 *  set current speed 
-	 *  @param currentSpeed in meter per second 
-	*/	
-	private void setCurrentSpeed(Double currentSpeed) {
-		this.currentSpeed = currentSpeed;
-	}
-
-	/** get current orientation 
-	 *  @return orientation in degree (0 to 360)
-	 */
-	public Double getCurrentTrack() {
-		return currentTrack;
-	}
-
-	/** set current orientation
-	 *  @param currentTrack orientation in degree (0 to 360) 
-	*/
-	private void setCurrentTrack(Double currentTrack) {
-		this.currentTrack = currentTrack;
-	}	
-	
 	
 	
 	/**

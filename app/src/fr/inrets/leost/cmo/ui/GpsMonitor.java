@@ -32,46 +32,54 @@ public class GpsMonitor {
 		return new Image(display, Class.forName("fr.inrets.leost.cmo.ui.GpsMonitor").getResourceAsStream("resources/twingo.png"));
 	}
 
+	public static void gpsGUI(Geolocation g){
+	    
+	      display = new Display ();
+	      Shell shell = new Shell(display);
+	      shell.setText("GPS Monitor");
+	      shell.setSize(600, 710);
+	      shell.setLocation(10, 10);
+	      shell.setLayout (new FillLayout());
+	      
+	      
+	      map = new MapWidget(shell, SWT.NONE);
+	      
+	      try{
+	    	  map.addOverImage( map.new OverImage(0, 0, loadCarImage()) );
+	      }catch (ClassNotFoundException e){}
+
+	      geo =g;
+	      
+	      geo.addPositionListener(new GeolocationListener() {
+
+	    	  public void positionChanged(WGS84 position, Double speed, Double track) {
+	    		  display.syncExec(
+					  new Runnable(){
+					      public void run(){
+					    	  map.setCenterPosition( WGS84toPoint(geo.getCurrentPos(), map.getZoom()) );
+					    	  //map.setCenterPosition(new Point(45,78));
+					    	  map.redraw();
+					      }
+					    }  
+	    		  );
+	    		 
+	    	  }
+
+	      });
+	      
+
+
+	      shell.open ();
+	      while (!shell.isDisposed ()) {
+	          if (!display.readAndDispatch ()) display.sleep ();
+	      }
+	      display.dispose ();		
+	}
+	
     public static void main (String [] args) throws Exception {
-
-      
-      display = new Display ();
-      Shell shell = new Shell(display);
-      shell.setText("GPS Monitor");
-      shell.setSize(600, 710);
-      shell.setLocation(10, 10);
-      shell.setLayout (new FillLayout());
-      
-      
-      map = new MapWidget(shell, SWT.NONE);
-      map.addOverImage( map.new OverImage(0, 0, loadCarImage()) ); 
-
-      geo =new Gps();
-      
-      geo.addPositionListener(new GeolocationListener() {
-
-    	  public void positionChanged(WGS84 position, Double speed, Double track) {
-    		  display.syncExec(
-				  new Runnable(){
-				      public void run(){
-				    	  map.setCenterPosition( WGS84toPoint(geo.getCurrentPos(), map.getZoom()) );
-				    	  //map.setCenterPosition(new Point(45,78));
-				    	  map.redraw();
-				      }
-				    }  
-    		  );
-    		 
-    	  }
-
-      });
-      
-      geo.start();
-
-      shell.open ();
-      while (!shell.isDisposed ()) {
-          if (!display.readAndDispatch ()) display.sleep ();
-      }
-      display.dispose ();
+    	Gps gps = new Gps();
+	     gps.start();
+    	gpsGUI(gps);
       
       
   }

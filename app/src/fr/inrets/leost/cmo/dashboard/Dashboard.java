@@ -12,6 +12,7 @@ import fr.inrets.leost.cmo.beaconning.packet.CMOState;
 import fr.inrets.leost.cmo.management.CMOManagement;
 import fr.inrets.leost.cmo.management.CMOTable;
 import fr.inrets.leost.cmo.management.CMOTableListener;
+import fr.inrets.leost.cmo.ui.GpsMonitor;
 import fr.inrets.leost.geolocation.*;
 
 
@@ -77,23 +78,25 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 
 	static final Dashboard db = new Dashboard();
 	public static void main(String[] args) throws IOException,InterruptedException {
-		Geolocation geo = new Fixe(new WGS84(3.0,50.0),1.0,0.0);
+		//Geolocation geo = new Fixe(new WGS84(),1.0,45.0);
+		Geolocation geo = new Gps();
 		BeaconRecvFake recv = new BeaconRecvFake();
-		recv.addFixedCMO(new CMOState(
-				new CMOHeader((byte)100, 0, 5000, "GR-487-AZ",CMOHeader.CMO_TYPE_CAR ),
-				3.1383562088f,
-				50.6111869812f,
-				0.0f,
-				1.0f,
-				56.0f));
 		
 		recv.addFixedCMO(new CMOState(
+				new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
+				3.12892007828f,
+				50.6190795898f,
+				0.0f,
+				1.0f,
+				0.0f));
+
+		/*recv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),
 				3.12586784363f,
 				50.6021995544f,
 				0.0f,
 				1.0f,
-				56.0f));
+				0.0f));*/
 				
 		
 		CMOManagement cmoMgt = new CMOManagement();
@@ -110,8 +113,8 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		//create the indicator of the dashboard
 		db.addIndicator( new Speed(geo));
 		db.addIndicator( new Position(geo));		
-		db.addIndicator( new ClosestCMO(geo,cmoMgt));	
-		
+		db.addIndicator( new Track(geo));	
+		db.addIndicator( new ClosestCMO(geo,cmoMgt));		
 		
 		//event when dashboard updated
 		db.addListener(new DashboardListener() {
@@ -126,6 +129,8 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		
 		//start the geolocation system 
 		geo.start();
+		
+		GpsMonitor.gpsGUI(geo);
 		
 		//wait the end
 		geo.join();recv.join();		

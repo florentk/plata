@@ -8,7 +8,8 @@ import java.util.Collection;
 
 import fr.inrets.leost.cmo.beaconning.BeaconRecv;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
-import fr.inrets.leost.cmo.beaconning.packet.CMOState;;
+import fr.inrets.leost.cmo.beaconning.packet.CMOState;
+import fr.inrets.leost.cmo.utils.Physics;
 
 /**
  * 
@@ -23,8 +24,6 @@ import fr.inrets.leost.cmo.beaconning.packet.CMOState;;
  *
  */
 public class CMOManagement implements BeaconRecvListener {
-	
-	public static final float MAX_ANGLE_SAME_DIRECTION = 90f; 
 
 	/** interval between two expired entry check (in ms) */
 	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;
@@ -79,13 +78,7 @@ public class CMOManagement implements BeaconRecvListener {
 		}
 	}
 	
-	static public boolean inSameDirection(double track1, double track2){
-		return Double(Math.abs( track1 - track2 )).compareTo(MAX_ANGLE_SAME_DIRECTION) < 0;
-	}
 
-	static public boolean inFront(double dx, double dy, double track){
-		return dx*Math.cos(track) + dy*Math.sin(track) > 0.0;
-	}
 	
 	public CMOTableEntry closestCMOInFront(Double longitude, Double latitude, Double track){
 		CMOTableEntry closest=null;
@@ -95,12 +88,12 @@ public class CMOManagement implements BeaconRecvListener {
 		
 		for ( CMOTableEntry e : table.values() ){
 			
-			if ( inSameDirection(t, e.getTrack().floatValue()) ){
+			if ( Physics.inSameDirection(t, e.getTrack().floatValue()) ){
 			
 				dx = (e.getLongitude().doubleValue() - lt);
 				dy = (e.getLatitude().doubleValue() - lg);
 
-				if(inFront(dx,dy,t))
+				if(Physics.inFront(dx,dy,t)){
 					dist = (float) Math.sqrt(  dx*dx + dy*dy  );
 	
 					if(closest == null || closestDist.compareTo( dist ) > 0 ){
