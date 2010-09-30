@@ -8,6 +8,10 @@ import fr.inrets.leost.geolocation.WGS84;
 
 public class ClosestCMO extends Indicator {
 
+	public static final int DECISION_NONE = 0;
+	public static final int DECISION_WARNING = 1;	
+	public static final int DECISION_HAZARD = 2;		
+	
 	private CMOManagement cmo;
 	private Geolocation geo;
 	
@@ -16,11 +20,8 @@ public class ClosestCMO extends Indicator {
 	
 	private double bDistance;
 	private double sDistance;
-	private String cmt="None";
-	
-
-	
-	
+	private int decision=DECISION_NONE;
+		
 	public ClosestCMO(Geolocation geo,CMOManagement cmo) {
 		this.cmo=cmo;
 		this.geo=geo;
@@ -42,11 +43,11 @@ public class ClosestCMO extends Indicator {
 
 			
 			if(distance < sDistance)
-				cmt = "Warning";
+				decision = DECISION_WARNING;
 			else if(distance < sDistance)
-				cmt = "Hazard";	
+				decision = DECISION_HAZARD;	
 			else 
-				cmt = "None";
+				decision = DECISION_NONE;
 				
 		}
 	}
@@ -57,13 +58,57 @@ public class ClosestCMO extends Indicator {
 		return (double) Math.sqrt(  dx*dx + dy*dy  ) * ((Math.PI * WGS84.a / 180.0)) ;			
 	}
 	
+	/**
+	 * @return the closestCMO
+	 */
+	public CMOTableEntry getClosestCMO() {
+		return closestCMO;
+	}
+
+	/**
+	 * @return the distance
+	 */
+	public double getDistance() {
+		return distance;
+	}
+
+	/**
+	 * @return the bDistance
+	 */
+	public double getBakingDistance() {
+		return bDistance;
+	}
+
+	/**
+	 * @return the sDistance
+	 */
+	public double getStoppingDistance() {
+		return sDistance;
+	}
+	
+	/**
+	 * @return the decision
+	 */
+	public int getDecision() {
+		return decision;
+	}
+	
+	public static String decisionToString(int decesion){
+		switch(decesion){
+		case DECISION_WARNING : return "Waring";
+		case DECISION_HAZARD : return "Hazard";
+		}
+		
+		return "None";
+	}
+
 	public String toString(){
 		String s="";
 
 		s+=String.format("Braking distance : %01.1f m Stopping distance : %01.1f m\n", bDistance, sDistance);
 		if(closestCMO != null){
-			s+=String.format("Closet CMO (%d) at %01.1f m : %s \n", closestCMO.getCmoType(),distance, closestCMO.getCmoID() ); 
-			s+=String.format("Comment : %s\n", cmt);
+			s+=String.format("Closest CMO (%d) at %01.1f m : %s \n", closestCMO.getCmoType(),distance, closestCMO.getCmoID() ); 
+			s+=String.format("Comment : %s\n", decisionToString(decision));
 		}
 
 		return s;
