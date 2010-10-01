@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import jpcap.JpcapCaptor;
+
 
 import fr.inrets.leost.cmo.beaconning.BeaconRecv;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
@@ -80,15 +82,15 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 	public static void main(String[] args) throws IOException,InterruptedException {
 		//Geolocation geo = new Fixe(new WGS84(),1.0,45.0);
 		Geolocation geo = new Gps();
-		BeaconRecvFake recv = new BeaconRecvFake();
+		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(args[0]);
 		
-		recv.addFixedCMO(new CMOState(
+		/*recv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
 				3.12892007828f,
 				50.6190795898f,
 				0.0f,
 				1.0f,
-				0.0f));
+				0.0f));*/
 
 		/*recv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),

@@ -53,6 +53,7 @@
     </target>
     <target name="Dashboard">
         <java classname="fr.inrets.leost.cmo.dashboard.Dashboard" failonerror="true" fork="yes">
+            <arg line="wlan1"/>
             <classpath refid="app.classpath"/>
         </java>
     </target>
