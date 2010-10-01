@@ -18,7 +18,7 @@ import fr.inrets.leost.cmo.beaconning.packet.*;
  *                    CMO config ----
  *                                  |
  *                                 \|/
- * Geolocation (GPS) --------> BeaconGenerator ----|CMOStatePacket|----> JPcap (row ethernet)
+ * Geolocation (GPS) --------> BeaconGenerator ----|CMOState|----> JPcap (row ethernet)
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
  *
@@ -30,6 +30,12 @@ public class BeaconGenerator extends Thread{
 	/** beacon lifetime in number of interval value
 	 *  between each beacon*/
 	public static final int BEACON_LIFETIME = 4;
+	
+	
+	/**
+	 * Value for initialize the TTL (number of hop maximum)
+	 */
+	public static final byte TTL_INIT = 16;
 	
 	
 	private static int seq=0;
@@ -72,7 +78,7 @@ public class BeaconGenerator extends Thread{
 		
 		Packet p = new Packet();
 
-		CMOHeader cmo_header = new CMOHeader((byte)0, seq++, beaconFreq * BEACON_LIFETIME, id, type);
+		CMOHeader cmo_header = new CMOHeader((byte)TTL_INIT, seq++, beaconFreq * BEACON_LIFETIME, id, type);
 		
 		CMOState cmo_stat = new CMOState (cmo_header,longitude, latitude, h, speed, track);
 		

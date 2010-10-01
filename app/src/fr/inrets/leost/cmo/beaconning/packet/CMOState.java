@@ -25,11 +25,10 @@ public final class CMOState extends CMOHeader{
 	/** orientation in degree (0 to 360) */
 	private Float track;	
 	
-	CMOHeader cmo;
 
 	public CMOState(CMOHeader cmo,Float longitude, Float latitude, Float h, Float speed,
 			Float track) {
-		super(cmo.getHopCount(), cmo.getSeq(), cmo.getLifetime(), cmo.getCmoID(),
+		super(cmo.getTTL(), cmo.getSeq(), cmo.getLifetime(), cmo.getCmoID(),
 				cmo.getCmoType());
 		this.longitude = longitude;
 		this.latitude = latitude;

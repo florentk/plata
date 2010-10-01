@@ -30,8 +30,8 @@ public class CMOHeader {
 	
 	
 	
-	/** number of hop */
-	private byte hopCount;
+	/** Time To Leave */
+	private byte ttl;
 	
 	/** sequence number */
 	private int seq;
@@ -47,9 +47,9 @@ public class CMOHeader {
 	
 
 
-	public CMOHeader(byte hopCount, int seq, int lifetime, String cmoID,
+	public CMOHeader(byte ttl, int seq, int lifetime, String cmoID,
 			short cmoType) {
-		this.hopCount = hopCount;
+		this.ttl = ttl;
 		this.seq = seq;
 		this.lifetime = lifetime;
 		
@@ -67,7 +67,7 @@ public class CMOHeader {
 	public CMOHeader(byte[] data){
 		int i=0;
 		
-		hopCount = ByteArrayConvert.toByte(ByteArrayConvert.memcpy(data, i, 1));i+=1;
+		ttl = ByteArrayConvert.toByte(ByteArrayConvert.memcpy(data, i, 1));i+=1;
 		seq = ByteArrayConvert.toInt(ByteArrayConvert.memcpy(data, i, 4));i+=4;
 		lifetime = ByteArrayConvert.toInt(ByteArrayConvert.memcpy(data, i, 4));i+=4;	
 		cmoID = ByteArrayConvert.toCharA(ByteArrayConvert.memcpy(data, i, CMO_IDENTITY_LENGHT));i+=CMO_IDENTITY_LENGHT;
@@ -108,10 +108,10 @@ public class CMOHeader {
 	}
 
 	/**
-	 * @return the hopCount
+	 * @return the TTL
 	 */
-	public byte getHopCount() {
-		return hopCount;
+	public byte getTTL() {
+		return ttl;
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class CMOHeader {
 	public byte[] toByteArray(){
 		byte b[];
 		
-		b = ByteArrayConvert.toByta(getHopCount());
+		b = ByteArrayConvert.toByta(getTTL());
 		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getSeq()));
 		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getLifetime()));
 		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getCmoID()));
@@ -157,7 +157,7 @@ public class CMOHeader {
 	public String toString(){
 		String s="";
 		
-		s+="HopCount : "+getHopCount()+"\n";
+		s+="TTL : "+getTTL()+"\n";
 		s+="Sequence number : "+getSeq()+"\n";
 		s+="Lifetime : "+getLifetime()+"\n";
 		s+="Identity : "+getCmoID()+"\n";
