@@ -53,7 +53,7 @@
     </target>
     <target name="Dashboard">
         <java classname="fr.inrets.leost.cmo.dashboard.Dashboard" failonerror="true" fork="yes">
-            <arg line="wlan1"/>
+            <arg line="wlan0"/>
             <classpath refid="app.classpath"/>
         </java>
     </target>
@@ -70,7 +70,13 @@
     </target>
     <target name="CMOManagement">
         <java classname="fr.inrets.leost.cmo.management.CMOManagement" failonerror="true" fork="yes">
-            <arg line="wlan1"/>
+            <arg line="wlan0"/>
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
+    <target name="BeaconForward">
+        <java classname="fr.inrets.leost.cmo.beaconning.BeaconForward" failonerror="true" fork="yes">
+            <arg line="wlan0"/>
             <classpath refid="app.classpath"/>
         </java>
     </target>

@@ -73,12 +73,12 @@ public class BeaconGenerator extends Thread{
 		this(sender, loc, id, type, BEACON_FREQ_DEFAULT);
 	}
 	
-	private Packet createCMOStatPacket(Float longitude, Float latitude, Float h, Float speed,
+	public static  Packet createCMOStatPacket(byte ttl, int seq, int lifetime, String cmoID,
+			short cmoType,Float longitude, Float latitude, Float h, Float speed,
 			Float track){
-		
 		Packet p = new Packet();
 
-		CMOHeader cmo_header = new CMOHeader((byte)TTL_INIT, seq++, beaconFreq * BEACON_LIFETIME, id, type);
+		CMOHeader cmo_header = new CMOHeader(ttl, seq,lifetime, cmoID, cmoType);
 		
 		CMOState cmo_stat = new CMOState (cmo_header,longitude, latitude, h, speed, track);
 		
@@ -92,7 +92,12 @@ public class BeaconGenerator extends Thread{
 		p.datalink = ether;
 		p.data = cmo_stat.toByteArray();
 		
-		return p;
+		return p;		
+	}
+	
+	private Packet createCMOStatPacket(Float longitude, Float latitude, Float h, Float speed,
+			Float track){
+		return createCMOStatPacket((byte)TTL_INIT, seq++, beaconFreq * BEACON_LIFETIME, id, type,longitude, latitude, h, speed, track );
 	}
 	
 	
