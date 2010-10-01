@@ -68,4 +68,10 @@
             <classpath refid="app.classpath"/>
         </java>
     </target>
+    <target name="CMOManagement">
+        <java classname="fr.inrets.leost.cmo.management.CMOManagement" failonerror="true" fork="yes">
+            <arg line="wlan1"/>
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
 </project>
