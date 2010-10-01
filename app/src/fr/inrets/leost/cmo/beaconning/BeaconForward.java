@@ -186,6 +186,7 @@ public class BeaconForward implements BeaconRecvListener {
 	    if(device==null){
 	    	System.out.println("The interface " + strDevice + " doesn't exist");
 	    	PcapsTool.printDevice();
+	    	return;
 	    }
 		
 	    try{

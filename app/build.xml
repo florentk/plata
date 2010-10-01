@@ -80,4 +80,10 @@
             <classpath refid="app.classpath"/>
         </java>
     </target>
+    <target name="BeaconRecv">
+        <java classname="fr.inrets.leost.cmo.beaconning.BeaconRecv" failonerror="true" fork="yes">
+            <arg line="-i wlan0"/>
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
 </project>
