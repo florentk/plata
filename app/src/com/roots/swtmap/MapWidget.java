@@ -222,25 +222,113 @@ public class MapWidget extends Canvas {
         }
     }
     
-    public final class OverImage{
-    	private int dx, dy;
+    public final class MapWidgetOverlayImage extends MapWidgetOverlay{
+
     	private Image img;
-		public OverImage(int dx, int dy, Image img) {
-			this.dx = dx;
-			this.dy = dy;
-			this.img = img;
-		}
-		public int getDx() {
-			return dx;
-		}
-		public int getDy() {
-			return dy;
-		}
+
 		public Image getImg() {
 			return img;
 		}
-    	
 
+		public MapWidgetOverlayImage(double dx, double dy, int reference,Image img) {
+			super(dx, dy, reference, img);
+			this.img = img;
+		}
+
+		/**(non-Javadoc)
+		 * @see com.roots.swtmap.MapWidget.MapWidgetOverlay#drawOverlay(org.eclipse.swt.graphics.GC, java.lang.Object, int, int)
+		 */
+		@Override
+		void drawOverlay(GC gc, Object overlay, int x, int y) {
+			Image img = (Image)overlay;
+			gc.drawImage(img, x -  img.getBounds().width / 2, y - img.getBounds().height / 2);
+		}
+		
+		
+    }
+    
+    /**
+     * abstract class for add a overlay on the map
+     * The  drawOverlay method is call for paint 
+     * the overlay.
+     * @author florent
+     *
+     */
+    public abstract class MapWidgetOverlay{
+    	
+    	public final static int REFERENCE_CENTER_WIDGET = 0;
+    	public final static int REFERENCE_WIDGET = 1;    
+    	public final static int REFERENCE_WORLD = 2;        	
+    	
+    	private double dx, dy;
+    	private int reference;
+    	private Object overlay;
+    	
+    	
+    	abstract void drawOverlay(GC gc, Object overlay, int x, int y);
+
+    	/**
+    	 * 
+    	 * @param dx x position use reference point
+    	 * @param dy y position use reference point
+    	 * @param reference reference point
+    	 * @param overlay a use object data
+    	 */
+		public MapWidgetOverlay(double dx, double dy, int reference, Object overlay) {
+			super();
+			this.dx = dx;
+			this.dy = dy;
+			this.reference = reference;
+			this.overlay = overlay;
+		}
+
+
+		/**
+		 * @param dx the dx to set
+		 */
+		public void setDx(double dx) {
+			this.dx = dx;
+		}
+
+		/**
+		 * @param dy the dy to set
+		 */
+		public void setDy(double dy) {
+			this.dy = dy;
+		}
+
+		/**
+		 * @return the dx
+		 */
+		public double getDx() {
+			return dx;
+		}
+
+
+		/**
+		 * @return the dy
+		 */
+		public double getDy() {
+			return dy;
+		}
+
+
+		/**
+		 * @return the reference
+		 */
+		public int getReference() {
+			return reference;
+		}
+
+
+		/**
+		 * @return the overlay
+		 */
+		public Object getOverlay() {
+			return overlay;
+		}
+    	
+    	
     }
         
 
@@ -457,10 +545,10 @@ public class MapWidget extends Canvas {
     /**
      * add images on the map
      */
-    private Collection<OverImage> overImages =  new ArrayList<OverImage>();
+    private Collection<MapWidgetOverlay> overlay =  new ArrayList<MapWidgetOverlay>();
     
     public MapWidget(Composite parent, int style) {
-        this(parent, style, computePosition(new PointD(3.12780, 50.61164),16), 16);
+        this(parent, style, computePosition(new PointD(0, 0),16), 16);
     }
     
     public MapWidget(Composite parent, int style, Point mapPosition, int zoom) {
@@ -492,6 +580,79 @@ public class MapWidget extends Canvas {
         
         getStats().reset();
         long t0 = System.currentTimeMillis();
+        
+        paintTiles(gc);
+        
+        paintOverlay(gc);
+        
+        long t1 = System.currentTimeMillis();
+        stats.dt = t1 - t0;
+        //gc.drawString("dis ya draw", 20, 50);
+    }
+    
+    
+    private void paintOverlayCenterWidget(GC gc, MapWidgetOverlay over, int width, int height){
+
+        over.drawOverlay(gc, over.getOverlay(), 
+        		width / 2 + (int)over.getDx() , 
+        		height / 2 + (int)over.getDy() );
+        
+    }
+    
+    private void paintOverlayWorld(GC gc, MapWidgetOverlay over, double x0, double y0, double x1, double y1){
+    	//position of overlay in tile reference
+    	double x,y; 
+
+    	//convert in pixel unit
+    	x = lon2positiond(over.getDx(), getZoom());
+    	y = lat2positiond(over.getDy(), getZoom());
+    	
+    	//the overlay is in view window
+    	if( (Double.compare( x0, x) < 0) && (Double.compare(x, x1) < 0)  
+    	 && (Double.compare( y0, y) < 0) && (Double.compare(y, y1) < 0) )
+    	{
+    		over.drawOverlay(gc, over.getOverlay(), 
+            		(int) ( x - x0 ) , 
+            		(int) ( y - y0 ) );
+    	}
+    }
+    
+    private void paintOverlay(GC gc){
+    	
+        Point size = getSize();
+        int width = size.x, height = size.y;
+    	
+        //view window
+        double x0 = Math.floor(((double) mapPosition.x));
+        double y0 = Math.floor(((double) mapPosition.y));
+        double x1 = Math.ceil(((double) mapPosition.x + width));
+        double y1 = Math.ceil(((double) mapPosition.y + height));    	
+        
+        for (MapWidgetOverlay over :  overlay){
+
+        	
+        	switch(over.getReference()){
+        	
+        	case MapWidgetOverlay.REFERENCE_CENTER_WIDGET:
+        		paintOverlayCenterWidget(gc, over, width, height);
+        		break;
+        		
+        	case MapWidgetOverlay.REFERENCE_WORLD:
+        		paintOverlayWorld(gc, over, x0, y0, x1, y1);
+        		break;  
+        		
+        	default:
+            	over.drawOverlay(gc, over.getOverlay(), 
+                		(int)over.getDx() , 
+                		(int)over.getDy() );
+        	}
+        	
+
+        }
+        
+    }
+    
+    private void paintTiles(GC gc){
         Point size = getSize();
         int width = size.x, height = size.y;
         int x0 = (int) Math.floor(((double) mapPosition.x) / TILE_SIZE);
@@ -508,24 +669,6 @@ public class MapWidget extends Canvas {
                 ++getStats().tileCount;
             }
             dy += TILE_SIZE;
-        }
-        
-        paintOverImages(gc);
-        
-        long t1 = System.currentTimeMillis();
-        stats.dt = t1 - t0;
-        //gc.drawString("dis ya draw", 20, 50);
-    }
-    
-    private void paintOverImages(GC gc){
-        Point size = getSize();
-        int width = size.x, height = size.y;
-        
-        for(Iterator<OverImage> i = overImages.iterator(); i.hasNext() ; ){
-        	OverImage img = i.next();
-        	
-        	gc.drawImage(img.getImg(), width / 2 + img.getDx(), height / 2 + img.getDy());
-        	
         }
     }
     
@@ -593,12 +736,12 @@ public class MapWidget extends Canvas {
         pcs.removePropertyChangeListener(propertyName, listener);
     }
     
-    public void addOverImage(OverImage img){
-    	overImages.add(img);
+    public void addOverlay(MapWidgetOverlay over){
+    	overlay.add(over);
     }
     
-    public void removeOverImage(OverImage img){
-    	overImages.remove(img);
+    public void removeOverlay(MapWidgetOverlay over){
+    	overlay.remove(over);
     }   
     
     public TileCache getCache() {
@@ -735,7 +878,7 @@ public class MapWidget extends Canvas {
                 position2lat(position.y, getZoom()));
     }
     
-    static Point computePosition(PointD coords, int z) {
+    public static Point computePosition(PointD coords, int z) {
         int x = lon2position(coords.x, z);
         int y = lat2position(coords.y, z);
         return new Point(x,y);
@@ -775,14 +918,22 @@ public class MapWidget extends Canvas {
     }
 
     public static int lon2position(double lon, int z) {
-        double xmax = TILE_SIZE * (1 << z);
-        return (int) Math.floor((lon + 180) / 360 * xmax);
+        return (int) Math.floor(lon2positiond(lon, z));
     }
 
     public static int lat2position(double lat, int z) {
-        double ymax = TILE_SIZE * (1 << z);
-        return (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * ymax);
+        return (int) Math.floor(lat2positiond(lat, z));
     }
+    
+    public static double lon2positiond(double lon, int z) {
+        double xmax = TILE_SIZE * (1 << z);
+        return (lon + 180.0) / 360.0 * xmax;
+    }
+
+    public static double lat2positiond(double lat, int z) {
+        double ymax = TILE_SIZE * (1 << z);
+        return (1 - Math.log(Math.tan(Math.toRadians(lat)) + 1.0 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2.0 * ymax;
+    }   
 
     public static String getTileNumber(TileServer tileServer, double lat, double lon, int zoom) {
         int xtile = (int) Math.floor((lon + 180) / 360 * (1 << zoom));

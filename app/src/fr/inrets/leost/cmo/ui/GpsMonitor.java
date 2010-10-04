@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Shell;
 import fr.inrets.leost.geolocation.*;
 
 import com.roots.swtmap.MapWidget;
+import com.roots.swtmap.MapWidget.PointD;
 
 /**
  * Create a window with a map and follow the current position
@@ -31,6 +32,11 @@ public class GpsMonitor {
 	public static Image loadCarImage()  throws ClassNotFoundException {
 		return new Image(display, Class.forName("fr.inrets.leost.cmo.ui.GpsMonitor").getResourceAsStream("resources/twingo.png"));
 	}
+	
+	public static Image loadHomeImage()  throws ClassNotFoundException {
+		return new Image(display, Class.forName("fr.inrets.leost.cmo.ui.GpsMonitor").getResourceAsStream("resources/home.png"));
+	}	
+	
 
 	public static void gpsGUI(Geolocation g){
 	    
@@ -41,14 +47,26 @@ public class GpsMonitor {
 	      shell.setLocation(10, 10);
 	      shell.setLayout (new FillLayout());
 	      
+	      Point initPos =  MapWidget.computePosition(new PointD(3.12780, 50.61164),16);
 	      
-	      map = new MapWidget(shell, SWT.NONE);
+	      map = new MapWidget(shell, SWT.NONE, initPos, 16);
 	      
 	      try{
-	    	  map.addOverImage( map.new OverImage(0, 0, loadCarImage()) );
+	    	  
+	    	  map.addOverlay( 
+	    			  map.new MapWidgetOverlayImage ( 0, 0, 
+	    					  MapWidget.MapWidgetOverlayImage.REFERENCE_CENTER_WIDGET ,
+	    					  loadCarImage()) );
+	    	  
+	    	  map.addOverlay( 
+	    			  map.new MapWidgetOverlayImage ( 3.13061, 50.61789, 
+	    					  MapWidget.MapWidgetOverlayImage.REFERENCE_WORLD,
+	    					  loadHomeImage()) );	    	  
+	    	  
 	      }catch (ClassNotFoundException e){}
 
-	      geo =g;
+	      
+	      geo = g;
 	      
 	      geo.addPositionListener(new GeolocationListener() {
 
