@@ -1,5 +1,5 @@
 package fr.inrets.leost.cmo.dashboard;
 
 public interface DashboardListener {
-	public void update();
+	public void dashboardUpdate();
 }

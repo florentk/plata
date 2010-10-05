@@ -2,7 +2,7 @@ package fr.inrets.leost.cmo.dashboard;
 
 import fr.inrets.leost.geolocation.Geolocation;
 
-public class Track extends Indicator {
+public class Track implements Indicator {
 
 	private Geolocation geo;
 	private Double track = new Double(0.0);
@@ -16,7 +16,7 @@ public class Track extends Indicator {
 
 
 	@Override
-	void update() {
+	public void update() {
 		// TODO Auto-generated method stub
 		track = geo.getCurrentTrack();
 	}
@@ -30,10 +30,13 @@ public class Track extends Indicator {
 		return track;
 	}
 
+	public String name(){
+		return "Track";
+	}
 
 
 	public String toString(){
-		return "Track : " + getTrack().toString();
+		return String.format("%01.0f°", getTrack()) ;
 	}
 
 }

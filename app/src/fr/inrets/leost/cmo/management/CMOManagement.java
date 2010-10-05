@@ -7,9 +7,13 @@ import java.util.Timer;
 import java.util.Collection;
 
 import fr.inrets.leost.cmo.beaconning.BeaconRecv;
+import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
 import fr.inrets.leost.cmo.beaconning.packet.CMOState;
 import fr.inrets.leost.cmo.utils.Physics;
+
+import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
+import fr.inrets.leost.cmo.beaconning.packet.CMOState;
 
 /**
  * 
@@ -41,18 +45,43 @@ public class CMOManagement implements BeaconRecvListener {
 		new Timer().schedule(new RemoveExpiredEntry() , 0, CHECK_EXPIRED_ENTRY_INTERVAL);
 	}
 	
+	
+	
+	private void notifyListenerChanged(CMOTableEntry cmo){
+		//notify the listerners
+		for (CMOTableListener l : listerners)
+			l.tableChanged(cmo);		
+	}
+	
+	private void notifyListenerRemove(CMOTableEntry cmo){
+		//notify the listerners
+		for (CMOTableListener l : listerners)
+			l.tableCMORemoved(cmo);		
+	}	
+	
+	private void notifyListenerAdd(CMOTableEntry cmo){
+		//notify the listerners
+		for (CMOTableListener l : listerners)
+			l.tableCMOAdded(cmo);		
+	}		
+	
 	/**
 	 * @see CMOStateListener#cmoStatChanged(CMOState)
 	 */
 	@Override
 	public void cmoStatChanged(CMOState newStat) {
-	
+		CMOTableEntry entry;
+		boolean newEntry = false;
+		
+		
 		if( table.containsKey(newStat.getCmoID()))
 			table.remove(newStat.getCmoID());
+		else
+			newEntry = true;
 		
 
 		table.put(newStat.getCmoID(), 
-				new CMOTableEntry(
+				entry = new CMOTableEntry(
 						newStat.getCmoID(),
 						newStat.getCmoType(),
 						
@@ -64,50 +93,22 @@ public class CMOManagement implements BeaconRecvListener {
 						newStat.getLifetime()
 					));
 
-		//notify the listerners
-		for (CMOTableListener l : listerners)
-			l.tableChanged(newStat.getCmoID(),table);
+		if(newEntry)
+			notifyListenerAdd(entry);
+		else
+			notifyListenerChanged(entry);
 			
 	}
 	
 	public void deleteExpiredEntry(){
 		for(Iterator<CMOTableEntry> i = table.values().iterator();i.hasNext();){
 			CMOTableEntry entry = i.next();
-			if(entry.isExpired())
+			if(entry.isExpired()){
+				notifyListenerRemove(entry);				
 				i.remove();
-		}
-	}
-	
-
-	
-	public CMOTableEntry closestCMOInFront(Double longitude, Double latitude, Double track){
-		CMOTableEntry closest=null;
-		Double closestDist= null;
-		double lg=longitude.doubleValue(),lt=latitude.doubleValue(),t=track.doubleValue();
-		double  dx,dy,dist;
-		
-		for ( CMOTableEntry e : table.values() ){
-			
-			if ( Physics.inSameDirection(t, e.getTrack().floatValue()) ){
-			
-				dx = (e.getLongitude().doubleValue() - lt);
-				dy = (e.getLatitude().doubleValue() - lg);
-
-				if(Physics.inFront(dx,dy,t)){
-					dist = (float) Math.sqrt(  dx*dx + dy*dy  );
-	
-					if(closest == null || closestDist.compareTo( dist ) > 0 ){
-						closest = e;
-						closestDist = dist;
-					}
-				}
 			}
 		}
-		
-		
-		return closest;
 	}
-	
 	
 	/**
 	 * @return the table
@@ -133,15 +134,32 @@ public class CMOManagement implements BeaconRecvListener {
 
 	public static void main(String[] args) throws Exception {
 		
-		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(args[0]);
+		//BeaconRecv recv = BeaconRecv.loopPacketFromDevice(args[0]);
+		BeaconRecvFake recv = new BeaconRecvFake();
+		
+		recv.addFixedCMO(new CMOState(
+				new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
+				3.12892007828f,
+				50.6190795898f,
+				0.0f,
+				1.0f,
+				0.0f));
 		
 		CMOManagement m = new CMOManagement();
 		
 		m.addListener(new CMOTableListener() {
 			@Override
-			public void tableChanged(String cmoId, CMOTable table) {
-				System.out.println(table);
+			public void tableChanged(CMOTableEntry cmo) {
+				System.out.println("Change : " + cmo);
 			}
+			
+			public void tableCMORemoved(CMOTableEntry cmo) {
+				System.out.println("Remove : " + cmo);
+			}
+			
+			public void tableCMOAdded(CMOTableEntry cmo) {
+				System.out.println("Add : " + cmo);
+			}		
 		});		
 		
 		recv.addListener(m);

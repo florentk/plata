@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.TableItem;
+
 import jpcap.JpcapCaptor;
 
 
@@ -13,6 +16,7 @@ import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
 import fr.inrets.leost.cmo.beaconning.packet.CMOState;
 import fr.inrets.leost.cmo.management.CMOManagement;
 import fr.inrets.leost.cmo.management.CMOTable;
+import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.management.CMOTableListener;
 import fr.inrets.leost.cmo.ui.GpsMonitor;
 import fr.inrets.leost.geolocation.*;
@@ -21,6 +25,10 @@ import fr.inrets.leost.geolocation.*;
 public class Dashboard implements CMOTableListener, GeolocationListener{
 
 	private Collection<Indicator> indicators =new ArrayList<Indicator>();
+
+
+
+
 	private Collection<DashboardListener> listeners =new ArrayList<DashboardListener>();	
 	
 	public void addIndicator(Indicator indicator){
@@ -44,10 +52,11 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 	 */
 	public void setUpdate(){
 		// compute the new data of indicators
-		for (Indicator i : indicators) i.update();
+		for (Indicator i : indicators) 
+			i.update();
 		
 		// notify the listener
-		for (DashboardListener l : listeners) l.update();
+		for (DashboardListener l : listeners) l.dashboardUpdate();
 	}
 	
 	
@@ -63,15 +72,38 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 	 * @see fr.inrets.leost.cmo.management.CMOTableListener#tableChanged(java.lang.String, fr.inrets.leost.cmo.management.CMOTable)
 	 */
 	@Override
-	public void tableChanged(String cmoId, CMOTable table) {
+	public void tableChanged(CMOTableEntry table) {
 		setUpdate();
 	}
+	
+	/**
+	 * @see fr.inrets.leost.cmo.management.CMOTableListener#tableCMOAdded(java.lang.String, fr.inrets.leost.cmo.management.CMOTable)
+	 */
+	@Override
+	public void tableCMOAdded(CMOTableEntry table) {
+		setUpdate();
+	}
+
+	/** 
+	 * @see fr.inrets.leost.cmo.management.CMOTableListener#tableCMORemoved(java.lang.String, fr.inrets.leost.cmo.management.CMOTable)
+	 */
+	@Override
+	public void tableCMORemoved(CMOTableEntry table) {
+		setUpdate();
+	}	
+	
+	/**
+	 * @return the indicators
+	 */
+	public Collection<Indicator> getIndicators() {
+		return indicators;
+	}	
 
 	public String toString(){
 		StringBuffer s=new StringBuffer();
 		
 		for (Indicator i : indicators)
-			s.append(i.toString()+"\n");
+			s.append(i.toString()+";");
 			
 		return s.toString();
 	}
@@ -113,15 +145,24 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		cmoMgt.addListener(db);
 		
 		//create the indicator of the dashboard
-		db.addIndicator( new Speed(geo));
-		db.addIndicator( new Position(geo));		
-		db.addIndicator( new Track(geo));	
-		db.addIndicator( new ClosestCMO(geo,cmoMgt));		
+		StoppingDistance sDistance = new StoppingDistance(geo);
+		BrakingDistance bDistance = new BrakingDistance(geo);		
+		ClosestCMO closestCMO = new ClosestCMO(geo, cmoMgt);
+		db.addIndicator(new Position(geo));
+		db.addIndicator(new Speed(geo));
+		db.addIndicator(new Track(geo));
+		db.addIndicator(bDistance);
+		db.addIndicator(sDistance);
+		db.addIndicator(closestCMO);   
+		db.addIndicator(new Hazard(geo, closestCMO, sDistance, bDistance));     
 		
+		for (Indicator id : db.getIndicators())
+			System.out.print(id.name()+";");		
+		System.out.println();	
 		//event when dashboard updated
 		db.addListener(new DashboardListener() {
-				public void update(){
-					System.out.print("\033[2J");
+				public void dashboardUpdate(){
+					//System.out.print("\033[2J");
 					System.out.println(db);
 				}
 		});
@@ -132,7 +173,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		//start the geolocation system 
 		geo.start();
 		
-		GpsMonitor.gpsGUI(geo);
+		//GpsMonitor.gpsGUI(geo);
 		
 		//wait the end
 		geo.join();recv.join();		

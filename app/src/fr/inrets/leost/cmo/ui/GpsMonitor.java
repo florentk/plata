@@ -11,12 +11,13 @@ import fr.inrets.leost.geolocation.*;
 
 import com.roots.swtmap.MapWidget;
 import com.roots.swtmap.MapWidget.PointD;
+import com.roots.swtmap.MapWidgetOverlayImage;
 
 /**
  * Create a window with a map and follow the current position
  * 
  * link between Gps and MapWidget
- * @author florent
+ * @author florent kaisser
  *
  */
 public class GpsMonitor {
@@ -54,13 +55,13 @@ public class GpsMonitor {
 	      try{
 	    	  
 	    	  map.addOverlay( 
-	    			  map.new MapWidgetOverlayImage ( 0, 0, 
-	    					  MapWidget.MapWidgetOverlayImage.REFERENCE_CENTER_WIDGET ,
+	    			  new MapWidgetOverlayImage ( 0, 0, 
+	    					  MapWidgetOverlayImage.REFERENCE_CENTER_WIDGET ,
 	    					  loadCarImage()) );
 	    	  
 	    	  map.addOverlay( 
-	    			  map.new MapWidgetOverlayImage ( 3.13061, 50.61789, 
-	    					  MapWidget.MapWidgetOverlayImage.REFERENCE_WORLD,
+	    			  new MapWidgetOverlayImage ( 3.13061, 50.61789, 
+	    					  MapWidgetOverlayImage.REFERENCE_WORLD,
 	    					  loadHomeImage()) );	    	  
 	    	  
 	      }catch (ClassNotFoundException e){}
@@ -96,11 +97,9 @@ public class GpsMonitor {
 	
     public static void main (String [] args) throws Exception {
     	Gps gps = new Gps();
-	     gps.start();
+	    gps.start();
     	gpsGUI(gps);
-      
-      
-  }
+    }
 	
 	
 }

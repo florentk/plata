@@ -132,7 +132,17 @@ public class CMOHeader {
 	 * @return the CMO identity
 	 */
 	public String getCmoID() {
-		return  new String(cmoID);
+		
+		int end=0;
+		
+		for(int i=0;i<cmoID.length;i++ ){
+			if(cmoID[i]==0){
+				end = i;
+				break;
+			}
+		}
+		
+		return  new String(cmoID).substring(0, end);
 	}
 
 	/**

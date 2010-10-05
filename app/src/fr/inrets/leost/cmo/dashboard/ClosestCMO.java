@@ -6,11 +6,9 @@ import fr.inrets.leost.cmo.utils.Physics;
 import fr.inrets.leost.geolocation.Geolocation;
 import fr.inrets.leost.geolocation.WGS84;
 
-public class ClosestCMO extends Indicator {
+public class ClosestCMO implements Indicator {
 
-	public static final int DECISION_NONE = 0;
-	public static final int DECISION_WARNING = 1;	
-	public static final int DECISION_HAZARD = 2;		
+	
 	
 	private CMOManagement cmo;
 	private Geolocation geo;
@@ -18,20 +16,44 @@ public class ClosestCMO extends Indicator {
 	private CMOTableEntry closestCMO=null;
 	private double distance=0.0;
 	
-	private double bDistance;
-	private double sDistance;
-	private int decision=DECISION_NONE;
-		
-	public ClosestCMO(Geolocation geo,CMOManagement cmo) {
-		this.cmo=cmo;
-		this.geo=geo;
+	
+	public ClosestCMO(Geolocation geo, CMOManagement cmo) {
+		super();
+		this.cmo = cmo;
+		this.geo = geo;
 	}
 	
+	public CMOTableEntry closestCMOInFront(Double longitude, Double latitude, Double track){
+		CMOTableEntry closest=null;
+		Double closestDist= null;
+		double lg=longitude.doubleValue(),lt=latitude.doubleValue(),t=track.doubleValue();
+		double  dx,dy,dist;
+		
+		for ( CMOTableEntry e : cmo.getTable().values() ){
+			
+			if ( Physics.inSameDirection(t, e.getTrack().floatValue()) ){
+			
+				dx = (e.getLongitude().doubleValue() - lt);
+				dy = (e.getLatitude().doubleValue() - lg);
+
+				if(Physics.inFront(dx,dy,t)){
+					dist = (float) Math.sqrt(  dx*dx + dy*dy  );
+	
+					if(closest == null || closestDist.compareTo( dist ) > 0 ){
+						closest = e;
+						closestDist = dist;
+					}
+				}
+			}
+		}
+		
+		
+		return closest;
+	}	
+	
 	@Override
-	void update() {
-		closestCMO = cmo.closestCMOInFront( geo.getCurrentPos().longitude(), geo.getCurrentPos().latitude(), geo.getCurrentTrack());
-		bDistance = Physics.BrakingDistance(geo.getCurrentSpeed(), Physics.COEF_FRICTION_AVG);
-		sDistance = Physics.StoppingDistance(geo.getCurrentSpeed(), Physics.COEF_FRICTION_AVG);
+	public void update() {
+		closestCMO = closestCMOInFront( geo.getCurrentPos().longitude(), geo.getCurrentPos().latitude(), geo.getCurrentTrack());
 
 		if(closestCMO!=null) {
 			distance = distanceToClosestCMO();
@@ -39,19 +61,12 @@ public class ClosestCMO extends Indicator {
 			//no take in account if too far or the track is not accurate (low speed)
 			if( distance > 1000.0 ||  geo.getCurrentSpeed() < 3.0)
 					closestCMO = null;
-			
 
-			
-			if(distance < sDistance)
-				decision = DECISION_WARNING;
-			else if(distance < sDistance)
-				decision = DECISION_HAZARD;	
-			else 
-				decision = DECISION_NONE;
-				
 		}
 	}
 	
+
+
 	private double distanceToClosestCMO(){
 		double dx = (closestCMO.getLongitude().doubleValue() -  geo.getCurrentPos().longitude().doubleValue());
 		double dy = (closestCMO.getLatitude().doubleValue() -  geo.getCurrentPos().latitude().doubleValue());
@@ -72,46 +87,21 @@ public class ClosestCMO extends Indicator {
 		return distance;
 	}
 
-	/**
-	 * @return the bDistance
-	 */
-	public double getBakingDistance() {
-		return bDistance;
-	}
 
-	/**
-	 * @return the sDistance
-	 */
-	public double getStoppingDistance() {
-		return sDistance;
-	}
 	
-	/**
-	 * @return the decision
-	 */
-	public int getDecision() {
-		return decision;
-	}
-	
-	public static String decisionToString(int decesion){
-		switch(decesion){
-		case DECISION_WARNING : return "Waring";
-		case DECISION_HAZARD : return "Hazard";
-		}
-		
-		return "None";
+
+	public String name(){
+		return "ClosestCMO";
 	}
 
 	public String toString(){
-		String s="";
 
-		s+=String.format("Braking distance : %01.1f m Stopping distance : %01.1f m\n", bDistance, sDistance);
-		if(closestCMO != null){
-			s+=String.format("Closest CMO (%d) at %01.1f m : %s \n", closestCMO.getCmoType(),distance, closestCMO.getCmoID() ); 
-			s+=String.format("Comment : %s\n", decisionToString(decision));
-		}
+		if(closestCMO == null)
+			return "N/A";
+		
 
-		return s;
+		return String.format("Closest CMO (%d) at %01.1f m : %s", closestCMO.getCmoType(),distance, closestCMO.getCmoID() ); 
+
 	}
 
 }

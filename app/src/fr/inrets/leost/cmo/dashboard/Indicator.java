@@ -1,5 +1,6 @@
 package fr.inrets.leost.cmo.dashboard;
 
-public abstract class Indicator {
-	abstract void update();
+public interface Indicator {
+	void update();
+	String name();
 }

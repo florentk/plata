@@ -2,7 +2,7 @@ package fr.inrets.leost.cmo.dashboard;
 
 import fr.inrets.leost.geolocation.Geolocation;
 
-public class Speed extends Indicator {
+public class Speed implements Indicator {
 
 	private Geolocation geo;
 	private Double speed = new Double(0.0);
@@ -16,7 +16,7 @@ public class Speed extends Indicator {
 
 
 	@Override
-	void update() {
+	public void update() {
 		// TODO Auto-generated method stub
 		speed = new Double( geo.getCurrentSpeed().doubleValue() * 3.6 );
 	}
@@ -30,10 +30,13 @@ public class Speed extends Indicator {
 		return speed;
 	}
 
+	public String name(){
+		return "Speed";
+	}
 
 
 	public String toString(){
-		return "Speed : " + getSpeed().toString() + " km/h";
+		return String.format("%01.1f km/h", getSpeed()) ;
 	}
 
 }

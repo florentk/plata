@@ -2,7 +2,7 @@ package fr.inrets.leost.cmo.dashboard;
 
 import fr.inrets.leost.geolocation.*;
 
-public class Position extends Indicator  {
+public class Position implements Indicator  {
 
 	private Geolocation geo;
 	private WGS84 pos;
@@ -13,11 +13,20 @@ public class Position extends Indicator  {
 	}
 	
 	@Override
-	void update() {
+	public void update() {
 		pos = geo.getCurrentPos();
 	}
 	
+	public String name(){
+		return "Position";
+	}
+	
+	public WGS84 getCurrentPos(){
+		return pos;
+	}
+
+	
 	public String toString(){
-		return "Position : " + " " +pos.toString();
+		return  pos.toString();
 	}
 }
