@@ -2,6 +2,11 @@ package fr.inrets.leost.cmo.dashboard;
 
 import fr.inrets.leost.geolocation.Geolocation;
 
+/**
+ * indicator for show the speed
+ * @author florent kaisser
+ *
+ */
 public class Speed implements Indicator {
 
 	private Geolocation geo;
@@ -17,7 +22,7 @@ public class Speed implements Indicator {
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
+		//convert the speed in kilometer by hour
 		speed = new Double( geo.getCurrentSpeed().doubleValue() * 3.6 );
 	}
 	

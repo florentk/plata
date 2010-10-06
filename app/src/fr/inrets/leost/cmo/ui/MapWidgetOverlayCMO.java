@@ -8,15 +8,28 @@ import com.roots.swtmap.MapWidgetOverlay;
 
 import fr.inrets.leost.cmo.management.CMOTableEntry;
 
+/**
+ * Draw a CMO neighborhood
+ * @author florent
+ *
+ */
 public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
 
 	private static Image img = null;
 	private static Font ft = null; 
 
+	/**
+	 * set a image representing a CMO
+	 * @param image a image representing a CMO
+	 */
 	public static void setImg(Image image) {
 		img = image;
 	}
 	
+	/**
+	 * set the text font for the CMO description
+	 * @param font text font for the CMO description
+	 */
 	public static void setFont(Font font) {
 		ft = font;
 	}	
@@ -38,8 +51,10 @@ public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
 		if(ft != null)
 			gc.setFont(ft);
 		
+		//get the weight text display
 		int tw = gc.stringExtent(cmo.getCmoID()).x;
 
+		//draw the text in the center
 		gc.drawString(cmo.getCmoID(),x - tw / 2,y,true); 
 	}
 }

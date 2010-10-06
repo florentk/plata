@@ -2,7 +2,11 @@ package fr.inrets.leost.cmo.management;
 
 import java.util.Date;
 
-
+/**
+ * Entry of a CMO
+ * @author florent kaisser
+ *
+ */
 public class CMOTableEntry {
 
 	/** CMO identity */

@@ -2,6 +2,11 @@ package fr.inrets.leost.cmo.dashboard;
 
 import fr.inrets.leost.geolocation.Geolocation;
 
+/**
+ * indicator for show the track
+ * @author florent kaisser
+ *
+ */
 public class Track implements Indicator {
 
 	private Geolocation geo;

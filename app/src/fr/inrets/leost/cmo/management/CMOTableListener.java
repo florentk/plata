@@ -1,5 +1,10 @@
 package fr.inrets.leost.cmo.management;
 
+/**
+ * for notification when the table is modified
+ * @author florent kaisser
+ *
+ */
 public interface CMOTableListener {
 	/**
 	 * event when the table change

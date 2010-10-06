@@ -21,7 +21,24 @@ import fr.inrets.leost.cmo.management.CMOTableListener;
 import fr.inrets.leost.cmo.ui.GpsMonitor;
 import fr.inrets.leost.geolocation.*;
 
-
+/**
+ * Collection of Indicator and update notification
+ * 
+ *          Indicator 1        .....           Indicator N 
+ *               |               |                  |
+ *               |----------------------------------|
+ *                             |   /|\  Indicator.update()
+ *                             |    |
+ * DashboardListener.update() \|/   |
+ *                        ---------------
+ * CMOTableListener ----->|             |
+ *                        |  Dashboard  |------------> DashboardListener.dashboardUpdate()
+ * GeolocationListener -->|             |
+ *                        ---------------
+ *
+ * @author florent kaisser
+ *
+ */
 public class Dashboard implements CMOTableListener, GeolocationListener{
 
 	private Collection<Indicator> indicators =new ArrayList<Indicator>();

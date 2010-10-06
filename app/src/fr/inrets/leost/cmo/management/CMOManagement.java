@@ -19,8 +19,10 @@ import fr.inrets.leost.cmo.beaconning.packet.CMOState;
  * 
  * CMO state agregator
  * 
+ * 
+ * 
  * BeaconRecv --------
- *       ...         |------> CMOManagement -----> CMOStateTable
+ *       ...         |------> CMOManagement -----> CMOTable
  * BeaconRecv --------
  * 
  * 
@@ -100,10 +102,16 @@ public class CMOManagement implements BeaconRecvListener {
 			
 	}
 	
+	/**
+	 * check in regular interval the expired entry
+	 */
 	public void deleteExpiredEntry(){
 		for(Iterator<CMOTableEntry> i = table.values().iterator();i.hasNext();){
 			CMOTableEntry entry = i.next();
+			
+			//expired entry ?
 			if(entry.isExpired()){
+				//notify the listener of the removed entry
 				notifyListenerRemove(entry);				
 				i.remove();
 			}

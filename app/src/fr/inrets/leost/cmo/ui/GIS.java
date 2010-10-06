@@ -37,6 +37,11 @@ import fr.inrets.leost.geolocation.GeolocationListener;
 import fr.inrets.leost.geolocation.Gps;
 import fr.inrets.leost.geolocation.WGS84;
 
+/**
+ * show a map with associated information from Geolocation and CMOMangement
+ * @author florent kaisser
+ *
+ */
 public class GIS extends Composite  implements DashboardListener, CMOTableListener, GeolocationListener  {
 	
 	private static final PointD home = new PointD(3.13252, 50.60689);
@@ -245,20 +250,28 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		display.syncExec(new Runnable(){public void run(){map.redraw();}});
 	}
 
+	/**
+	 * show the GIS window
+	 * @param strDevice device name for intercept the neighborhood CMO beacon
+	 * @throws IOException Gps reader problem
+	 * @throws SecurityException illegal thread interrupt
+	 */
 	public static void startGIS(String strDevice) throws IOException,SecurityException{
-	      Display display = new Display ();
-	      Shell shell = new Shell(display);
-	      shell.setText("GPS Monitor");
-	      shell.setSize(1245, 700);
-	      shell.setLocation(30, 10);
-	      shell.setLayout (new FillLayout());
-	      
+		
+		//create the parent window
+		Display display = new Display ();
+		Shell shell = new Shell(display);
+		shell.setText("Global Information System");
+		shell.setSize(1245, 700);
+		shell.setLocation(30, 10);
+		shell.setLayout (new FillLayout());
 
-	      
-			BeaconRecv recv = BeaconRecv.loopPacketFromDevice(strDevice);
-			
-	      /*BeaconRecvFake recv = new BeaconRecvFake();
-	      
+
+		//create the beacon receiver
+		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(strDevice);
+
+		/*BeaconRecvFake recv = new BeaconRecvFake();
+
 			recv.addFixedCMO(new CMOState(
 					new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
 					3.13061f,
@@ -267,39 +280,46 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 					1.0f,
 					0.0f));*/
 
-			/*recv.addFixedCMO(new CMOState(
+		/*recv.addFixedCMO(new CMOState(
 					new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),
 					3.12586784363f,
 					50.6021995544f,
 					0.0f,
 					1.0f,
 					0.0f));*/
-					
-	        Geolocation gps = new Gps();
-			CMOManagement cmoMgt = new CMOManagement();
-			
-			//link the CMO Management with the beaconning receiver
-			recv.addListener(cmoMgt);
-			
+
+		//create the GPS
+		Geolocation gps = new Gps();
+		
+		//create the CMO management
+		CMOManagement cmoMgt = new CMOManagement();
+
+		//link the CMO Management with the beaconning receiver
+		recv.addListener(cmoMgt);
+
+		//create the GIS window
+		new GIS(display, gps, cmoMgt, shell, SWT.NONE);
+
+		//start the beaconning receiver
+		recv.start();
+
+		//start the GPS
+		gps.start();	      
+
+		//show the window
+		shell.open ();
+
+		//event loop
+		while (!shell.isDisposed ()) {
+			if (!display.readAndDispatch ()) display.sleep ();
+		}
 
 
-	      
-	      new GIS(display, gps, cmoMgt, shell, SWT.NONE);
-	      
-		  //start the beaconning receiver
-		  recv.start();
-	      gps.start();	      
-	      
-	      shell.open ();
-	      while (!shell.isDisposed ()) {
-	          if (!display.readAndDispatch ()) display.sleep ();
-	      }
-	      
-	      gps.interrupt();
-	      recv.interrupt();
-	      
-	      display.dispose ();	
-	      
+		//clean
+		gps.interrupt();
+		recv.interrupt();
+		display.dispose ();	
+
 
 	}
 	

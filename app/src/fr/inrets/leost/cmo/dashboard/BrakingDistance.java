@@ -3,6 +3,9 @@ package fr.inrets.leost.cmo.dashboard;
 import fr.inrets.leost.cmo.utils.Physics;
 import fr.inrets.leost.geolocation.Geolocation;
 
+/**
+ * indicator for braking distance 
+ */
 public class BrakingDistance implements Indicator {
 
 	private Geolocation geo;

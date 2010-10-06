@@ -2,6 +2,12 @@ package fr.inrets.leost.cmo.dashboard;
 
 import fr.inrets.leost.geolocation.*;
 
+/**
+ * indicator for the current position
+ * 
+ * @author florent kaisser
+ *
+ */
 public class Position implements Indicator  {
 
 	private Geolocation geo;

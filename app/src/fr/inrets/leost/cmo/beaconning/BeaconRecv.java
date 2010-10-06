@@ -39,6 +39,7 @@ public class BeaconRecv extends Thread implements PacketReceiver {
 		listerners.remove(l);
 	}
 	
+	//receive a packet from layer 2 (Ethernet)
 	public void receivePacket(Packet packet) {
 		
 
