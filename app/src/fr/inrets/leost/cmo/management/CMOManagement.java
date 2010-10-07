@@ -1,6 +1,7 @@
 package fr.inrets.leost.cmo.management;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.Iterator;
 import java.util.TimerTask;
 import java.util.Timer;
@@ -35,6 +36,8 @@ public class CMOManagement implements BeaconRecvListener {
 	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;
 	
 	private CMOTable table;
+	 
+	//private static boolean tableLock = false;
 	
 
 	private final Collection<CMOTableListener> listerners = new ArrayList<CMOTableListener>();
@@ -71,7 +74,7 @@ public class CMOManagement implements BeaconRecvListener {
 	 * @see CMOStateListener#cmoStatChanged(CMOState)
 	 */
 	@Override
-	public void cmoStatChanged(CMOState newStat) {
+	synchronized public void cmoStatChanged(CMOState newStat) {
 		CMOTableEntry entry;
 		boolean newEntry = false;
 		
@@ -105,25 +108,37 @@ public class CMOManagement implements BeaconRecvListener {
 	/**
 	 * check in regular interval the expired entry
 	 */
-	public void deleteExpiredEntry(){
+	synchronized public void deleteExpiredEntry(){
+		
+		
 		for(Iterator<CMOTableEntry> i = table.values().iterator();i.hasNext();){
 			CMOTableEntry entry = i.next();
 			
 			//expired entry ?
 			if(entry.isExpired()){
-				//notify the listener of the removed entry
-				notifyListenerRemove(entry);				
+				//notify the listener of the removed entry				
 				i.remove();
+				notifyListenerRemove(entry);
 			}
 		}
 	}
 	
-	/**
-	 * @return the table
-	 */
-	public CMOTable getTable() {
-		return table;
+
+	public Collection<CMOTableEntry> getTable() {
+		return table.values();
 	}	
+	
+	public CMOTableEntry getEntry(String id) {
+		return table.get(id);
+	}		
+	
+	public boolean cmoInTable(String id){
+		return table.containsKey(id);
+	}
+	
+	public Set<String> getCMOIds(){
+		return table.keySet();
+	}
 	
 	public void addListener(CMOTableListener l){
 		listerners.add(l);

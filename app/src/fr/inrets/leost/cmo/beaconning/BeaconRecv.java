@@ -22,13 +22,19 @@ import fr.inrets.leost.cmo.beaconning.packet.*;
 public class BeaconRecv extends Thread implements PacketReceiver {
 	
 	JpcapCaptor jpcap;
+	int delay;
 	
 	private final Collection<BeaconRecvListener> listerners = new ArrayList<BeaconRecvListener>();
 	
 
-	public BeaconRecv(JpcapCaptor jpcap){
+	public BeaconRecv(JpcapCaptor jpcap, int delay){
 		this.jpcap = jpcap;
+		this.delay = delay;
 	}
+	
+	public BeaconRecv(JpcapCaptor jpcap){
+		this(jpcap, 0);
+	}	
 	
 	
 	public void addListener(BeaconRecvListener l){
@@ -42,6 +48,9 @@ public class BeaconRecv extends Thread implements PacketReceiver {
 	//receive a packet from layer 2 (Ethernet)
 	public void receivePacket(Packet packet) {
 		
+		if(delay!=0){
+			try{sleep(100);}catch(InterruptedException e){}
+		}
 
 		if (packet.datalink instanceof EthernetPacket){
 			EthernetPacket ether = (EthernetPacket) packet.datalink;
@@ -99,10 +108,8 @@ public class BeaconRecv extends Thread implements PacketReceiver {
 	 * @return
 	 */
 	public static BeaconRecv loopPacketFromFile(String path){
-
-	    
 	    try{
-	    	return new BeaconRecv(JpcapCaptor.openFile(path));
+	    	return new BeaconRecv(JpcapCaptor.openFile(path),100);
 	    }catch (java.io.IOException e){
 	    	System.out.println("Cannot open file : "+e);
 	    	return null;

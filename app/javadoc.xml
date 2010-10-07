@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" author="true" classpath="/usr/share/java/swt-gtk-3.5.1.jar:lib/json_simple-1.1.jar" destdir="doc" doctitle="Plata project" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="fr.inrets.leost.cmo.management,fr.inrets.leost.cmo.beaconning,fr.inrets.leost.cmo.ui,fr.inrets.leost.cmo.beaconning.packet,fr.inrets.leost.cmo.utils,fr.inrets.leost.cmo.dashboard,fr.inrets.leost.geolocation" source="1.5" sourcefiles="src/com/roots/swtmap/MapWidgetOverlay.java,src/com/roots/swtmap/MapWidget.java,src/com/roots/swtmap/MapWidgetOverlayImage.java" sourcepath="src" splitindex="true" use="true" version="true"/>
+    </target>
+</project>

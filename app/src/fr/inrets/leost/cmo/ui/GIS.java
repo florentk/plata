@@ -1,8 +1,12 @@
 package fr.inrets.leost.cmo.ui;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -17,6 +21,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.ExpandBar;
+import org.eclipse.swt.widgets.ExpandItem;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Event;
 
 import com.roots.swtmap.MapWidget;
 import com.roots.swtmap.MapWidgetOverlayImage;
@@ -47,13 +56,14 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	private static final PointD home = new PointD(3.13252, 50.60689);
 	private static int defaultZoom = 16;
 	
-	private SashForm sashForm;
 	private MapWidget map;
 	private Dashboard dashboard;
-	private Table table;
+	private Table tableInfo;
+	private Table tableCMO;	
 	private Display display;
 	private Geolocation geo;
 	private CMOManagement cmoMgt;
+	private ExpandItem expandItemCMOTable;
 
 	private Map<String, MapWidgetOverlayCMO> neighborhood  =   new HashMap<String, MapWidgetOverlayCMO>();
 
@@ -69,39 +79,40 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	
     //////////////////////////////
     // init the dashboard 
-	private void initDashboard(){
+	private Dashboard initDashboard(){
 
-		dashboard = new Dashboard();
+		Dashboard db = new Dashboard();
 		
 		//link the  dashboard with the geolocation system
-		geo.addPositionListener(dashboard);
+		geo.addPositionListener(db);
 		
 		//link the  dashboard with the CMO Mangement		
-		cmoMgt.addListener(dashboard);
+		cmoMgt.addListener(db);
 		
 		//alow receive the dashboardUpdate
-		dashboard.addListener(this);
+		db.addListener(this);
 		
 		//add indicator
 		StoppingDistance sDistance = new StoppingDistance(geo);
 		BrakingDistance bDistance = new BrakingDistance(geo);		
 		ClosestCMO closestCMO = new ClosestCMO(geo, cmoMgt);
-        dashboard.addIndicator(new Position(geo));
-        dashboard.addIndicator(new Speed(geo));
-        dashboard.addIndicator(new Track(geo));
-        dashboard.addIndicator(bDistance);
-        dashboard.addIndicator(sDistance);
-        dashboard.addIndicator(closestCMO);   
-        dashboard.addIndicator(new Hazard(geo, closestCMO, sDistance, bDistance));     	
+		db.addIndicator(new Position(geo));
+		db.addIndicator(new Speed(geo));
+		db.addIndicator(new Track(geo));
+		db.addIndicator(bDistance);
+		db.addIndicator(sDistance);
+		db.addIndicator(closestCMO);   
+		db.addIndicator(new Hazard(geo, closestCMO, sDistance, bDistance));     	
+        
+        return db;
 	}
 	
 	//////////////////////////////
-	// init the table 
-	void initTable(){
-		
-		initDashboard();
+	// init the table info (indicators)
+	private static Table initTableInfo(Composite parent, Dashboard db){
+	
 
-		table = new Table(sashForm, SWT.FULL_SELECTION  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		Table table = new Table(parent, SWT.FULL_SELECTION  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		table.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 2 , 1));
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
@@ -112,14 +123,50 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		column2.setText("Value");
 		column2.setWidth(160);
 
-		for (Indicator id : dashboard.getIndicators())
+		for (Indicator id : db.getIndicators())
 			new TableItem(table, SWT.NONE).setText(0, id.name());
+		
+		return table;
 	}
+	
+	//////////////////////////////
+	// init the cmo table 
+	private static Table initTableCMO(Composite parent){
+
+		Table table = new Table(parent, SWT.FULL_SELECTION  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		table.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 2 , 1));
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		
+		TableColumn column = new TableColumn(table, SWT.NONE);
+		column.setText("ID");
+		column.setWidth(100);
+		
+		column = new TableColumn(table, SWT.NONE);
+		column.setText("Type");
+		column.setWidth(100);
+		
+		column = new TableColumn(table, SWT.NONE);
+		column.setText("Position");
+		column.setWidth(100);	
+	
+		column = new TableColumn(table, SWT.NONE);
+		column.setText("Speed");
+		column.setWidth(50);	
+		
+		column = new TableColumn(table, SWT.NONE);
+		column.setText("Track");
+		column.setWidth(50);			
+		
+		return table;
+	}	
+	
+	//tableCMO
 	
     //////////////////////////////
     // init the map 
-	void initMap(){
-		map = new MapWidget(sashForm, SWT.NONE, MapWidget.computePosition(home,defaultZoom),defaultZoom);
+	void initMap(Composite parent){
+		map = new MapWidget(parent, SWT.NONE, MapWidget.computePosition(home,defaultZoom),defaultZoom);
 
 		MapWidgetOverlayCMO.setImg(loadCarImage());
 		MapWidgetOverlayCMO.setFont(new Font(display,"Arial",14,SWT.BOLD));	
@@ -148,14 +195,91 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
         setLayout(new FillLayout());
         
         //create a Sash
-        sashForm = new SashForm(this, SWT.HORIZONTAL);
+        SashForm sashForm = new SashForm(this, SWT.HORIZONTAL);
         sashForm.setLayout(new FillLayout());
-  
-        initTable();
-        initMap();  
-
-        sashForm.setWeights(new int[] { 30, 70 });
         
+        //create the left expandbar
+        ExpandBar bar = new ExpandBar (sashForm, SWT.V_SCROLL);
+        
+
+  
+        //create the information table
+        dashboard = initDashboard();
+        tableInfo = initTableInfo(bar,dashboard);
+    	ExpandItem item = new ExpandItem (bar, SWT.NONE, 0);
+    	item.setText("Informations");
+    	item.setHeight(tableInfo.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+    	item.setControl(tableInfo);
+    	item.setExpanded(true);
+    	//item.setImage(image);        
+        
+        
+    	//create the CMO table
+        tableCMO = initTableCMO(bar);
+    	expandItemCMOTable = new ExpandItem (bar, SWT.NONE, 0);
+    	expandItemCMOTable.setText("Neighborhood");
+    	expandItemCMOTable.setHeight(tableCMO.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+    	expandItemCMOTable.setControl(tableCMO); 
+    	
+    	//adapt the Expand item to size of table
+    	tableCMO.addListener(SWT.MeasureItem, new Listener() {
+    		public void handleEvent(Event event) {
+    			Point size = tableCMO.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+    			if (expandItemCMOTable.getHeight() != size.y) {
+    				expandItemCMOTable.setHeight(size.y);
+    			}
+    		}
+    	});
+        
+        //create the map
+        initMap(sashForm);  
+
+        sashForm.setWeights(new int[] { 35, 65 });
+        
+	}
+	
+	public String[] getTextsTableItemCMO(CMOTableEntry entry){
+		return new String[] {
+				entry.getCmoID(),  
+				Short.toString(entry.getCmoType()),
+				new WGS84(entry.getLongitude(), entry.getLatitude(), entry.getAltitude()).toString(),
+				String.format("%01.1f km/h", entry.getSpeed()) ,
+				String.format("%01.0f°", entry.getTrack())};
+	}
+
+	public void updateTableCMO(){
+		//create a hashtable for associate a primary key with the TableItems
+		Map<String,TableItem> entryInTheWidgetTable = new HashMap<String,TableItem>(tableCMO.getItemCount());
+		for (TableItem i : tableCMO.getItems())
+			entryInTheWidgetTable.put( ((CMOTableEntry)i.getData()).getCmoID(), i);
+		
+		//add and update the table entry
+		for (CMOTableEntry entry : cmoMgt.getTable()){
+			TableItem i;
+			
+			if(entryInTheWidgetTable.containsKey(entry.getCmoID())){
+				i = entryInTheWidgetTable.get(entry.getCmoID());
+			}else{
+				i = new TableItem(tableCMO, SWT.NONE);
+			}
+			
+			i.setText(getTextsTableItemCMO(entry));
+			i.setData(entry);			
+		}
+		
+		
+		//remove the table entry
+		int pos=0;
+		for (TableItem i : tableCMO.getItems()){
+			String id = ((CMOTableEntry)i.getData()).getCmoID();
+			//System.out.println("Check " + id + " entry " + (n++));
+			if(! cmoMgt.cmoInTable(id)){
+				tableCMO.remove(pos);
+				pos--;
+			}
+				
+			pos++;
+		}
 	}
 	
 	/**
@@ -168,10 +292,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 					public void run(){
 
 						//update the table item
-						if (table != null){
+						if (tableInfo != null){
 							int i=0;
 							for (Indicator id : dashboard.getIndicators())
-								table.getItem(i++).setText(1, id.toString());
+								tableInfo.getItem(i++).setText(1, id.toString());
 						}
 					}
 				}  
@@ -221,7 +345,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		over.setDy(entry.getLatitude());
 		
 		//see http://www.eclipse.org/swt/faq.php#uithread
-		display.syncExec(new Runnable(){public void run(){map.redraw();}});
+		display.syncExec(new Runnable(){public void run(){map.redraw();updateTableCMO();}});
 	}
 
 	/**
@@ -234,8 +358,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		map.addOverlay(over);
 		neighborhood.put(entry.getCmoID(),over);
 		
+
+		
 		//see http://www.eclipse.org/swt/faq.php#uithread
-		display.syncExec(new Runnable(){public void run(){map.redraw();}});
+		display.syncExec(new Runnable(){public void run(){map.redraw();updateTableCMO();}});
 	}
 
 	/** 
@@ -247,7 +373,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		neighborhood.remove(entry.getCmoID());
 		
 		//see http://www.eclipse.org/swt/faq.php#uithread
-		display.syncExec(new Runnable(){public void run(){map.redraw();}});
+		display.syncExec(new Runnable(){public void run(){map.redraw();updateTableCMO();}});
 	}
 
 	/**
@@ -268,7 +394,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 
 		//create the beacon receiver
-		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(strDevice);
+		//BeaconRecv recv = BeaconRecv.loopPacketFromDevice(strDevice);
+		BeaconRecv recv = BeaconRecv.loopPacketFromFile(strDevice);
 
 		/*BeaconRecvFake recv = new BeaconRecvFake();
 
@@ -278,9 +405,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 					50.61789f,
 					0.0f,
 					1.0f,
-					0.0f));*/
+					0.0f));
 
-		/*recv.addFixedCMO(new CMOState(
+		recv.addFixedCMO(new CMOState(
 					new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),
 					3.12586784363f,
 					50.6021995544f,

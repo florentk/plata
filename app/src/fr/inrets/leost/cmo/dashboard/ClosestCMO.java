@@ -33,14 +33,14 @@ public class ClosestCMO implements Indicator {
 	 * @param track track  of CMO
 	 * @return the table entry of closest CMO
 	 */
-	public CMOTableEntry closestCMOInFront(Double longitude, Double latitude, Double track){
+	synchronized public CMOTableEntry closestCMOInFront(Double longitude, Double latitude, Double track){
 		CMOTableEntry closest=null;
 		Double closestDist= null;
 		double lg=longitude.doubleValue(),lt=latitude.doubleValue(),t=track.doubleValue();
 		double  dx,dy,dist;
 		
 		//for each value in CMO table
-		for ( CMOTableEntry e : cmo.getTable().values() ){
+		for ( CMOTableEntry e : cmo.getTable() ){
 			
 			//same direction of CMO candidate ?
 			if ( Physics.inSameDirection(t, e.getTrack().floatValue()) ){
