@@ -51,14 +51,20 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-    <target name="GIS">
-        <java classname="fr.inrets.leost.cmo.ui.GIS" failonerror="true" fork="yes">
-            <arg line="wlan0"/>
+    <target name="BeaconGenerator">
+        <java classname="fr.inrets.leost.cmo.beaconning.BeaconGenerator" failonerror="true" fork="yes">
+            <arg line="wlan0 &quot;ER-589-FE&quot; car 500"/>
             <classpath refid="app.classpath"/>
         </java>
     </target>
     <target name="BeaconForward">
         <java classname="fr.inrets.leost.cmo.beaconning.BeaconForward" failonerror="true" fork="yes">
+            <arg line="wlan0"/>
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
+    <target name="Dashboard">
+        <java classname="fr.inrets.leost.cmo.dashboard.Dashboard" failonerror="true" fork="yes">
             <arg line="wlan0"/>
             <classpath refid="app.classpath"/>
         </java>
@@ -71,18 +77,6 @@
     </target>
     <target name="MapWidget">
         <java classname="com.roots.swtmap.MapWidget" failonerror="true" fork="yes">
-            <classpath refid="app.classpath"/>
-        </java>
-    </target>
-    <target name="Dashboard">
-        <java classname="fr.inrets.leost.cmo.dashboard.Dashboard" failonerror="true" fork="yes">
-            <arg line="wlan0"/>
-            <classpath refid="app.classpath"/>
-        </java>
-    </target>
-    <target name="BeaconGenerator">
-        <java classname="fr.inrets.leost.cmo.beaconning.BeaconGenerator" failonerror="true" fork="yes">
-            <arg line="wlan0 &quot;ER-589-FE&quot; car 500"/>
             <classpath refid="app.classpath"/>
         </java>
     </target>
@@ -99,6 +93,17 @@
     </target>
     <target name="MapBrowser">
         <java classname="com.roots.swtmap.MapBrowser" failonerror="true" fork="yes">
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
+    <target name="GIS">
+        <java classname="fr.inrets.leost.cmo.ui.GIS" failonerror="true" fork="yes">
+            <arg line="/home/florent/tmp/lille_two.pcap"/>
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
+    <target name="AlertWidget">
+        <java classname="fr.inrets.leost.cmo.ui.AlertWidget" failonerror="true" fork="yes">
             <classpath refid="app.classpath"/>
         </java>
     </target>
