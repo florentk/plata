@@ -1,6 +1,10 @@
 package fr.inrets.leost.cmo.beaconning.packet;
 
+import fr.inrets.leost.cmo.dashboard.Indicator;
 import fr.inrets.leost.cmo.utils.ByteArrayConvert;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collections;
 
 /**
  * Packet for exchange between Communicating Mobile Object (CMO)
@@ -29,6 +33,21 @@ public class CMOHeader {
 	private static final short CMO_IDENTITY_LENGHT = 16;	
 	
 	
+	//Map String cmo type with the id cmo type
+    private static final Map<Short, String> cmoTypeString;
+    static {
+        Map<Short, String> aMap = new HashMap<Short, String>(7);
+        aMap.put(CMO_TYPE_CAR, "Car");
+        aMap.put(CMO_TYPE_TRUCK, "Truck");
+        aMap.put(CMO_TYPE_BUS, "Bus");
+        aMap.put(CMO_TYPE_MOTORBIKE, "Motorbike");
+        aMap.put(CMO_TYPE_WALKER, "Walker");
+        aMap.put(CMO_TYPE_BIKE, "Bike");
+        aMap.put(CMO_TYPE_SPOT, "Spot");
+
+        cmoTypeString = Collections.unmodifiableMap(aMap);
+    }    
+    
 	
 	/** Time To Leave */
 	private byte ttl;
@@ -75,36 +94,26 @@ public class CMOHeader {
 
 	}
 	
-	//TODO plutot utilisé a map : http://stackoverflow.com/questions/507602/how-to-initialise-a-static-map-in-java
 	public static String getTypeAvailable(){
-		return "car, truck, bus, motorbike, walker, bike, spot";
+		StringBuffer s=new StringBuffer("[ ");
+		
+		for (String cmostr : cmoTypeString.values())
+			s.append(cmostr+" ");
+			
+		return s.toString()+"]";
 	}
 	
 	public static short typeFromString(String str){
 
-		if (str.compareToIgnoreCase("car")==0)
-			return CMO_TYPE_CAR;
-		
-		if (str.compareToIgnoreCase("truck")==0)
-			return CMO_TYPE_TRUCK;
-
-		if (str.compareToIgnoreCase("bus")==0)
-			return CMO_TYPE_BUS;
-
-		if (str.compareToIgnoreCase("motorbike")==0)
-			return CMO_TYPE_MOTORBIKE;
-
-		if (str.compareToIgnoreCase("walker")==0)
-			return CMO_TYPE_WALKER;
-
-		if (str.compareToIgnoreCase("bike")==0)
-			return CMO_TYPE_BIKE;
-
-		if (str.compareToIgnoreCase("spot")==0)
-			return CMO_TYPE_SPOT;		
-		
+		for (Map.Entry<Short, String> e : cmoTypeString.entrySet())
+			if(str.compareToIgnoreCase(e.getValue())==0)
+				return  e.getKey();
 
 		return -1;
+	}
+	
+	public static String typeToString(short cmoType){	
+		return cmoTypeString.get(cmoType);
 	}
 
 	/**
@@ -171,7 +180,7 @@ public class CMOHeader {
 		s+="Sequence number : "+getSeq()+"\n";
 		s+="Lifetime : "+getLifetime()+"\n";
 		s+="Identity : "+getCmoID()+"\n";
-		s+="Type : "+getCmoType()+"\n";
+		s+="Type : "+typeToString(getCmoType())+"\n";
 		
 		return s;
 	}

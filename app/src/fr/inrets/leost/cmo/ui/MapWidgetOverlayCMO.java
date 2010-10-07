@@ -1,5 +1,8 @@
 package fr.inrets.leost.cmo.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Font;
@@ -14,17 +17,20 @@ import fr.inrets.leost.cmo.management.CMOTableEntry;
  *
  */
 public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
+	private static final Map<Short, Image> cmoimg =  new HashMap<Short, Image>();
 
-	private static Image img = null;
+	
 	private static Font ft = null; 
 
 	/**
 	 * set a image representing a CMO
 	 * @param image a image representing a CMO
 	 */
-	public static void setImg(Image image) {
-		img = image;
+	public static void setImg(Image image, short cmoType) {
+		cmoimg.put(cmoType, image);
 	}
+	
+	
 	
 	/**
 	 * set the text font for the CMO description
@@ -44,6 +50,8 @@ public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
 	@Override
 	public void drawOverlay(GC gc, Object overlay, int x, int y) {
 		CMOTableEntry cmo = (CMOTableEntry)overlay;
+		
+		Image img = cmoimg.get(cmo.getCmoType());
 		
 		if(img != null)
 			gc.drawImage(img, x -  img.getBounds().width / 2, y - img.getBounds().height);

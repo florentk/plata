@@ -224,7 +224,7 @@ public class BeaconGenerator extends Thread{
 		
 		if(args.length<4){
 			System.out.println("Not enough arguments");
-			System.out.println("Usage : java BeaconGenerator <device> <cmo id> <cmo tpye> <beacon interval>");			
+			System.out.println("Usage : java BeaconGenerator <device> <cmo id> <cmo type> <beacon interval>");			
 			System.exit(1);
 		}
 		

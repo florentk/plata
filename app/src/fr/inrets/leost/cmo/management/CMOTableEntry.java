@@ -1,6 +1,7 @@
 package fr.inrets.leost.cmo.management;
 
 import java.util.Date;
+import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
 
 /**
  * Entry of a CMO
@@ -130,7 +131,7 @@ public class CMOTableEntry {
 		String s="";
 		
 		s+="CMO Id : "+	getCmoID()+"\n";
-		s+="CMO Type : "+ getCmoType() + "\n";
+		s+="CMO Type : "+ CMOHeader.typeToString(getCmoType()) + "\n";
 		s+="Longitude : "+getLongitude()+"\n";
 		s+="Latitude : "+getLatitude()+"\n";
 		s+="Altitude : "+getAltitude()+"\n";

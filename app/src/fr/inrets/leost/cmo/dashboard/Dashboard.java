@@ -171,7 +171,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		db.addIndicator(bDistance);
 		db.addIndicator(sDistance);
 		db.addIndicator(closestCMO);   
-		db.addIndicator(new Hazard(geo, closestCMO, sDistance, bDistance));     
+		db.addIndicator(new Alert(geo, closestCMO, sDistance, bDistance));     
 		
 		for (Indicator id : db.getIndicators())
 			System.out.print(id.name()+";");		

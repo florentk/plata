@@ -8,7 +8,7 @@ import fr.inrets.leost.geolocation.Geolocation;
  * @author florent kaisser
  *
  */
-public class Hazard implements Indicator {
+public class Alert implements Indicator {
 
 	/**none hazard*/
 	public static final int DECISION_NONE = 0;
@@ -25,7 +25,8 @@ public class Hazard implements Indicator {
 	private int decision=DECISION_NONE;
 
 
-	public Hazard(Geolocation geo, ClosestCMO closestCMO,
+
+	public Alert(Geolocation geo, ClosestCMO closestCMO,
 			StoppingDistance sDistance, BrakingDistance bDistance) {
 		super();
 		this.geo = geo;
@@ -62,9 +63,16 @@ public class Hazard implements Indicator {
 					brakingDistance.getDistance());
 	}
 	
+	/**
+	 * @return the decision
+	 */
+	public int getDecision() {
+		return decision;
+	}
 
+	
 	public String name(){
-		return "Comment";
+		return "Alert";
 	}
 
 
