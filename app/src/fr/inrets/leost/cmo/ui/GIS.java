@@ -458,6 +458,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 		//create the beacon receiver
 		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(strDevice);
+		
+		if(recv==null)System.exit(1);
+		
 		//BeaconRecv recv = BeaconRecv.loopPacketFromFile(strDevice);
 
 		/*BeaconRecvFake recv = new BeaconRecvFake();
@@ -477,6 +480,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 					0.0f,
 					1.0f,
 					0.0f));*/
+		
+		
 
 		//create the GPS
 		Geolocation gps = new Gps();
