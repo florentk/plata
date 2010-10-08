@@ -7,7 +7,7 @@ import fr.inrets.leost.cmo.beaconning.packet.*;
  * Listener for receive the state change
  * 
  * @author Florent Kaisser
- *
+ * @dep - - - CMOState
  */
 
 public interface BeaconRecvListener {

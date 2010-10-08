@@ -1,19 +1,14 @@
 package fr.inrets.leost.cmo.ui;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -22,7 +17,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Listener;
@@ -36,7 +30,6 @@ import fr.inrets.leost.cmo.beaconning.BeaconRecv;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
 import fr.inrets.leost.cmo.dashboard.*;
 import fr.inrets.leost.cmo.management.CMOManagement;
-import fr.inrets.leost.cmo.management.CMOTable;
 import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.management.CMOTableListener;
 
@@ -50,7 +43,19 @@ import fr.inrets.leost.geolocation.WGS84;
 /**
  * show a map with associated information from Geolocation and CMOMangement
  * @author florent kaisser
- *
+ * @has 1 - - Geolocation
+ * @has 1 - - CMOManagement
+ * @has 1 - - Dashboard
+ * @has 1 - - AlertWidget
+ * @has 1 - - MapWidget
+ * @depend 1 - - StoppingDistance
+ * @depend 1 - - BrakingDistance
+ * @depend 1 - - ClosestCMO
+ * @depend 1 - - Alert
+ * @depend 2 - - MapWidgetOverlayImage
+ * @depend - - - CMOTableEntry
+ * 
+ * @has 0..* - - MapWidgetOverlayCMO
  */
 public class GIS extends Composite  implements DashboardListener, CMOTableListener, GeolocationListener  {
 	
@@ -115,7 +120,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		//alow receive the dashboardUpdate
 		db.addListener(this);
-		
+
 		//add indicator
 		StoppingDistance sDistance = new StoppingDistance(geo);
 		BrakingDistance bDistance = new BrakingDistance(geo);		

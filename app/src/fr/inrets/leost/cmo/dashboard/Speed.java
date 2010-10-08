@@ -5,7 +5,7 @@ import fr.inrets.leost.geolocation.Geolocation;
 /**
  * indicator for show the speed
  * @author florent kaisser
- *
+ * @has 1 - - Geolocation
  */
 public class Speed implements Indicator {
 

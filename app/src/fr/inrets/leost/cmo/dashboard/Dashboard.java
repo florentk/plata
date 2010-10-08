@@ -37,6 +37,8 @@ import fr.inrets.leost.geolocation.*;
  *                        ---------------
  *
  * @author florent kaisser
+ * @has 0..* - - Indicator
+ * @has 0..* - - DashboardListener
  *
  */
 public class Dashboard implements CMOTableListener, GeolocationListener{

@@ -28,7 +28,8 @@ import fr.inrets.leost.cmo.beaconning.packet.CMOState;
  * 
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
- *
+ * @has 1 - - CMOTable
+ * @has 0..* - - CMOTableListener
  */
 public class CMOManagement implements BeaconRecvListener {
 

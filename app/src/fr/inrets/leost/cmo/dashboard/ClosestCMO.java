@@ -10,7 +10,10 @@ import fr.inrets.leost.geolocation.WGS84;
  * indicator for show the closest CMO in front and same direction
  * 
  * @author florent kaisser
- *
+ * @has 1 - - CMOManagement
+ * @has 1 - - Geolocation
+ * @depend 1 closest - CMOTableEntry
+ * @assoc - - - Physics
  */
 public class ClosestCMO implements Indicator {
 	private CMOManagement cmo;

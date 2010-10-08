@@ -4,7 +4,7 @@ package fr.inrets.leost.geolocation;
  * Listener for receive a event when the geographical position change 
  * 
  * @author florent
- *
+ * @depend - - - WGS84
  */
 public interface GeolocationListener {
 	/**

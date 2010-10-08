@@ -3,21 +3,20 @@ package fr.inrets.leost.cmo.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
-import com.roots.swtmap.MapWidget;
 
 import fr.inrets.leost.cmo.dashboard.Alert;
 
+/**
+ * Widget for representing a Alert indicator
+ * @author florent kaisser
+ * @had 1 - - Alert
+ */
 public class AlertWidget extends Canvas {
 
 	private Alert dbAlert;
@@ -37,6 +36,11 @@ public class AlertWidget extends Canvas {
         });		
 	}
 	
+	/**
+	 * set a image associate to a level alert
+	 * @param image
+	 * @param alert
+	 */
 	public void setImg(Image image, int alert) {
 		alertImg.put(alert, image);
 	}	

@@ -6,6 +6,7 @@ import fr.inrets.leost.geolocation.Geolocation;
  * indicator for show the track
  * @author florent kaisser
  *
+ * @has 1 - - Geolocation
  */
 public class Track implements Indicator {
 

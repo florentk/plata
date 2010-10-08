@@ -21,7 +21,7 @@ import fr.inrets.leost.cmo.beaconning.packet.*;
  * Geolocation (GPS) --------> BeaconGenerator ----|CMOState|----> JPcap (row ethernet)
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
- *
+ * @has 1 - - Geolocation
  */
 public class BeaconGenerator extends Thread{
 	/** freqency interval between each packet send (ms)*/

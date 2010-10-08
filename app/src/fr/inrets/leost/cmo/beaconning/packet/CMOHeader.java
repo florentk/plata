@@ -9,7 +9,7 @@ import java.util.Collections;
  * Packet for exchange between Communicating Mobile Object (CMO)
  * 
  * @author florent kaisser <florent.kaisse@free.fr>
- *
+ * @assoc - - - ByteArrayConvert
  */
 public class CMOHeader {	
 	

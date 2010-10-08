@@ -7,7 +7,7 @@ import fr.inrets.leost.cmo.utils.ByteArrayConvert;
  * Packet for exchange the CMO state between Communicating Mobile Object (CMO)
  * 
  * @author florent kaisser <florent.kaisse@free.fr>
- *
+ * @assoc - - - ByteArrayConvert
  */
 public final class CMOState extends CMOHeader{
 

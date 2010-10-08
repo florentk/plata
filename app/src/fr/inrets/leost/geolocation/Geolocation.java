@@ -12,6 +12,9 @@ import java.util.Collection;
  * commonly used by the GPS <br><br>
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
+ * @has 1 - - WGS84
+ * @has 0..* - - GeolocationListener
+ * 
  */
 
 public abstract class  Geolocation extends Thread {

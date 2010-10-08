@@ -7,6 +7,8 @@ import fr.inrets.leost.geolocation.*;
  * 
  * @author florent kaisser
  *
+ * @has 1 - - Geolocation
+ * @depend 1 - - WGS84
  */
 public class Position implements Indicator  {
 

@@ -6,7 +6,11 @@ import fr.inrets.leost.geolocation.Geolocation;
  * Indicator for shwo a hazard
  * 
  * @author florent kaisser
- *
+ * @has 1 - - Geolocation
+ * @has 1 - - ClosestCMO
+ * @has 1 - - StoppingDistance
+ * @has 1 - - BrakingDistance
+ * 
  */
 public class Alert implements Indicator {
 

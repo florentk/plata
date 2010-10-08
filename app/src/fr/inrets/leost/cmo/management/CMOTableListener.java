@@ -3,7 +3,7 @@ package fr.inrets.leost.cmo.management;
 /**
  * for notification when the table is modified
  * @author florent kaisser
- *
+ * @dep CMOTableEntry
  */
 public interface CMOTableListener {
 	/**

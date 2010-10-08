@@ -14,7 +14,7 @@ import fr.inrets.leost.cmo.management.CMOTableEntry;
 /**
  * Draw a CMO neighborhood
  * @author florent
- *
+ * @depend - - - CMOTableEntry
  */
 public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
 	private static final Map<Short, Image> cmoimg =  new HashMap<Short, Image>();

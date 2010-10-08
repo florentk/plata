@@ -5,6 +5,9 @@ import fr.inrets.leost.geolocation.Geolocation;
 
 /**
  * indicator for stopping distance (breaking distance + human reaction delay)
+ * 
+ * @has 1 - - Geolocation
+ * @assoc - - - Physics
  */
 public class StoppingDistance implements Indicator {
 
