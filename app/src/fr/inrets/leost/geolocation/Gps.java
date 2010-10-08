@@ -142,8 +142,11 @@ public class Gps  extends Geolocation  {
 	 * Connection to gpsd
 	 * @throws IOException
 	 */
-	private void connectGPS() throws IOException {
+	private void connectGPS()  {
 		Socket gpsSocket;
+		
+		try {
+
 		
 		//create the socket
 		gpsSocket = connectToGpsd();
@@ -156,7 +159,9 @@ public class Gps  extends Geolocation  {
 		writeGPSInitJson(new BufferedWriter( new 
 				OutputStreamWriter( gpsSocket.getOutputStream() ) ));
 		
-
+		}catch (IOException e){
+			System.out.println("Unable connect to GPS daemon, is it started ?");
+		}
 
 	}
 	
