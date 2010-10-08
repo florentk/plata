@@ -126,12 +126,17 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 	}
 	
 	
+	
+	
 
 	static final Dashboard db = new Dashboard();
-	public static void main(String[] args) throws IOException,InterruptedException {
+	
+	
+	public static void startDashboard(String device)  throws IOException,InterruptedException {
+		
 		//Geolocation geo = new Fixe(new WGS84(),1.0,45.0);
 		Geolocation geo = new Gps();
-		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(args[0]);
+		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(device);
 		
 		/*recv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
@@ -194,6 +199,21 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		
 		//wait the end
 		geo.join();recv.join();		
+		
+	}
+	
+	
+	
+	public static void main(String[] args) throws IOException,InterruptedException {
+		
+		if(args.length<1){
+			System.out.println("Not enough arguments");
+			System.out.println("Usage : java Dashboard <device>");			
+			System.exit(1);
+		}	
+		
+		
+		startDashboard(args[0]);
 	}
 	
 

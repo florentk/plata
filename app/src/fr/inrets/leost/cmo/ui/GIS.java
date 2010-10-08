@@ -520,5 +520,15 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 	}
 	
-    public static void main (String [] args) throws Exception {startGIS(args[0]); System.exit(0);}	
+	public static void main (String [] args) throws Exception {
+
+		if(args.length<1){
+			System.out.println("Not enough arguments");
+			System.out.println("Usage : java GIS <device>");			
+			System.exit(1);
+		}	
+
+		startGIS(args[0]); 
+		System.exit(0);
+	}
 }

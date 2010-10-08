@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo java -classpath bin/:lib/json_simple-1.1.jar:/usr/share/java/swt-gtk-3.5.1.jar fr.inrets.leost.cmo.beaconning.BeaconGenerator $*
