@@ -1,6 +1,5 @@
 package fr.inrets.leost.cmo.beaconning.packet;
 
-import fr.inrets.leost.cmo.dashboard.Indicator;
 import fr.inrets.leost.cmo.utils.ByteArrayConvert;
 import java.util.HashMap;
 import java.util.Map;
@@ -141,8 +140,9 @@ public class CMOHeader {
 	 * @return the CMO identity
 	 */
 	public String getCmoID() {
+		return new String(cmoID);
 		
-		int end=0;
+		/*int end=0;
 		
 		for(int i=0;i<cmoID.length;i++ ){
 			if(cmoID[i]==0){
@@ -151,7 +151,7 @@ public class CMOHeader {
 			}
 		}
 		
-		return  new String(cmoID).substring(0, end);
+		return  new String(cmoID).substring(0, end);*/
 	}
 
 	/**
