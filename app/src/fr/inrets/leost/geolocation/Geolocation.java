@@ -34,6 +34,9 @@ public abstract class  Geolocation extends Thread {
 	/** current orientation in degree (0 to 360) */
 	private Double currentTrack;
 	
+	/** current time when the data has received*/
+	private Double currentTime;
+	
 
 	/** collection of listener for receive a event on position changing*/
 	private final Collection<GeolocationListener> gpsListeners = new ArrayList<GeolocationListener>();
@@ -61,7 +64,7 @@ public abstract class  Geolocation extends Thread {
 	private void positionChanged(){
 		//call the method positionChanged of each registered listener
 		for (GeolocationListener l : gpsListeners)
-			l.positionChanged(getCurrentPos(),getCurrentSpeed(),getCurrentTrack());
+			l.positionChanged(getCurrentTime(),getCurrentPos(),getCurrentSpeed(),getCurrentTrack());
 	}	
 	
 
@@ -122,7 +125,15 @@ public abstract class  Geolocation extends Thread {
 	public Double getCurrentSpeed() {
 		return currentSpeed;
 	}
-
+	
+	
+	/** get current time when the data has received
+	 * @return current time when the data has received
+	 * */
+	public Double getCurrentTime() {
+		return currentTime;
+	}
+	
 	/**
 	 *  set current speed 
 	 *  @param currentSpeed in meter per second 
@@ -145,7 +156,7 @@ public abstract class  Geolocation extends Thread {
 		this.currentTrack = currentTrack;
 	}	
 		
-	
+	public abstract void dispose();
 
 
 }

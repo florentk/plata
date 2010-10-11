@@ -29,6 +29,8 @@ import org.json.simple.parser.*;
  * 
  * [1] http://gpsd.berlios.de/
  * 
+ * @depend - - - GpsData
+ * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
  */
 public class Gps  extends Geolocation  {
@@ -39,17 +41,10 @@ public class Gps  extends Geolocation  {
 
 	/** reader buffer for read the data from gpsd*/
 	private BufferedReader gpsBR;
+	/** writer buffer for read the data from gpsd*/
+	private BufferedWriter gpsBW;	
 	
-	/**
-	 * 
-	 * configure gpsd session in json data format
-	 * @param gpsBW
-	 * @throws IOException
-	 */
-	static private void writeGPSInitJson(BufferedWriter gpsBW) throws IOException {
-		gpsBW.write( "?WATCH={\"enable\":true,\"json\":true}\n" );
-		gpsBW.flush();		
-	}
+
 
 	/**
 	 * Create a socket for the gpsd session. The dest address is localhost and 
@@ -89,6 +84,28 @@ public class Gps  extends Geolocation  {
 	}
 	
 	/**
+	 * 
+	 * configure gpsd session in json data format
+	 * @param gpsBW
+	 * @throws IOException
+	 */
+    private void writeGPSInitJson() throws IOException {
+		gpsBW.write( "?WATCH={\"enable\":true,\"json\":true}\n" );
+		gpsBW.flush();		
+	}
+	
+	/**
+	 * 
+	 * stop gpsd session 
+	 * @param gpsBW
+	 * @throws IOException
+	 */
+	private void writeGPSStop() throws IOException {
+		gpsBW.write( "?WATCH={\"enable\":false}\n" );
+		gpsBW.flush();		
+	}		
+	
+	/**
 	 * decode a json gps data.
 	 * @param str json string
 	 * @return the geographical position in WGS84 format
@@ -111,10 +128,11 @@ public class Gps  extends Geolocation  {
 				Double lon   = checkDoubleNull((Double)dict.get("lon"));		
 				Double alt   = checkDoubleNull((Double)dict.get("alt"));	
 				Double speed = knotToSI(checkDoubleNull((Double)dict.get("speed")));		
-				Double track = checkDoubleNull((Double)dict.get("track"));					
+				Double track = checkDoubleNull((Double)dict.get("track"));	
+				Double t = checkDoubleNull((Double)dict.get("time"));	
 				
 				
-				return new GpsData(new WGS84(lon,lat,alt),speed,track);
+				return new GpsData(t,new WGS84(lon,lat,alt),speed,track);
 			}
 		}
 		catch(ParseException pe){
@@ -155,9 +173,11 @@ public class Gps  extends Geolocation  {
 		gpsBR = new BufferedReader( new 
 				InputStreamReader( gpsSocket.getInputStream()) );
 		
+		gpsBW = new BufferedWriter( new 
+				OutputStreamWriter( gpsSocket.getOutputStream()) );
+		
 		//configure the gpsd session in json data
-		writeGPSInitJson(new BufferedWriter( new 
-				OutputStreamWriter( gpsSocket.getOutputStream() ) ));
+		writeGPSInitJson();
 		
 		}catch (IOException e){
 			System.out.println("Unable connect to GPS daemon, is it started ?");
@@ -165,6 +185,13 @@ public class Gps  extends Geolocation  {
 
 	}
 	
+	public void dispose(){
+		try{
+			writeGPSStop();
+		}catch (IOException e){
+			System.out.println("Unable write to GPS daemon");
+		}
+	}
 
 	
 	/**
@@ -202,37 +229,7 @@ public class Gps  extends Geolocation  {
 
 	
 	
-	/**
-	 * GpsData for return type of decodeGPSDataJson
-	 */
-	private static final class GpsData{
-		
-		private WGS84 position;
-		private Double speed;
-		private Double track;
 
-		public GpsData(WGS84 position, Double speed, Double track) {
-			super();
-			this.position = position;
-			this.speed = speed;
-			this.track = track;
-		}	
-		
-		/** current position in WGC84 format */
-		private WGS84 getPosition() {
-			return position;
-		}
-		
-		/** current speed in meter per second */
-		private Double getSpeed() {
-			return speed;
-		}
-		
-		/** current orientation in degree (0 to 360) */
-		private Double getTrack() {
-			return track;
-		}		
-	}
 	
 	
 	//Unit testing
@@ -241,14 +238,14 @@ public class Gps  extends Geolocation  {
 		
 		geo.addPositionListener(new GeolocationListener() {
 
-			public void positionChanged(WGS84 position, Double speed, Double track) {
-				System.out.println(position + " Speed : " + speed + " Track : " + track);
+			public void positionChanged(Double time, WGS84 position, Double speed, Double track) {
+				System.out.println(time + " : " + position + " Speed : " + speed + " Track : " + track);
 			}
 
 		});
 		
-		geo.start();
-		
+		geo.run();
+		geo.dispose();
 		
 	}
 

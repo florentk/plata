@@ -31,7 +31,9 @@ public class Fixe  extends Geolocation  {
 		
 	}
 
-
+	public void dispose(){
+		
+	}
 	
 	
 	//Unit testing
@@ -40,8 +42,8 @@ public class Fixe  extends Geolocation  {
 		
 		geo.addPositionListener(new GeolocationListener() {
 
-			public void positionChanged(WGS84 position, Double speed, Double track) {
-				System.out.println(position + " Speed : " + speed + " Track : " + track);
+			public void positionChanged(Double time,WGS84 position, Double speed, Double track) {
+				System.out.println(time + " : " + position + " Speed : " + speed + " Track : " + track);
 			}
 
 		});

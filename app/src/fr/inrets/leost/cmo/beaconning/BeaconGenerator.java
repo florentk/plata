@@ -189,6 +189,8 @@ public class BeaconGenerator extends Thread{
 			
 	    	BeaconGenerator gen = new BeaconGenerator(sender, loc, strId,type,beaconInter);
 	    	gen.run();	  
+	    	
+	    	loc.dispose();
 		}catch(java.io.IOException e){
 			System.out.println("Cannot init the geolocation system : " + e);
 		}

@@ -5,6 +5,8 @@ import fr.inrets.leost.geolocation.Geolocation;
 
 /**
  * indicator for braking distance 
+ * @has 1 - - Geolocation
+ * @assoc - - - Physics
  */
 public class BrakingDistance implements Indicator {
 

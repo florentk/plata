@@ -71,7 +71,7 @@ public class GpsMonitor {
 	      
 	      geo.addPositionListener(new GeolocationListener() {
 
-	    	  public void positionChanged(WGS84 position, Double speed, Double track) {
+	    	  public void positionChanged(Double time, WGS84 position, Double speed, Double track) {
 	    		  display.syncExec(
 					  new Runnable(){
 					      public void run(){
@@ -99,6 +99,7 @@ public class GpsMonitor {
     	Gps gps = new Gps();
 	    gps.start();
     	gpsGUI(gps);
+    	gps.dispose();
     }
 	
 	

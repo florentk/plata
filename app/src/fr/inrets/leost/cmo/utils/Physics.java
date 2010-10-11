@@ -22,10 +22,14 @@ public class Physics {
 		return Double.compare( differenceTrack( track1 , track2 ),MAX_ANGLE_SAME_DIRECTION) <0;
 	}
 
+	static public double trackToRadians(double track){
+		//TODO 360 - track ???
+		return Math.toRadians(360.0-track);
+	}
 
 	
 	static public boolean inFront(double dx, double dy, double track){
-		double a=  Math.toRadians(track);
+		double a=  trackToRadians(track);
 		return dx*Math.cos(a) + dy*Math.sin(a) > 0.0;
 	}
 	
