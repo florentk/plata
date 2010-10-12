@@ -121,7 +121,7 @@ public class BeaconGenerator extends Thread{
 	 * broadcast a CMOStat packet with location information
 	 */
 	private void broadcastCMOStatPacket(){
-		broadcastCMOStatPacket( loc.getCurrentPos(), loc.getCurrentSpeed(), loc.getCurrentTrack() );
+		broadcastCMOStatPacket( loc.getLastPos(), loc.getCurrentSpeed(), loc.getCurrentTrack() );
 	}
 	
 	public void run() {

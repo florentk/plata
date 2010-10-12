@@ -14,6 +14,7 @@ public  class GpsData{
 
 	public GpsData(Double t,WGS84 position, Double speed, Double track) {
 		super();
+		this.t = t;
 		this.position = position;
 		this.speed = speed;
 		this.track = track;

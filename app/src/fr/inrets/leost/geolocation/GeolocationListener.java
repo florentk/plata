@@ -13,5 +13,5 @@ public interface GeolocationListener {
 	 * @param speed speed in meter per second
 	 * @param track orientation in degree (0 to 360)
 	 */
-	void positionChanged(Double time, WGS84 position, Double speed, Double track);
+	void positionChanged(WGS84 position, Double speed, Double track);
 }

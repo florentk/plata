@@ -70,7 +70,7 @@ public class WGS84 {
 	}
 	
 	public String toString(){
-		return String.format("%01.6f %01.6f %01.1f m", longitude, latitude, h);
+		return String.format("%01.6f %01.6f %01.1f", longitude, latitude, h);
 	}
 	
 	public boolean equals(WGS84 a, WGS84 b){
@@ -78,5 +78,20 @@ public class WGS84 {
 				&& 	a.longitude.equals(b.longitude)
 				&&  a.h.equals(b.h);
 	}
+	
+	WGS84 add (WGS84 p){
+		if(p==null)return this;
+		return  new WGS84(longitude() + p.longitude(), latitude() + p.latitude(), h() + p.h());
+	}
+	
+	WGS84 mul (WGS84 p){
+		if(p==null)return this;
+		return  new WGS84(longitude() * p.longitude(), latitude() * p.latitude(), h() * p.h());
+	}	
+	
+	WGS84 sub (WGS84 p){
+		if(p==null)return this;
+		return  new WGS84(longitude() - p.longitude(), latitude() - p.latitude(), h() - p.h());
+	}		
 
 }

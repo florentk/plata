@@ -83,7 +83,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 	 * @see fr.inrets.leost.geolocation.GeolocationListener#positionChanged(fr.inrets.leost.geolocation.WGS84, java.lang.Double, java.lang.Double)
 	 */
 	@Override
-	public void positionChanged(Double time,WGS84 position, Double speed, Double track) {
+	public void positionChanged(WGS84 position, Double speed, Double track) {
 		setUpdate();
 	}
 

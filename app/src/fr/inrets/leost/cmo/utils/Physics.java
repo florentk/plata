@@ -12,26 +12,75 @@ public class Physics {
 	
 	public static final double G = 9.81;
 	
+	/**
+	 * Compute the angle between two track in degree
+	 * @param track1 first track in degree
+	 * @param track2 second track in degree
+	 * @return the angular difference between track1 et track2
+	 */
 	static public double differenceTrack(double track1, double track2){
 		double diffAbs =  Math.abs(track1 - track2);
 		
 		return Math.min(360 - diffAbs, diffAbs);
 	}	
 	
+	/**
+	 * return true if the mobile object move in same direction
+	 * @param track1 track of first mobile object 
+	 * @param track2 track of second mobile object 
+	 * @return true if the mobile object move in same direction
+	 */
 	static public boolean inSameDirection(double track1, double track2){
 		return Double.compare( differenceTrack( track1 , track2 ),MAX_ANGLE_SAME_DIRECTION) <0;
 	}
 
+	/**
+	 * convert a track in radian angular unit
+	 * @param track the track in degree 
+	 * @return the track in radian
+	 */
 	static public double trackToRadians(double track){
 		//TODO 360 - track ???
 		return Math.toRadians(360.0-track);
 	}
 
-	
+	/**
+	 * return true if the mobile object move to a point
+	 * @param dx x delta between the mobile object and the point
+	 * @param dy y delta between the mobile object and the point
+	 * @param track track of mobile object
+	 * @return true if the mobile object move to a point
+	 */
 	static public boolean inFront(double dx, double dy, double track){
 		double a=  trackToRadians(track);
 		return dx*Math.cos(a) + dy*Math.sin(a) > 0.0;
 	}
+	
+	/**
+	 * extrapolate the longitude with the current speed
+	 * @param time difference between actual time and t0
+	 * @param lon longitude at t0
+	 * @param speed current speed
+	 * @param track current track
+	 * @return the extrapolate current longitude
+	 */
+	/*static public double extrapolateLongitude(double dt, double lon, double speed, double track){
+		return lon + speed * Math.sin(trackToRadians(track)) * dt ;
+	}*/
+	
+	/**
+	 * extrapolate the longitude with the current speed
+	 * @param time difference between actual time and t0
+	 * @param lat latitude at t0
+	 * @param speed current speed
+	 * @param track current track
+	 * @return the extrapolate current longitude
+	 */
+	/*static public double extrapolateLatitude(double dt, double lat, double speed, double track){
+		return lat + speed * Math.cos(trackToRadians(track)) * dt ;
+	}*/
+	
+	
 	
 	/**
 	 * Compute the Braking distance
@@ -69,7 +118,7 @@ public class Physics {
 	}
 	
 	/**
-	 * distance between the perception and the vehicule stoped
+	 * distance between the perception and the vehicle stopped
 	 * @param v speed (m/s)
 	 * @param coef friction coef 
 	 */

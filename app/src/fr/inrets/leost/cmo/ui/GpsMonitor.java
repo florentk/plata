@@ -1,5 +1,8 @@
 package fr.inrets.leost.cmo.ui;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -24,7 +27,7 @@ public class GpsMonitor {
 	static MapWidget map;
 	static Display display;
 	static Geolocation geo;
-	static Image car;
+	static MapWidgetOverlayImage car;
 	
 	public static Point WGS84toPoint(WGS84 position,int z){
 		return new Point(MapWidget.lon2position(position.longitude(), z), MapWidget.lat2position(position.latitude(), z));
@@ -55,8 +58,8 @@ public class GpsMonitor {
 	      try{
 	    	  
 	    	  map.addOverlay( 
-	    			  new MapWidgetOverlayImage ( 0, 0, 
-	    					  MapWidgetOverlayImage.REFERENCE_CENTER_WIDGET ,
+	    			 car = new MapWidgetOverlayImage ( 0, 0, 
+	    					  MapWidgetOverlayImage.REFERENCE_WORLD ,
 	    					  loadCarImage()) );
 	    	  
 	    	  map.addOverlay( 
@@ -69,13 +72,36 @@ public class GpsMonitor {
 	      
 	      geo = g;
 	      
+	      new Timer().schedule( new TimerTask() {
+	    	  public void run() {
+	    		  display.syncExec(
+					  new Runnable(){
+					      public void run(){
+					    	  //map.setCenterPosition( WGS84toPoint(geo.getCurrentPos(), map.getZoom()) );
+					    	  car.setDx(geo.getCurrentPos().longitude());
+					    	  car.setDy(geo.getCurrentPos().latitude());
+					    	  //map.setCenterPosition(new Point(45,78));
+					    	  map.redraw();
+					      }
+					    }  
+	    		  );
+	    		 
+	    	  }
+
+	      }, 0, 50);
+	      
+	      
+	     
+	      
 	      geo.addPositionListener(new GeolocationListener() {
 
-	    	  public void positionChanged(Double time, WGS84 position, Double speed, Double track) {
+	    	  public void positionChanged(WGS84 position, Double speed, Double track) {
 	    		  display.syncExec(
 					  new Runnable(){
 					      public void run(){
 					    	  map.setCenterPosition( WGS84toPoint(geo.getCurrentPos(), map.getZoom()) );
+					    	  /*car.setDx(geo.getCurrentPos().longitude());
+					    	  car.setDy(geo.getCurrentPos().latitude());*/
 					    	  //map.setCenterPosition(new Point(45,78));
 					    	  map.redraw();
 					      }
@@ -85,8 +111,8 @@ public class GpsMonitor {
 	    	  }
 
 	      });
+	      	      
 	      
-
 
 	      shell.open ();
 	      while (!shell.isDisposed ()) {

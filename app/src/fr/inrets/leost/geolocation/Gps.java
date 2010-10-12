@@ -210,10 +210,11 @@ public class Gps  extends Geolocation  {
 				//System.out.println("Read a line : " + data);
 				
 				//if needed, update the current position
-				if(data!= null  && (   !getCurrentPos().equals(data.getPosition())
+				if(data!= null  && (   !getLastPos().equals(data.getPosition())
 						|| !getCurrentSpeed().equals(data.getSpeed())
 						|| !getCurrentTrack().equals(data.getTrack())))
 				{
+					//setCurrentTime(data.getTime());
 					setCurrentPos(data.getPosition());
 					setCurrentSpeed(data.getSpeed());	
 					setCurrentTrack(data.getTrack());						
@@ -226,20 +227,17 @@ public class Gps  extends Geolocation  {
 		}
 		
 	}
-
-	
-	
-
-	
 	
 	//Unit testing
 	public static void main (String[] args) throws IOException{
 		Geolocation geo = new Gps();
 		
+		java.util.Locale.setDefault(java.util.Locale.US);
+		
 		geo.addPositionListener(new GeolocationListener() {
 
-			public void positionChanged(Double time, WGS84 position, Double speed, Double track) {
-				System.out.println(time + " : " + position + " Speed : " + speed + " Track : " + track);
+			public void positionChanged(WGS84 position, Double speed, Double track) {
+				//System.out.println(position + " Speed : " + speed + " Track : " + track);
 			}
 
 		});
