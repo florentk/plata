@@ -4,7 +4,7 @@ import java.util.Date;
 import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
 
 /**
- * Entry of a CMO
+ * Entry of a CMO (mutable)
  * @author florent kaisser
  *
  */
@@ -41,11 +41,19 @@ public class CMOTableEntry {
 	
 	private Date dateEntry;
 	
+	private Double vLongitude=null, vLatitude=null, vAltitude=null;
+	
 
 	public CMOTableEntry(String cmoID, short cmoType, Double longitude,
 			Double latitude, Double altitude, Double speed, Double track,
 			int lifetime) {
 		super();
+		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime);
+	}
+	
+	private void setEntry(String cmoID, short cmoType, Double longitude,
+			Double latitude, Double altitude, Double speed, Double track,
+			int lifetime){
 		this.cmoID = cmoID;
 		this.cmoType = cmoType;
 		this.longitude = longitude;
@@ -54,7 +62,25 @@ public class CMOTableEntry {
 		this.speed = speed;
 		this.track = track;
 		this.lifetime = lifetime;
-		this.dateEntry = new Date();
+		this.dateEntry = new Date();		
+	}
+	
+	private double entryOlder(){
+		return ((double)((new Date()).getTime() - dateEntry.getTime()))/1000.0;
+	}
+	
+	private void computeVelocity(double longitude, double latitude, double altitude, double dt) {	
+		vLongitude = new Double((longitude - this.longitude) / dt);
+		vLatitude  = new Double((latitude - this.latitude) / dt);
+		vAltitude  = new Double((altitude - this.altitude) / dt);
+	}
+	
+	public void updateEntry(String cmoID, short cmoType, Double longitude,
+			Double latitude, Double altitude, Double speed, Double track,
+			int lifetime) {
+		double dt = entryOlder();
+		computeVelocity(longitude, latitude, altitude, dt);
+		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime);
 	}
 
 	boolean isExpired(){
@@ -82,21 +108,30 @@ public class CMOTableEntry {
 	 * @return the longitude (in ddmm.mmmm)
 	 */
 	public Double getLongitude() {
-		return longitude;
+		if(vLongitude == null)
+			return longitude;
+		else
+			return longitude + vLongitude *  entryOlder();
 	}
 
 	/**
 	 * @return the latitude (in ddmm.mmmm)
 	 */
 	public Double getLatitude() {
-		return latitude;
+		if(vLatitude == null)
+			return latitude;
+		else
+			return latitude + vLatitude *  entryOlder();		
 	}
 
 	/**
 	 * @return  altitude (in metter)
 	 */
 	public Double getAltitude() {
-		return altitude;
+		if(vAltitude == null)
+			return altitude;
+		else
+			return altitude + vAltitude *  entryOlder();		
 	}
 
 	/**
@@ -116,14 +151,14 @@ public class CMOTableEntry {
 	/**
 	 * @return the time for which CMO considere not accessible
 	 */
-	public int getLifetime() {
+	protected int getLifetime() {
 		return lifetime;
 	}
 
 	/**
 	 * @return date which entry is added
 	 */
-	public Date getDateEntry() {
+	protected Date getDateEntry() {
 		return dateEntry;
 	}
 	

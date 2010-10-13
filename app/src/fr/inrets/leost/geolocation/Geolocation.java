@@ -109,17 +109,21 @@ public abstract class  Geolocation extends Thread {
 	
 	private WGS84 getPredictPos() {
 		if(velocity == null)
+			//no velocity, assume no moving
 			return currentPos;
 		
+		//compute the time since the last data acquisition
 		double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;	
 		
 		if(acc == null)
+			//no acceleration, assume a constant velocity
 			return new WGS84(
 				currentPos.longitude() +  (velocity.longitude() * dt) ,
 				currentPos.latitude() +  (velocity.latitude() * dt) , 
 				currentPos.h() + (velocity.h() * dt)
 				);
 		
+		//full equation with velocity and acceleration
 		return new WGS84(
 				currentPos.longitude() +  (velocity.longitude() * dt) +  (acc.longitude() * dt * dt),
 				currentPos.latitude() +  (velocity.latitude() * dt) +  (velocity.latitude() * dt * dt), 
@@ -131,33 +135,25 @@ public abstract class  Geolocation extends Thread {
 	
 	/**
 	 * get the last position recevied by the device
+	 * without interpolation
 	 * @return the last position
 	 */
 	public WGS84 getLastPos() {
 		return currentPos;
 	}
 	
-	
-	public static double median3val(double _v1, double _v2, double _v3){
-		/*double v1 = Math.abs(_v1);
-		double v2 = Math.abs(_v2);		
-		double v3 = Math.abs(_v3);	*/
-		
-		double v1 = _v1;
-		double v2 = _v2;
-		double v3 = _v3;
-		
-		
-		if((v1<=v2 && v2<=v3) || (v3<=v2 && v2<=v1))
-			return _v2;
 
-		if((v2<=v1 && v1<=v3) || (v3<=v1 && v1<=v2))
-			return _v1;	
-		
-		return _v3;			
-	}
 
-	
+	/**
+	 * compute the dirivate from WGS84 type. The derivate is smooth with the last computed derivate
+	 * The position can be a derivate position, i.e. the velocity for compute a acceleration
+	 * @param prevPos position at t0
+	 * @param newPos position at t1
+	 * @param dt t1 - t0
+	 * @param hist last derivate computed. This list will be update with the new derivate
+	 * @param nbMaxHist max entry in hist
+	 * @return the derivate
+	 */
 	private WGS84 computeDerivate(WGS84 prevPos, WGS84 newPos, double dt, LinkedList<WGS84> hist, int nbMaxHist){
 		WGS84 d =  new WGS84(
 				(newPos.longitude() - prevPos.longitude()) / dt,
@@ -191,7 +187,7 @@ public abstract class  Geolocation extends Thread {
 		
 	}
 	
-static int n =0;
+//static int n =0;
 	/**
 	 * set the current position
 	 * @param currentPos the current position in WGS84 format
@@ -199,7 +195,7 @@ static int n =0;
 	protected void setCurrentPos(WGS84 currentPos) {
 		
 		
-		
+		//if no current piosition, can't compute the velocity
 		if(this.currentPos!=null){
 			
 			//System.out.println(n++ + " " + getPredictPos().sub(currentPos) + " " + velocity);
@@ -208,18 +204,19 @@ static int n =0;
 			
 			WGS84 newVelocity = computeDerivate(this.currentPos,currentPos, dt, velocities, VELOCITIES_SIZE_MAX);
 			
+			//if no velocity, can't compute the acceleration
 			if(velocity != null){
 				acc = computeDerivate(velocity,newVelocity, dt, accs, ACCS_SIZE_MAX);
 			}
 			
 			//if(velocity != null) System.out.println(n++ + " " + velocity + " "+ acc);
-
-			
+				
+			//update the current velocity
 			velocity=newVelocity;
 		}		
 		
 		
-		
+		//update the current position
 		this.currentPos = currentPos;
 		sysTime = new Date();
 		positionChanged();
