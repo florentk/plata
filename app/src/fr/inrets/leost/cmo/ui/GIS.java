@@ -324,7 +324,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			}
 			
 			i.setText(getTextsTableItemCMO(entry));
-			i.setData(entry);			
+			i.setData(entry);		
 		}
 		
 		
@@ -348,6 +348,15 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			tableInfo.getItem(i++).setText(1, id.toString());
 	}
 	
+	public void updateNeighborhood(){
+		
+		for (CMOTableEntry entry : cmoMgt.getTable()){
+			MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
+			over.setDx(entry.getLongitude());
+			over.setDy(entry.getLatitude());
+		}
+	}
+	
 	public void updateAll(){
 		if(stop) return;
 		
@@ -362,6 +371,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		map.setCenterPosition( lastPos );
 		updateTableCMO();
 		updateTableInfo();
+		updateNeighborhood();
 		map.redraw();
 		alert.redraw();
 	}
@@ -415,10 +425,6 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			tableCMOAdded(entry);
 			return;
 		}
-		
-		over.setDx(entry.getLongitude());
-		over.setDy(entry.getLatitude());
-		
 		
 		updateAsyncAll();
 	}
