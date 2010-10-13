@@ -75,33 +75,40 @@ public class CMOManagement implements BeaconRecvListener {
 	@Override
 	synchronized public void cmoStatChanged(CMOState newStat) {
 		CMOTableEntry entry;
-		boolean newEntry = false;
-		
-		
-		if( table.containsKey(newStat.getCmoID()))
-			table.remove(newStat.getCmoID());
-		else
-			newEntry = true;
-		
 
-		table.put(newStat.getCmoID(), 
-				entry = new CMOTableEntry(
-						newStat.getCmoID(),
-						newStat.getCmoType(),
-						
-						new Double (newStat.getLongitude().doubleValue()),
-						new Double (newStat.getLatitude()),
-						new Double (newStat.getH()),
-						new Double (newStat.getSpeed()),
-						new Double (newStat.getTrack()),
-						newStat.getLifetime()
-					));
-
-		if(newEntry)
-			notifyListenerAdd(entry);
-		else
-			notifyListenerChanged(entry);
+		
+		
+		if( table.containsKey(newStat.getCmoID())){
+			entry = table.get(newStat.getCmoID());
+			entry.updateEntry(
+							newStat.getCmoID(),
+							newStat.getCmoType(),
+							new Double (newStat.getLongitude().doubleValue()),
+							new Double (newStat.getLatitude()),
+							new Double (newStat.getH()),
+							new Double (newStat.getSpeed()),
+							new Double (newStat.getTrack()),
+							newStat.getLifetime()
+							);
 			
+			notifyListenerChanged(entry);
+		}else{
+			table.put(newStat.getCmoID(), 
+					entry = new CMOTableEntry(
+							newStat.getCmoID(),
+							newStat.getCmoType(),
+							
+							new Double (newStat.getLongitude().doubleValue()),
+							new Double (newStat.getLatitude()),
+							new Double (newStat.getH()),
+							new Double (newStat.getSpeed()),
+							new Double (newStat.getTrack()),
+							newStat.getLifetime()
+						));
+	
+			notifyListenerAdd(entry);
+		
+		}	
 	}
 	
 	/**
