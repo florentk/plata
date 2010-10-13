@@ -88,8 +88,8 @@ public class ClosestCMO implements Indicator {
 			distance = distanceToClosestCMO();
 		
 			//no take in account if too far or the track is not accurate (low speed)
-			if( distance > 1000.0 ||  geo.getCurrentSpeed() < 3.0)
-					closestCMO = null;
+			/*if( distance > 1000.0 ||  geo.getCurrentSpeed() < 3.0)
+					closestCMO = null;*/
 
 		}
 	}

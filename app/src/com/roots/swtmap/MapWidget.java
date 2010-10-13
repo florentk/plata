@@ -388,7 +388,7 @@ public class MapWidget extends Canvas {
 
     /* constants ... */
     public static final TileServer[] TILESERVERS = {
-        new TileServer("file:///home/florent/var/osm/tiles/", 18),    	
+        new TileServer("file://" + System.getProperty("user.home") + "/var/osm/tiles/", 18),    	
         new TileServer("http://tile.openstreetmap.org/", 18),
         new TileServer("http://tah.openstreetmap.org/Tiles/tile/", 17),
     };
@@ -466,7 +466,12 @@ public class MapWidget extends Canvas {
         addMouseMoveListener(mouseListener);
         addMouseWheelListener(mouseListener);
         addMouseTrackListener(mouseListener);
+        
         /// TODO: check tileservers
+        
+        System.out.println("Using tile server : ");
+        for (TileServer t : TILESERVERS)
+        	System.out.println("\t" + t.getURL());
     }
     
     protected void paintControl(PaintEvent e) {

@@ -456,13 +456,11 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	public void dispose(){
 		stop = true;
 		alert.dispose();
-		
 		map.dispose();
 		tableInfo.dispose();
 		tableCMO.dispose();
 		display.dispose();
 		expandItemCMOTable.dispose();
-		
 	}
 	
 	public static BeaconRecv createBeaconRecv(String strDevice){
