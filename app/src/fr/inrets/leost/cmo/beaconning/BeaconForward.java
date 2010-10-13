@@ -192,7 +192,7 @@ public class BeaconForward implements BeaconRecvListener {
 	    try{
 	    	 
 	    	 
-	    	BeaconRecv recv =  new BeaconRecv(JpcapCaptor.openDevice(device, 2000, false, 20));
+	    	BeaconRecv recv =  new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20));
 	    	BeaconForward f = new BeaconForward(JpcapSender.openDevice(device));
 	    	
 			recv.addListener(f);

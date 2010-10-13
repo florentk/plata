@@ -3,6 +3,8 @@ package fr.inrets.leost.cmo.ui;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -27,6 +29,7 @@ import com.roots.swtmap.MapWidgetOverlayImage;
 import com.roots.swtmap.MapWidget.PointD;
 
 import fr.inrets.leost.cmo.beaconning.BeaconRecv;
+import fr.inrets.leost.cmo.beaconning.BeaconRecvEthernet;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
 import fr.inrets.leost.cmo.dashboard.*;
 import fr.inrets.leost.cmo.management.CMOManagement;
@@ -72,6 +75,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	private Table tableCMO;	
 	private Display display;
 	private ExpandItem expandItemCMOTable;
+	private MapWidgetOverlayImage myCar;
 	
 	private boolean stop=false;
 
@@ -211,8 +215,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		MapWidgetOverlayCMO.setFont(new Font(display,"Arial",14,SWT.BOLD));	
 		
 		map.addOverlay( 
-				new MapWidgetOverlayImage ( 0, 0, 
-						MapWidgetOverlayImage.REFERENCE_CENTER_WIDGET ,
+				myCar = new MapWidgetOverlayImage ( 0, 0, 
+						MapWidgetOverlayImage.REFERENCE_WORLD ,
 						loadMyCarImage()) );
 
 		map.addOverlay( 
@@ -283,6 +287,15 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
         sashForm.setWeights(new int[] { 35, 65 });
         
+        new Timer().schedule(
+        		new TimerTask(){
+
+					public void run() {
+						updateAsyncAll();
+					}
+        		}
+        ,0, 100);
+  
 	}
 	
 	public String[] getTextsTableItemCMO(CMOTableEntry entry){
@@ -329,29 +342,55 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}
 	
+	public void updateTableInfo(){
+		int i=0;
+		for (Indicator id : dashboard.getIndicators())
+			tableInfo.getItem(i++).setText(1, id.toString());
+	}
+	
+	public void updateAll(){
+		if(stop) return;
+		
+		//compute the current position in pixel
+		Point lastPos = new Point(
+				MapWidget.lon2position(geo.getLastPos().longitude(), map.getZoom()), 
+				MapWidget.lat2position(geo.getLastPos().latitude(), map.getZoom())
+		);
+		
+		
+		myCar.setDx(geo.getCurrentPos().longitude());myCar.setDy(geo.getCurrentPos().latitude());
+		map.setCenterPosition( lastPos );
+		updateTableCMO();
+		updateTableInfo();
+		map.redraw();
+		alert.redraw();
+	}
+	
+	class UpdateAll implements Runnable{
+
+		@Override
+		public void run() {
+			updateAll();
+		}
+	}
+	
+	public void updateAsyncAll(){
+		if(!stop && !display.isDisposed())
+			//see http://www.eclipse.org/swt/faq.php#uithread
+			display.syncExec(new UpdateAll());
+	}
+
+	
 	/**
 	 * update the table and the map position
 	 */
 	public void dashboardUpdate(){
 		if (display.isDisposed()) return;
 		
-		//see http://www.eclipse.org/swt/faq.php#uithread
-		if(!stop)display.syncExec(
-				new Runnable(){
-					public void run(){
-						
-						if(stop) return;
-
-						//update the table item
-						if (tableInfo != null){
-							int i=0;
-							for (Indicator id : dashboard.getIndicators())
-								tableInfo.getItem(i++).setText(1, id.toString());
-							alert.redraw();
-						}
-					}
-				}  
-		);
+		//update the table item
+		if (tableInfo != null){
+			updateAsyncAll();
+		}
 	}	
 	
 
@@ -362,27 +401,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 */
 	@Override
 	public void positionChanged(WGS84 position, Double speed, Double track) {
-		
-		if (display.isDisposed()) return;
-		
-		//see http://www.eclipse.org/swt/faq.php#uithread
-		if(!stop)display.syncExec(
-				new Runnable(){
-					public void run(){
-						if(stop) return;
-						//compute the current position in pixel
-						Point currentPos = new Point(
-								MapWidget.lon2position(geo.getCurrentPos().longitude(), map.getZoom()), 
-								MapWidget.lat2position(geo.getCurrentPos().latitude(), map.getZoom())
-						);
-
-						//center the map on current position
-						map.setCenterPosition( currentPos );
-						map.redraw();	
-					}
-				}
-
-		);
+		updateAsyncAll();
 	}
 
 	/** 
@@ -400,8 +419,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		over.setDx(entry.getLongitude());
 		over.setDy(entry.getLatitude());
 		
-		//see http://www.eclipse.org/swt/faq.php#uithread
-		if(!stop)display.syncExec(new Runnable(){public void run(){if(stop) return;map.redraw();updateTableCMO();}});
+		
+		updateAsyncAll();
 	}
 
 	/**
@@ -414,10 +433,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		map.addOverlay(over);
 		neighborhood.put(entry.getCmoID(),over);
 		
-
-		
-		//see http://www.eclipse.org/swt/faq.php#uithread
-		if(!stop)display.syncExec(new Runnable(){public void run(){if(stop) return;map.redraw();updateTableCMO();}});
+		updateAsyncAll();
 	}
 
 	/** 
@@ -428,8 +444,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		map.removeOverlay(neighborhood.get(entry.getCmoID()));
 		neighborhood.remove(entry.getCmoID());
 		
-		//see http://www.eclipse.org/swt/faq.php#uithread
-		if(!stop)display.syncExec(new Runnable(){public void run(){if(stop) return;map.redraw();updateTableCMO();}});
+		updateAsyncAll();
 	}
 	
 	public void dispose(){
@@ -443,10 +458,44 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		expandItemCMOTable.dispose();
 		
 	}
+	
+	public static BeaconRecv createBeaconRecv(String strDevice){
+		if(strDevice.compareToIgnoreCase("fake")==0){
+			BeaconRecvFake recvf = new BeaconRecvFake();		
+			recvf.addFixedCMO(new CMOState(
+					new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
+					3.13061f,
+					50.61789f,
+					0.0f,
+					1.0f,
+					0.0f));
+
+			recvf.addFixedCMO(new CMOState(
+						new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),
+						3.12586784363f,
+						50.6021995544f,
+						0.0f,
+						1.0f,
+						0.0f));
+			
+			return recvf;
+
+		}else{
+			//create the beacon receiver
+			BeaconRecv recv = BeaconRecvEthernet.loopPacketFromDevice(strDevice);
+			
+			if(recv==null){
+				System.err.println("Can't initialize the beacon receiver");
+				System.exit(1);
+			}
+			return recv;
+		}		
+	}
 
 	/**
 	 * show the GIS window
-	 * @param strDevice device name for intercept the neighborhood CMO beacon
+	 * @param strDevice device name for intercept the neighborhood 
+	 *        CMO beacon, or fake for un fake receiver
 	 * @throws IOException Gps reader problem
 	 * @throws SecurityException illegal thread interrupt
 	 */
@@ -460,33 +509,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		shell.setLocation(30, 10);
 		shell.setLayout (new FillLayout());
 
-
 		//create the beacon receiver
-		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(strDevice);
-		
-		if(recv==null)System.exit(1);
-		
-		//BeaconRecv recv = BeaconRecv.loopPacketFromFile(strDevice);
-
-		/*BeaconRecvFake recv = new BeaconRecvFake();
-
-			recv.addFixedCMO(new CMOState(
-					new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
-					3.13061f,
-					50.61789f,
-					0.0f,
-					1.0f,
-					0.0f));
-
-		recv.addFixedCMO(new CMOState(
-					new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),
-					3.12586784363f,
-					50.6021995544f,
-					0.0f,
-					1.0f,
-					0.0f));*/
-		
-		
+		BeaconRecv recv = createBeaconRecv(strDevice);
 
 		//create the GPS
 		Geolocation gps = new Gps();
@@ -511,7 +535,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 		//event loop
 		while (!shell.isDisposed ()) {
-			if (!display.readAndDispatch ()) display.sleep ();
+			if (!display.readAndDispatch ()) {
+				display.sleep ();
+			}
 		}
 
 		gps.dispose();

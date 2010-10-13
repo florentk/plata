@@ -7,14 +7,12 @@ import java.util.TimerTask;
 import java.util.Timer;
 import java.util.Collection;
 
-import fr.inrets.leost.cmo.beaconning.BeaconRecv;
+
 import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
 import fr.inrets.leost.cmo.beaconning.packet.CMOState;
-import fr.inrets.leost.cmo.utils.Physics;
-
 import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
-import fr.inrets.leost.cmo.beaconning.packet.CMOState;
+
 
 /**
  * 

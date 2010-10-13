@@ -7,21 +7,10 @@ import fr.inrets.leost.cmo.beaconning.packet.*;
 
 
 
-public class BeaconRecvFake extends Thread {
-	private final Collection<BeaconRecvListener> listerners = new ArrayList<BeaconRecvListener>();
+public class BeaconRecvFake extends BeaconRecv{
 	private final Collection<CMOState> cmos = new ArrayList<CMOState>();
 	
 
-
-	
-	
-	public void addListener(BeaconRecvListener l){
-		listerners.add(l);
-	}
-	
-	public void removeListener(BeaconRecvListener l){
-		listerners.remove(l);
-	}
 	
 	public void addFixedCMO(CMOState cmo){
 		cmos.add(cmo);
@@ -30,23 +19,19 @@ public class BeaconRecvFake extends Thread {
 
 
 	public void run() {
-		
 		while(true){
 		
 			try{
 			
 				for ( CMOState cmo : cmos )
 					//notify the listerners
-					for ( BeaconRecvListener l : listerners ){
-						l.cmoStatChanged(cmo);
-					}
+					notifyListener(cmo);
 				
 				sleep(1000);
 			
 			}catch(InterruptedException e){
 				
 			}
-		
 		}
 	}
 	
@@ -62,6 +47,8 @@ public class BeaconRecvFake extends Thread {
 
 		};
 	}	
+	
+	
 	public static void main(String[] args) throws Exception {
 		BeaconRecvFake bRecv = new BeaconRecvFake();
 		

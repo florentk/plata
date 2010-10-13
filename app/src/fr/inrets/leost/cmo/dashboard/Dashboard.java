@@ -4,21 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.TableItem;
-
-import jpcap.JpcapCaptor;
-
 
 import fr.inrets.leost.cmo.beaconning.BeaconRecv;
-import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
-import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
-import fr.inrets.leost.cmo.beaconning.packet.CMOState;
+import fr.inrets.leost.cmo.beaconning.BeaconRecvEthernet;
 import fr.inrets.leost.cmo.management.CMOManagement;
-import fr.inrets.leost.cmo.management.CMOTable;
 import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.management.CMOTableListener;
-import fr.inrets.leost.cmo.ui.GpsMonitor;
 import fr.inrets.leost.geolocation.*;
 
 /**
@@ -138,7 +129,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		
 		//Geolocation geo = new Fixe(new WGS84(),1.0,45.0);
 		Geolocation geo = new Gps();
-		BeaconRecv recv = BeaconRecv.loopPacketFromDevice(device);
+		BeaconRecv recv = BeaconRecvEthernet.loopPacketFromDevice(device);
 		
 		/*recv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
