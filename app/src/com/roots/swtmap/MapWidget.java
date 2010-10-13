@@ -516,7 +516,7 @@ public class MapWidget extends Canvas {
     	}
     }
     
-    private void paintOverlay(GC gc){
+    synchronized private void paintOverlay(GC gc){
     	
         Point size = getSize();
         int width = size.x, height = size.y;
@@ -635,11 +635,11 @@ public class MapWidget extends Canvas {
         pcs.removePropertyChangeListener(propertyName, listener);
     }
     
-    public void addOverlay(MapWidgetOverlay over){
+    synchronized  public void addOverlay(MapWidgetOverlay over){
     	overlay.add(over);
     }
     
-    public void removeOverlay(MapWidgetOverlay over){
+    synchronized  public void removeOverlay(MapWidgetOverlay over){
     	overlay.remove(over);
     }   
     

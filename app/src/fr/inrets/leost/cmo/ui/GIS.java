@@ -418,7 +418,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 * @see fr.inrets.leost.cmo.management.CMOTableListener#tableChanged(java.lang.String, fr.inrets.leost.cmo.management.CMOTable)
 	 */
 	@Override
-	public void tableChanged(CMOTableEntry entry) {
+	synchronized public void tableChanged(CMOTableEntry entry) {
 		MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
 		
 		if(over==null){
@@ -433,7 +433,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 * @see fr.inrets.leost.cmo.management.CMOTableListener#tableCMOAdded(java.lang.String, fr.inrets.leost.cmo.management.CMOTable)
 	 */
 	@Override
-	public void tableCMOAdded(CMOTableEntry entry) {
+	synchronized public void tableCMOAdded(CMOTableEntry entry) {
 
 		MapWidgetOverlayCMO over =  new MapWidgetOverlayCMO(entry.getLongitude(), entry.getLatitude(), entry);
 		map.addOverlay(over);
@@ -446,7 +446,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 * @see fr.inrets.leost.cmo.management.CMOTableListener#tableCMORemoved(java.lang.String, fr.inrets.leost.cmo.management.CMOTable)
 	 */
 	@Override
-	public void tableCMORemoved(CMOTableEntry entry) {
+	synchronized public void tableCMORemoved(CMOTableEntry entry) {
 		map.removeOverlay(neighborhood.get(entry.getCmoID()));
 		neighborhood.remove(entry.getCmoID());
 		
