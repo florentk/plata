@@ -9,7 +9,7 @@ import fr.inrets.leost.cmo.beaconning.packet.CMOState;
 /**
  * generalisation of a beacon receiver
  * @author florent kaisser <florent.kaisser@free.fr>
- *
+ * @has 0..* - -  BeaconRecvListener
  */
 public class BeaconRecv extends Thread{
 
