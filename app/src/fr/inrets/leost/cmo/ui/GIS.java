@@ -13,6 +13,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -23,6 +26,9 @@ import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.ModifyEvent;
 
 import com.roots.swtmap.MapWidget;
 import com.roots.swtmap.MapWidgetOverlayImage;
@@ -77,6 +83,12 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	private ExpandItem expandItemCMOTable;
 	private MapWidgetOverlayImage myCar;
 	
+	private boolean syncOnExternalEvent = true;
+	private boolean mapCenter = true;	
+	private Timer timerUpdate = new Timer();
+	private int updateInterval = 100;
+	private Spinner wUpdateInterval;
+	
 	private boolean stop=false;
 
 	private Map<String, MapWidgetOverlayCMO> neighborhood  =   new HashMap<String, MapWidgetOverlayCMO>();
@@ -109,6 +121,67 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	public Image loadSemaphoreRed()  {
 		return new Image(display, getClass().getResourceAsStream("resources/feux_rouge.png"));
 	}			
+	
+	private Composite initOptions(Composite parent){
+		Composite c= new Composite(parent, SWT.NONE);
+		
+		c.setLayout (new FillLayout(SWT.VERTICAL));
+		
+		Button b = new Button(c, SWT.CHECK); 
+		b.setText("Sync on external event");
+		b.setSelection(syncOnExternalEvent);
+		b.addListener(SWT.Selection, new Listener() {
+		    public void handleEvent(Event event) {
+		    	syncOnExternalEvent = ((Button)event.widget).getSelection();
+		    	
+		}});
+		
+		
+		Composite cUpdate = new Composite(c, SWT.NONE);
+		RowLayout rl = new RowLayout(SWT.HORIZONTAL);
+		rl.marginLeft = 0;
+		rl.center = true;
+		cUpdate.setLayout (rl);
+		
+		b = new Button(cUpdate, SWT.CHECK); 
+		b.setText("Refresh update interval : ");
+		b.setSelection(true);
+		b.addListener(SWT.Selection, new Listener() {
+		    public void handleEvent(Event event) {
+		    	boolean enable = ((Button)event.widget).getSelection();
+		    	enableTimer (enable);
+		    	wUpdateInterval.setEnabled(enable);
+		}});		
+		
+		wUpdateInterval = new Spinner (cUpdate, SWT.BORDER);
+		wUpdateInterval.setMinimum(10);
+		wUpdateInterval.setMaximum(10000);
+		wUpdateInterval.setSelection(100);
+		wUpdateInterval.setIncrement(10);
+		wUpdateInterval.setPageIncrement(100);
+		wUpdateInterval.pack();
+		wUpdateInterval.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent event) {	
+				updateInterval = Integer.parseInt(
+						wUpdateInterval.getText());
+				enableTimer(true);
+			}
+		});
+		
+		b = new Button(c, SWT.CHECK); 
+		b.setText("Center the map on current position");
+		b.setSelection(true);
+		b.addListener(SWT.Selection, new Listener() {
+		    public void handleEvent(Event event) {
+				mapCenter =  ((Button)event.widget).getSelection();
+		}});
+		
+
+
+		
+
+		return c;
+	}
 	
     //////////////////////////////
     // init the dashboard 
@@ -225,6 +298,26 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 						loadHomeImage()) );	
 	}
 	
+	private void enableTimer(boolean enable){
+		
+		if(timerUpdate != null){
+			timerUpdate.cancel();
+			timerUpdate = null;
+		}
+		
+		if(enable){
+			timerUpdate = new Timer();
+			timerUpdate.schedule(
+	        		new TimerTask(){
+	
+						public void run() {
+							updateAsyncAll();
+						}
+	        		}
+	        ,0, updateInterval);
+		}
+	}
+	
 	//associate a control to a expand bar
 	private ExpandItem associateToExpandBar(ExpandBar bar, int id,Composite parent, String text, boolean expand){
     	ExpandItem item = new ExpandItem (bar, SWT.NONE, id);
@@ -279,22 +372,17 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
     		}
     	});
     	
+    	//create the options part
+    	associateToExpandBar(bar, 3, initOptions(bar),"Options",false);
     	
     	
-        
         //create the map
         initMap(sashForm);  
 
         sashForm.setWeights(new int[] { 35, 65 });
         
-        new Timer().schedule(
-        		new TimerTask(){
-
-					public void run() {
-						updateAsyncAll();
-					}
-        		}
-        ,0, 100);
+        //init the timer
+        enableTimer(true);
   
 	}
 	
@@ -368,7 +456,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		
 		myCar.setDx(geo.getCurrentPos().longitude());myCar.setDy(geo.getCurrentPos().latitude());
-		map.setCenterPosition( lastPos );
+		if(mapCenter)
+			map.setCenterPosition( lastPos );
 		updateTableCMO();
 		updateTableInfo();
 		updateNeighborhood();
@@ -389,6 +478,11 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			//see http://www.eclipse.org/swt/faq.php#uithread
 			display.syncExec(new UpdateAll());
 	}
+	
+	public void updateOnExternalEvent(){
+		if(syncOnExternalEvent)
+			updateAsyncAll();
+	}
 
 	
 	/**
@@ -399,7 +493,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		//update the table item
 		if (tableInfo != null){
-			updateAsyncAll();
+			updateOnExternalEvent();
 		}
 	}	
 	
@@ -411,7 +505,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 */
 	@Override
 	public void positionChanged(WGS84 position, Double speed, Double track) {
-		updateAsyncAll();
+		updateOnExternalEvent();
 	}
 
 	/** 
@@ -426,7 +520,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			return;
 		}
 		
-		updateAsyncAll();
+		updateOnExternalEvent();
 	}
 
 	/**
@@ -439,7 +533,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		map.addOverlay(over);
 		neighborhood.put(entry.getCmoID(),over);
 		
-		updateAsyncAll();
+		updateOnExternalEvent();
 	}
 
 	/** 
@@ -450,7 +544,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		map.removeOverlay(neighborhood.get(entry.getCmoID()));
 		neighborhood.remove(entry.getCmoID());
 		
-		updateAsyncAll();
+		updateOnExternalEvent();
 	}
 	
 	public void dispose(){
