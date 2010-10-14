@@ -101,8 +101,10 @@ public class Gps  extends Geolocation  {
 	 * @throws IOException
 	 */
 	private void writeGPSStop() throws IOException {
-		gpsBW.write( "?WATCH={\"enable\":false}\n" );
-		gpsBW.flush();		
+		if(gpsBW != null){
+			gpsBW.write( "?WATCH={\"enable\":false}\n" );
+			gpsBW.flush();		
+		}
 	}		
 	
 	/**
@@ -180,7 +182,7 @@ public class Gps  extends Geolocation  {
 		writeGPSInitJson();
 		
 		}catch (IOException e){
-			System.out.println("Unable connect to GPS daemon, is it started ?");
+			System.err.println("Unable connect to GPS daemon, is it started ?");
 		}
 
 	}
@@ -189,7 +191,7 @@ public class Gps  extends Geolocation  {
 		try{
 			writeGPSStop();
 		}catch (IOException e){
-			System.out.println("Unable write to GPS daemon");
+			System.err.println("Unable write to GPS daemon");
 		}
 	}
 

@@ -85,6 +85,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	
 	private boolean syncOnExternalEvent = true;
 	private boolean mapCenter = true;	
+	private boolean extrapolePosition = false;		
 	private Timer timerUpdate = new Timer();
 	private int updateInterval = 100;
 	private Spinner wUpdateInterval;
@@ -145,7 +146,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		b = new Button(cUpdate, SWT.CHECK); 
 		b.setText("Refresh update interval : ");
-		b.setSelection(true);
+		b.setSelection(timerUpdate != null);
 		b.addListener(SWT.Selection, new Listener() {
 		    public void handleEvent(Event event) {
 		    	boolean enable = ((Button)event.widget).getSelection();
@@ -168,9 +169,19 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			}
 		});
 		
+
+		b = new Button(c, SWT.CHECK); 
+		b.setText("Extrapolate current position");
+		b.setSelection(extrapolePosition);
+		b.addListener(SWT.Selection, new Listener() {
+		    public void handleEvent(Event event) {
+		    	extrapolePosition =  ((Button)event.widget).getSelection();
+		}});
+		
+		
 		b = new Button(c, SWT.CHECK); 
 		b.setText("Center the map on current position");
-		b.setSelection(true);
+		b.setSelection(mapCenter);
 		b.addListener(SWT.Selection, new Listener() {
 		    public void handleEvent(Event event) {
 				mapCenter =  ((Button)event.widget).getSelection();
@@ -372,7 +383,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
     		}
     	});
     	
-    	//create the options part
+    	//create the options panel
     	associateToExpandBar(bar, 3, initOptions(bar),"Options",false);
     	
     	
@@ -382,7 +393,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
         sashForm.setWeights(new int[] { 35, 65 });
         
         //init the timer
-        enableTimer(true);
+        if(timerUpdate != null)
+        	enableTimer(true);
   
 	}
 	
@@ -448,14 +460,28 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	public void updateAll(){
 		if(stop) return;
 		
+		//discret position
+		WGS84 discretPos = geo.getLastPos();
+		
+		//extrapolate continue position
+		WGS84 currentPos = geo.getCurrentPos();
+		
 		//compute the current position in pixel
 		Point lastPos = new Point(
-				MapWidget.lon2position(geo.getLastPos().longitude(), map.getZoom()), 
-				MapWidget.lat2position(geo.getLastPos().latitude(), map.getZoom())
+				MapWidget.lon2position(discretPos.longitude(), map.getZoom()), 
+				MapWidget.lat2position(discretPos.latitude(), map.getZoom())
 		);
 		
 		
-		myCar.setDx(geo.getCurrentPos().longitude());myCar.setDy(geo.getCurrentPos().latitude());
+		if(extrapolePosition){
+			//use the extrapolate position
+			myCar.setDx(currentPos.longitude());
+			myCar.setDy(currentPos.latitude());		
+		}else{
+			myCar.setDx(discretPos.longitude());
+			myCar.setDy(discretPos.latitude());
+		}
+		
 		if(mapCenter)
 			map.setCenterPosition( lastPos );
 		updateTableCMO();

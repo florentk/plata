@@ -8,6 +8,7 @@ package com.roots.swtmap;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -265,22 +266,31 @@ public class MapWidget extends Canvas {
             try {
                 //System.err.println("fetch " + url);
                 //Thread.sleep(2000);
-                InputStream in = new URL(url).openConnection().getInputStream();
-                imageData.set(new ImageData(in));
-                try {
-                    // here is a race, we just live with.
-                    if (!getDisplay().isDisposed()) {
-                        getDisplay().asyncExec(new Runnable() {
-                            public void run() {
-                                redraw();
-                            }
-                        });
-                    }
-                } catch (SWTException e) {
-                    log.log(Level.INFO, "swt exception during redraw display-race, ignoring");
-                }
+            	URL ourl = new URL(url);
+            	
+            	//(ourl.getProtocol().compareTo("file")==0) && !ourl.getPath()
+            	try{
+            		InputStream in = ourl.openConnection().getInputStream();
+            	
+	                imageData.set(new ImageData(in));
+	                try {
+	                    // here is a race, we just live with.
+	                    if (!getDisplay().isDisposed()) {
+	                        getDisplay().asyncExec(new Runnable() {
+	                            public void run() {
+	                                redraw();
+	                            }
+	                        });
+	                    }
+	                } catch (SWTException e) {
+	                    log.log(Level.INFO, "swt exception during redraw display-race, ignoring");
+	                }
+                
+	            } catch (FileNotFoundException e) {
+	                log.log(Level.SEVERE, "failed to load imagedata from url: " + ourl);
+	            }
             } catch (Exception e) {
-                log.log(Level.SEVERE, "failed to load imagedata from url: " + url, e);
+                log.log(Level.SEVERE, "failed to load imagedata from url: " + url);
             }
         }
         
