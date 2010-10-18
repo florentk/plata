@@ -40,6 +40,7 @@ public class CMOTableEntry {
 	private int lifetime;
 	
 	private Date dateEntry;
+	private Date dateLastPos;	
 	
 	private Double vLongitude=null, vLatitude=null, vAltitude=null;
 	
@@ -48,6 +49,7 @@ public class CMOTableEntry {
 			Double latitude, Double altitude, Double speed, Double track,
 			int lifetime) {
 		super();
+		dateLastPos = new Date();
 		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime);
 	}
 	
@@ -65,8 +67,8 @@ public class CMOTableEntry {
 		this.dateEntry = new Date();		
 	}
 	
-	private double entryOlder(){
-		return ((double)((new Date()).getTime() - dateEntry.getTime()))/1000.0;
+	private double lastPosOlder(){
+		return ((double)((new Date()).getTime() - dateLastPos.getTime()))/1000.0;
 	}
 	
 	private void computeVelocity(double longitude, double latitude, double altitude, double dt) {	
@@ -79,13 +81,16 @@ public class CMOTableEntry {
 			Double latitude, Double altitude, Double speed, Double track,
 			int lifetime) {
 		
+		//System.out.println(longitude + " " + latitude);
+		
 		//if move, update velocity
-		if(	!(longitude.equals(this.longitude) || 
-			latitude.equals(this.latitude) || 
+		if(	!(longitude.equals(this.longitude) && 
+			latitude.equals(this.latitude) && 
 			altitude.equals(this.altitude))	)
 		{
-			double dt = entryOlder();
+			double dt = lastPosOlder();
 			computeVelocity(longitude, latitude, altitude, dt);
+			dateLastPos = new Date();
 		}
 			
 		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime);
@@ -120,7 +125,7 @@ public class CMOTableEntry {
 		if(vLongitude == null)
 			return longitude;
 		else
-			return longitude + vLongitude *  entryOlder();
+			return longitude + vLongitude *  lastPosOlder();
 	}
 
 	/**
@@ -130,7 +135,7 @@ public class CMOTableEntry {
 		if(vLatitude == null)
 			return latitude;
 		else
-			return latitude + vLatitude *  entryOlder();		
+			return latitude + vLatitude *  lastPosOlder();		
 	}
 
 	/**
@@ -140,7 +145,7 @@ public class CMOTableEntry {
 		if(vAltitude == null)
 			return altitude;
 		else
-			return altitude + vAltitude *  entryOlder();		
+			return altitude + vAltitude *  lastPosOlder();		
 	}
 
 	/**
