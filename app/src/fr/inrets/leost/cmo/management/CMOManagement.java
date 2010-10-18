@@ -86,8 +86,8 @@ public class CMOManagement implements BeaconRecvListener {
 							new Double (newStat.getH()),
 							new Double (newStat.getSpeed()),
 							new Double (newStat.getTrack()),
-							newStat.getLifetime()
-							);
+							newStat.getLifetime(),
+							newStat.getTime());
 			
 			notifyListenerChanged(entry);
 		}else{
@@ -101,7 +101,8 @@ public class CMOManagement implements BeaconRecvListener {
 							new Double (newStat.getH()),
 							new Double (newStat.getSpeed()),
 							new Double (newStat.getTrack()),
-							newStat.getLifetime()
+							newStat.getLifetime(),
+							newStat.getTime()
 						));
 	
 			notifyListenerAdd(entry);
@@ -170,7 +171,7 @@ public class CMOManagement implements BeaconRecvListener {
 				50.6190795898f,
 				0.0f,
 				1.0f,
-				0.0f));
+				0.0f,0));
 		
 		CMOManagement m = new CMOManagement();
 		

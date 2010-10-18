@@ -51,6 +51,8 @@ public abstract class  Geolocation extends Thread {
 	/** system time when the data has received*/
 	private Date sysTime;
 	
+	/** time when the device has started*/
+	private Date startTime = new Date();	
 	
 	/** collection of listener for receive a event on position changing*/
 	private final Collection<GeolocationListener> gpsListeners = new ArrayList<GeolocationListener>();
@@ -250,11 +252,15 @@ static int n =0;
 	
 	
 	/** get current time when the data has received
-	 * @return current time when the data has received
+	 * @return current time when the data has received 
+	 *         in millisecond since this devise started
 	 * */
-	/*public Double getCurrentTime() {
-		return devTime;
-	}*/
+	public int getTime() {
+		if(sysTime!=null)
+			return (int)(sysTime.getTime() - startTime.getTime());
+		else 
+			return 0;
+	}
 	
 	/**
 	 *  set current speed 

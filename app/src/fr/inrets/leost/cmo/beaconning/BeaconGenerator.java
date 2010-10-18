@@ -75,12 +75,12 @@ public class BeaconGenerator extends Thread{
 	
 	public static  Packet createCMOStatPacket(byte ttl, int seq, int lifetime, String cmoID,
 			short cmoType,Float longitude, Float latitude, Float h, Float speed,
-			Float track){
+			Float track, int time){
 		Packet p = new Packet();
 
 		CMOHeader cmo_header = new CMOHeader(ttl, seq,lifetime, cmoID, cmoType);
 		
-		CMOState cmo_stat = new CMOState (cmo_header,longitude, latitude, h, speed, track);
+		CMOState cmo_stat = new CMOState (cmo_header,longitude, latitude, h, speed, track, time);
 		
 		EthernetPacket ether=new EthernetPacket();
 		ether.frametype=CMOHeader.ETHERTYPE_CMO;
@@ -96,24 +96,26 @@ public class BeaconGenerator extends Thread{
 	}
 	
 	private Packet createCMOStatPacket(Float longitude, Float latitude, Float h, Float speed,
-			Float track){
-		return createCMOStatPacket((byte)TTL_INIT, seq++, beaconFreq * BEACON_LIFETIME, id, type,longitude, latitude, h, speed, track );
+			Float track, int time){
+		return createCMOStatPacket((byte)TTL_INIT, seq++, beaconFreq * BEACON_LIFETIME, id, type,longitude, latitude, h, speed, track, time);
 	}
 	
 	
 	/** 
 	 * broadcast a CMOStat packet
 	 */
-	private void broadcastCMOStatPacket(WGS84 position, Double speed, Double track) {
+	private void broadcastCMOStatPacket(int t, WGS84 position, Double speed, Double track) {
 
-		System.out.println("Beacon " + position + " " +  speed + " " + track);
+		System.out.println("Beacon " + t + " " + position + " " +  speed + " " + track);
 		
 		sender.sendPacket(createCMOStatPacket(
 				new Float(position.longitude()), 
 				new Float(position.latitude()), 
 				new Float(position.h()),
 				new Float(speed),
-				new Float(track)));
+				new Float(track),
+				t
+				));
 		
 	}	
 	
@@ -121,7 +123,7 @@ public class BeaconGenerator extends Thread{
 	 * broadcast a CMOStat packet with location information
 	 */
 	private void broadcastCMOStatPacket(){
-		broadcastCMOStatPacket( loc.getLastPos(), loc.getCurrentSpeed(), loc.getCurrentTrack() );
+		broadcastCMOStatPacket(loc.getTime(), loc.getLastPos(), loc.getCurrentSpeed(), loc.getCurrentTrack() );
 	}
 	
 	public void run() {

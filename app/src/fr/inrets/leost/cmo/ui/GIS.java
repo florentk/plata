@@ -466,24 +466,33 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		//extrapolate continue position
 		WGS84 currentPos = geo.getCurrentPos();
 		
-		//compute the current position in pixel
-		Point lastPos = new Point(
-				MapWidget.lon2position(discretPos.longitude(), map.getZoom()), 
-				MapWidget.lat2position(discretPos.latitude(), map.getZoom())
-		);
-		
-		
+		//last pos in pixel
+		Point lastPos;
+
 		if(extrapolePosition){
 			//use the extrapolate position
 			myCar.setDx(currentPos.longitude());
-			myCar.setDy(currentPos.latitude());		
+			myCar.setDy(currentPos.latitude());	
+			
+			//compute the current position in pixel
+		    lastPos = new Point(
+					MapWidget.lon2position(currentPos.longitude(), map.getZoom()), 
+					MapWidget.lat2position(currentPos.latitude(), map.getZoom())
+			);
 		}else{
 			myCar.setDx(discretPos.longitude());
 			myCar.setDy(discretPos.latitude());
+			
+			//compute the current position in pixel
+			lastPos = new Point(
+					MapWidget.lon2position(discretPos.longitude(), map.getZoom()), 
+					MapWidget.lat2position(discretPos.latitude(), map.getZoom())
+			);
 		}
 		
 		if(mapCenter)
 			map.setCenterPosition( lastPos );
+		
 		updateTableCMO();
 		updateTableInfo();
 		updateNeighborhood();
@@ -592,7 +601,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 					50.61789f,
 					0.0f,
 					1.0f,
-					0.0f));
+					0.0f,0));
 
 			recvf.addFixedCMO(new CMOState(
 						new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),
@@ -600,7 +609,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 						50.6021995544f,
 						0.0f,
 						1.0f,
-						0.0f));
+						0.0f,0));
 			
 			return recvf;
 

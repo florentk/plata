@@ -40,22 +40,21 @@ public class CMOTableEntry {
 	private int lifetime;
 	
 	private Date dateEntry;
-	private Date dateLastPos;	
+	private int dateLastState;	
 	
 	private Double vLongitude=null, vLatitude=null, vAltitude=null;
 	
 
 	public CMOTableEntry(String cmoID, short cmoType, Double longitude,
 			Double latitude, Double altitude, Double speed, Double track,
-			int lifetime) {
+			int lifetime, int dateLastState) {
 		super();
-		dateLastPos = new Date();
-		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime);
+		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime, dateLastState);
 	}
 	
 	private void setEntry(String cmoID, short cmoType, Double longitude,
 			Double latitude, Double altitude, Double speed, Double track,
-			int lifetime){
+			int lifetime, int dateLastState){
 		this.cmoID = cmoID;
 		this.cmoType = cmoType;
 		this.longitude = longitude;
@@ -64,11 +63,12 @@ public class CMOTableEntry {
 		this.speed = speed;
 		this.track = track;
 		this.lifetime = lifetime;
-		this.dateEntry = new Date();		
+		this.dateEntry = new Date();	
+		this.dateLastState = dateLastState;
 	}
 	
-	private double lastPosOlder(){
-		return ((double)((new Date()).getTime() - dateLastPos.getTime()))/1000.0;
+	private double stateOlder(){
+		return ((((double)(new Date()).getTime())/1000.0 - dateLastState));
 	}
 	
 	private void computeVelocity(double longitude, double latitude, double altitude, double dt) {	
@@ -79,21 +79,18 @@ public class CMOTableEntry {
 	
 	public void updateEntry(Double longitude,
 			Double latitude, Double altitude, Double speed, Double track,
-			int lifetime) {
+			int lifetime, int dateLastState) {
 		
 		//System.out.println(longitude + " " + latitude);
 		
-		//if move, update velocity
-		if(	!(longitude.equals(this.longitude) && 
-			latitude.equals(this.latitude) && 
-			altitude.equals(this.altitude))	)
+		//if a new state : update velocity
+		if (dateLastState != this.dateLastState)
 		{
-			double dt = lastPosOlder();
+			double dt = ((double)(dateLastState - this.dateLastState))/1000.0;
 			computeVelocity(longitude, latitude, altitude, dt);
-			dateLastPos = new Date();
 		}
 			
-		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime);
+		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime, dateLastState);
 		
 	}
 
@@ -125,7 +122,7 @@ public class CMOTableEntry {
 		if(vLongitude == null)
 			return longitude;
 		else
-			return longitude + vLongitude *  lastPosOlder();
+			return longitude + vLongitude *  stateOlder();
 	}
 
 	/**
@@ -135,7 +132,7 @@ public class CMOTableEntry {
 		if(vLatitude == null)
 			return latitude;
 		else
-			return latitude + vLatitude *  lastPosOlder();		
+			return latitude + vLatitude *  stateOlder();		
 	}
 
 	/**
@@ -145,7 +142,7 @@ public class CMOTableEntry {
 		if(vAltitude == null)
 			return altitude;
 		else
-			return altitude + vAltitude *  lastPosOlder();		
+			return altitude + vAltitude *  stateOlder();		
 	}
 
 	/**

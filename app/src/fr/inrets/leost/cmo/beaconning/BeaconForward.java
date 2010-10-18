@@ -162,7 +162,7 @@ public class BeaconForward implements BeaconRecvListener {
 		if(stat.getTTL()==0)
 			return;
 		
-		sender.sendPacket(BeaconGenerator.createCMOStatPacket( (byte)((int)stat.getTTL()-1), stat.getSeq(), stat.getLifetime(), stat.getCmoID(), stat.getCmoType(), stat.getLongitude(), stat.getLatitude(), stat.getH(), stat.getSpeed(), stat.getTrack()));
+		sender.sendPacket(BeaconGenerator.createCMOStatPacket( (byte)((int)stat.getTTL()-1), stat.getSeq(), stat.getLifetime(), stat.getCmoID(), stat.getCmoType(), stat.getLongitude(), stat.getLatitude(), stat.getH(), stat.getSpeed(), stat.getTrack(), stat.getTime()));
 	
 		packetFwd.put(pfk, new PacketForwardedValue(stat.getLifetime()));
 		

@@ -32,9 +32,12 @@ public final class CMOState extends CMOHeader{
 	/** orientation in degree (0 to 360) */
 	private Float track;	
 	
+	/** time when the stat has changed*/
+	private int time;
+	
 
 	public CMOState(CMOHeader cmo,Float longitude, Float latitude, Float h, Float speed,
-			Float track) {
+			Float track, int time) {
 		super(cmo.getTTL(), cmo.getSeq(), cmo.getLifetime(), cmo.getCmoID(),
 				cmo.getCmoType());
 		this.longitude = longitude;
@@ -42,6 +45,7 @@ public final class CMOState extends CMOHeader{
 		this.h = h;
 		this.speed = speed;
 		this.track = track;
+		this.time = time;		
 	}
 	
 	public CMOState(byte data[]){
@@ -53,7 +57,7 @@ public final class CMOState extends CMOHeader{
 		h = new Float(ByteArrayConvert.toFloat(ByteArrayConvert.memcpy(data, i, 4)));i+=4;
 		speed = new Float(ByteArrayConvert.toFloat(ByteArrayConvert.memcpy(data, i, 4)));i+=4;
 		track = new Float(ByteArrayConvert.toFloat(ByteArrayConvert.memcpy(data, i, 4)));i+=4;
-		
+		time = ByteArrayConvert.toInt(ByteArrayConvert.memcpy(data, i, 4));i+=4;		
 		
 	}
 
@@ -92,6 +96,14 @@ public final class CMOState extends CMOHeader{
 	public Float getTrack() {
 		return track;
 	}
+	
+	
+	/**
+	 * @return time when state has changed (in second)
+	 */
+	public int getTime() {
+		return time;
+	}	
 
 
 	public byte[] toByteArray(){
@@ -103,7 +115,7 @@ public final class CMOState extends CMOHeader{
 		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getH().floatValue()));
 		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getSpeed().floatValue()));
 		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getTrack().floatValue()));
-
+		b = ByteArrayConvert.concat(b, ByteArrayConvert.toByta(getTime()));
 		
 		return b;
 	}
@@ -116,6 +128,7 @@ public final class CMOState extends CMOHeader{
 		s+="Altitude : "+getH()+"\n";
 		s+="Speed : "+getSpeed()+"\n";
 		s+="Orientation : "+getTrack()+"\n";
+		s+="Time : "+getTime()+"\n";		
 		
 		return s;
 	}

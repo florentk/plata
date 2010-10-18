@@ -58,7 +58,7 @@ public class BeaconRecvFake extends BeaconRecv{
 				50.6111869812f,
 				0.0f,
 				1.0f,
-				56.0f));
+				56.0f,0));
 		
 		bRecv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),
@@ -66,7 +66,7 @@ public class BeaconRecvFake extends BeaconRecv{
 				50.6021995544f,
 				0.0f,
 				1.0f,
-				56.0f));
+				56.0f,0));
 		
 		
 		
