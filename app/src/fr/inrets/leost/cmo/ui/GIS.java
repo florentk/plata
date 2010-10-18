@@ -85,7 +85,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	
 	private boolean syncOnExternalEvent = true;
 	private boolean mapCenter = true;	
-	private boolean extrapolePosition = false;		
+	private boolean extrapolePosition = true;		
 	private Timer timerUpdate = new Timer();
 	private int updateInterval = 100;
 	private Spinner wUpdateInterval;

@@ -65,6 +65,8 @@ public class Alert implements Indicator {
 					closestCMO.getDistance(), 
 					stoppingDistance.getDistance(), 
 					brakingDistance.getDistance());
+		else
+			decision =  DECISION_NONE;
 	}
 	
 	/**
