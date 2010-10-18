@@ -75,12 +75,21 @@ public class CMOTableEntry {
 		vAltitude  = new Double((altitude - this.altitude) / dt);
 	}
 	
-	public void updateEntry(String cmoID, short cmoType, Double longitude,
+	public void updateEntry(Double longitude,
 			Double latitude, Double altitude, Double speed, Double track,
 			int lifetime) {
-		double dt = entryOlder();
-		computeVelocity(longitude, latitude, altitude, dt);
+		
+		//if move, update velocity
+		if(	!(longitude.equals(this.longitude) || 
+			latitude.equals(this.latitude) || 
+			altitude.equals(this.altitude))	)
+		{
+			double dt = entryOlder();
+			computeVelocity(longitude, latitude, altitude, dt);
+		}
+			
 		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime);
+		
 	}
 
 	boolean isExpired(){
