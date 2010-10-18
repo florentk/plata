@@ -37,7 +37,7 @@ public abstract class  Geolocation extends Thread {
 	LinkedList<WGS84> velocities = new LinkedList<WGS84>();*/
 	
 	/** acceleration in unit by second by second  */
-	private WGS84 acc = null;	
+	//private WGS84 acc = null;	
 	/** acceleration  history  */
 	/*private static final int ACCS_SIZE_MAX = 1;
 	LinkedList<WGS84> accs = new LinkedList<WGS84>();	*/
@@ -115,20 +115,20 @@ public abstract class  Geolocation extends Thread {
 		//compute the time since the last data acquisition
 		double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;	
 		
-		if(acc == null)
+		//if(acc == null)
 			//no acceleration, assume a constant velocity
 			return new WGS84(
 				currentPos.longitude() +  (velocity.longitude() * dt) ,
 				currentPos.latitude() +  (velocity.latitude() * dt) , 
 				currentPos.h() + (velocity.h() * dt)
 				);
-		
+		/*
 		//full equation with velocity and acceleration
 		return new WGS84(
 				currentPos.longitude() +  (velocity.longitude() * dt) +  (acc.longitude() * dt * dt),
 				currentPos.latitude() +  (velocity.latitude() * dt) +  (velocity.latitude() * dt * dt), 
 				currentPos.h() + (velocity.h() * dt) + (velocity.h() * dt * dt)
-				);		
+				);		*/
 	}	
 	
 	//
@@ -188,7 +188,7 @@ public abstract class  Geolocation extends Thread {
 		
 	}
 	
-//static int n =0;
+static int n =0;
 	/**
 	 * set the current position
 	 * @param currentPos the current position in WGS84 format
@@ -202,13 +202,13 @@ public abstract class  Geolocation extends Thread {
 			//System.out.println(n++ + " " + getPredictPos().sub(currentPos) + " " + velocity);
 
 			double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;
-			
+			//System.out.println(dt);
 			WGS84 newVelocity = computeDerivate(this.currentPos,currentPos, dt/*, velocities, VELOCITIES_SIZE_MAX*/);
 			
 			//if no velocity, can't compute the acceleration
-			if(velocity != null){
-				acc = computeDerivate(velocity,newVelocity, dt/*, accs, ACCS_SIZE_MAX*/);
-			}
+			/*if(velocity != null){
+				acc = computeDerivate(velocity,newVelocity, dt);
+			}*/
 			
 			//if(velocity != null) System.out.println(n++ + " " + velocity + " "+ acc);
 				
