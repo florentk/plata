@@ -40,6 +40,8 @@ public class CMOTableEntry {
 	private int lifetime;
 	
 	private Date dateEntry;
+	
+	private Date sysDateLastState;
 	private int dateLastState;	
 	
 	private Double vLongitude=null, vLatitude=null, vAltitude=null;
@@ -49,6 +51,7 @@ public class CMOTableEntry {
 			Double latitude, Double altitude, Double speed, Double track,
 			int lifetime, int dateLastState) {
 		super();
+		sysDateLastState = new Date();
 		setEntry(cmoID,cmoType,longitude, latitude, altitude, speed, track, lifetime, dateLastState);
 	}
 	
@@ -68,13 +71,14 @@ public class CMOTableEntry {
 	}
 	
 	private double stateOlder(){
-		return ((((double)(new Date()).getTime())/1000.0 - dateLastState));
+		return ((double)((new Date()).getTime() - sysDateLastState.getTime()))/1000.0;
 	}
 	
 	private void computeVelocity(double longitude, double latitude, double altitude, double dt) {	
 		vLongitude = new Double((longitude - this.longitude) / dt);
 		vLatitude  = new Double((latitude - this.latitude) / dt);
 		vAltitude  = new Double((altitude - this.altitude) / dt);
+		sysDateLastState = new Date();
 	}
 	
 	public void updateEntry(Double longitude,

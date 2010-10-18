@@ -8,7 +8,7 @@ import java.util.Timer;
 import java.util.Collection;
 
 
-import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
+import fr.inrets.leost.cmo.beaconning.BeaconRecvEthernet;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
 import fr.inrets.leost.cmo.beaconning.packet.CMOState;
 import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
@@ -162,8 +162,8 @@ public class CMOManagement implements BeaconRecvListener {
 
 	public static void main(String[] args) throws Exception {
 		
-		//BeaconRecv recv = BeaconRecv.loopPacketFromDevice(args[0]);
-		BeaconRecvFake recv = new BeaconRecvFake();
+		BeaconRecvEthernet recv = BeaconRecvEthernet.loopPacketFromDevice(args[0]);
+		/*BeaconRecvFake recv = new BeaconRecvFake();
 		
 		recv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
@@ -171,7 +171,7 @@ public class CMOManagement implements BeaconRecvListener {
 				50.6190795898f,
 				0.0f,
 				1.0f,
-				0.0f,0));
+				0.0f,0));*/
 		
 		CMOManagement m = new CMOManagement();
 		
