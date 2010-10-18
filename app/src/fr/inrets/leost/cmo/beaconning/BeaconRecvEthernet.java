@@ -15,7 +15,6 @@ import fr.inrets.leost.cmo.beaconning.packet.*;
  * JpcapCaptor (raw Ethernet) ----> BeaconRecv ----|CMOState|----> CMOStatListener
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
- * @has 0..* - -  BeaconRecvListener
  *
  */
 

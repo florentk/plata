@@ -33,14 +33,14 @@ public abstract class  Geolocation extends Thread {
 	/** velocity in unit by second   */
 	private WGS84 velocity = null;
 	/** velocity  history  */
-	private static final int VELOCITIES_SIZE_MAX = 5;
-	LinkedList<WGS84> velocities = new LinkedList<WGS84>();
+	/*private static final int VELOCITIES_SIZE_MAX = 1;
+	LinkedList<WGS84> velocities = new LinkedList<WGS84>();*/
 	
 	/** acceleration in unit by second by second  */
 	private WGS84 acc = null;	
 	/** acceleration  history  */
-	private static final int ACCS_SIZE_MAX = 5;
-	LinkedList<WGS84> accs = new LinkedList<WGS84>();	
+	/*private static final int ACCS_SIZE_MAX = 1;
+	LinkedList<WGS84> accs = new LinkedList<WGS84>();	*/
 	
 	/** current speed in meter per second */
 	private Double currentSpeed;
@@ -154,13 +154,14 @@ public abstract class  Geolocation extends Thread {
 	 * @param nbMaxHist max entry in hist
 	 * @return the derivate
 	 */
-	private WGS84 computeDerivate(WGS84 prevPos, WGS84 newPos, double dt, LinkedList<WGS84> hist, int nbMaxHist){
+	private WGS84 computeDerivate(WGS84 prevPos, WGS84 newPos, double dt/*, LinkedList<WGS84> hist, int nbMaxHist*/){
 		WGS84 d =  new WGS84(
 				(newPos.longitude() - prevPos.longitude()) / dt,
 				(newPos.latitude() - prevPos.latitude()) / dt,	
 				(newPos.h() - prevPos.h()) / dt
 		);		
-		
+		return d;
+		/*
 		if(d.longitude()>1.0) return new WGS84();
 		
 		hist.addLast(d);
@@ -183,7 +184,7 @@ public abstract class  Geolocation extends Thread {
 				slat/hist.size(),
 				sh/hist.size()
 		);		
-		
+		*/
 		
 	}
 	
@@ -202,11 +203,11 @@ public abstract class  Geolocation extends Thread {
 
 			double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;
 			
-			WGS84 newVelocity = computeDerivate(this.currentPos,currentPos, dt, velocities, VELOCITIES_SIZE_MAX);
+			WGS84 newVelocity = computeDerivate(this.currentPos,currentPos, dt/*, velocities, VELOCITIES_SIZE_MAX*/);
 			
 			//if no velocity, can't compute the acceleration
 			if(velocity != null){
-				acc = computeDerivate(velocity,newVelocity, dt, accs, ACCS_SIZE_MAX);
+				acc = computeDerivate(velocity,newVelocity, dt/*, accs, ACCS_SIZE_MAX*/);
 			}
 			
 			//if(velocity != null) System.out.println(n++ + " " + velocity + " "+ acc);
