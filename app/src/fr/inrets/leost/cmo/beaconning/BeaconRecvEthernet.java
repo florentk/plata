@@ -22,16 +22,23 @@ public class BeaconRecvEthernet extends  BeaconRecv implements PacketReceiver {
 	
 	JpcapCaptor jpcap;
 	int delay;
+	String myCmoId;
 	
 	
 
-	public BeaconRecvEthernet(JpcapCaptor jpcap, int delay){
+	public BeaconRecvEthernet(JpcapCaptor jpcap, int delay, String myCmoId){
 		this.jpcap = jpcap;
 		this.delay = delay;
+		this.myCmoId = myCmoId;
 	}
 	
-	public BeaconRecvEthernet(JpcapCaptor jpcap){
-		this(jpcap, 0);
+	/**
+	 * 
+	 * @param jpcap capture interface
+	 * @param myCmoId my cmo ID, for drop packet send by me
+	 */
+	public BeaconRecvEthernet(JpcapCaptor jpcap, String myCmoId){
+		this(jpcap, 0, myCmoId);
 	}	
 	
 
@@ -45,15 +52,17 @@ public class BeaconRecvEthernet extends  BeaconRecv implements PacketReceiver {
 
 		if (packet.datalink instanceof EthernetPacket){
 			EthernetPacket ether = (EthernetPacket) packet.datalink;
-			
+
 			if (ether.frametype == CMOHeader.ETHERTYPE_CMO){
 
 				//decode packet
 				CMOState cmo = new CMOState(packet.data);
 				
-				
-				//notify the listerners
-				notifyListener(cmo);
+				//drop packet from me
+				if(cmo.getCmoID().compareTo(myCmoId)!=0){
+					//notify the listerners
+					notifyListener(cmo);
+				}
 							
 			}
 				
@@ -85,7 +94,7 @@ public class BeaconRecvEthernet extends  BeaconRecv implements PacketReceiver {
 	    }
 		
 	    try{
-	    	return new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20));
+	    	return new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20),"");
 	    }catch (java.io.IOException e){
 	    	System.out.println("Cannot open network interface : "+e);
 	    	return null;
@@ -99,7 +108,7 @@ public class BeaconRecvEthernet extends  BeaconRecv implements PacketReceiver {
 	 */
 	public static BeaconRecvEthernet loopPacketFromFile(String path){
 	    try{
-	    	return new BeaconRecvEthernet(JpcapCaptor.openFile(path),100);
+	    	return new BeaconRecvEthernet(JpcapCaptor.openFile(path),100,"");
 	    }catch (java.io.IOException e){
 	    	System.out.println("Cannot open file : "+e);
 	    	return null;

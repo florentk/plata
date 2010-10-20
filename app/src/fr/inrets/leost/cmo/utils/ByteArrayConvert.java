@@ -254,9 +254,18 @@ public final class ByteArrayConvert {
 
 	public static char[] toCharA(byte[] data) {
 	    if (data == null || data.length % 2 != 0) return null;
+	    
+	   
+	    int i;
+	    for (i = 0; i < data.length; i++) {
+	        if((char)data[i]==0)break;
+	    }	    
+	    
+	    int strLen = i;
+	    
 	    // ----------
-	    char[] chrs = new char[data.length];
-	    for (int i = 0; i < chrs.length; i++) {
+	    char[] chrs = new char[strLen];
+	    for (i = 0; i < chrs.length; i++) {
 	        chrs[i] = (char)data[i];
 	    }
 	    return chrs;

@@ -809,7 +809,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		    }
 		    
 		    //create the Ethernet beacon receiver
-			recv = new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20));
+			recv = new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20), opt.cmoId);
 
 		}
 		

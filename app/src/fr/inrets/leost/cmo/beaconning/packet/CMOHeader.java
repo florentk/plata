@@ -90,9 +90,9 @@ public class CMOHeader {
 		lifetime = ByteArrayConvert.toInt(ByteArrayConvert.memcpy(data, i, 4));i+=4;	
 		cmoID = ByteArrayConvert.toCharA(ByteArrayConvert.memcpy(data, i, CMO_IDENTITY_LENGHT));i+=CMO_IDENTITY_LENGHT;
 		cmoType = ByteArrayConvert.toShort(ByteArrayConvert.memcpy(data, i, 2));i+=2;		
-
 	}
 	
+
 	public static String getTypeAvailable(){
 		StringBuffer s=new StringBuffer("[ ");
 		
@@ -114,6 +114,7 @@ public class CMOHeader {
 	public static String typeToString(short cmoType){	
 		return cmoTypeString.get(cmoType);
 	}
+	
 
 	/**
 	 * @return the TTL
