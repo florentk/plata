@@ -86,3 +86,13 @@ Ethernet RAW avec java
 	- Jpcap :
 		- installation sous linux : ancienne version avec dépendance sun-java6-jdk incorecte.
 		- compilation : définir JAVA_HOME avant make
+		
+		
+		
+Point du 20 octobre
+-------------------
+
+- voir le coté broadcast pour la météo (interfacage avec le materiel et gui)
+- pb : raw socket sur la plateforme
+- test sur le terrain le 27 octobre (sous reserve)
+
