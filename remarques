@@ -87,6 +87,10 @@ Ethernet RAW avec java
 		- installation sous linux : ancienne version avec dépendance sun-java6-jdk incorecte.
 		- compilation : définir JAVA_HOME avant make
 		
+Déplacement non fluide
+----------------------
+
+l'ui ne doit pas se synchronisé sur les événement materiel ou du réseau, elle doit faire des get régulier pour récupérer sa position et celles des voisins. Il faut rentre continu le system de geolocalisation, et la table des voisins 
 		
 		
 Point du 20 octobre
@@ -95,4 +99,3 @@ Point du 20 octobre
 - voir le coté broadcast pour la météo (interfacage avec le materiel et gui)
 - pb : raw socket sur la plateforme
 - test sur le terrain le 27 octobre (sous reserve)
-
