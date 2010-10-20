@@ -131,8 +131,8 @@ public class BeaconGenerator extends Thread{
 	    while(true) {
 	        try {
 	        	sleep(beaconFreq);
-
-	    		broadcastCMOStatPacket();
+	        	if(loc.isReady())
+	        		broadcastCMOStatPacket();
 	        } catch (InterruptedException ie) {}
 	    }		
 	}
