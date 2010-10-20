@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/json_simple-1.1.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/swt-gtk-3.5.1.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/commons-cli.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

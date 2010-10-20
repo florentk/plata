@@ -5,6 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import jpcap.JpcapCaptor;
+import jpcap.JpcapSender;
+import jpcap.NetworkInterface;
+
+import org.apache.commons.cli.*;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -34,6 +42,8 @@ import com.roots.swtmap.MapWidget;
 import com.roots.swtmap.MapWidgetOverlayImage;
 import com.roots.swtmap.MapWidget.PointD;
 
+import fr.inrets.leost.cmo.beaconning.BeaconForward;
+import fr.inrets.leost.cmo.beaconning.BeaconGenerator;
 import fr.inrets.leost.cmo.beaconning.BeaconRecv;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvEthernet;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
@@ -41,7 +51,7 @@ import fr.inrets.leost.cmo.dashboard.*;
 import fr.inrets.leost.cmo.management.CMOManagement;
 import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.management.CMOTableListener;
-
+import fr.inrets.leost.cmo.utils.PcapsTool;
 import fr.inrets.leost.cmo.beaconning.packet.*;
 
 import fr.inrets.leost.geolocation.Geolocation;
@@ -91,38 +101,47 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	private Spinner wUpdateInterval;
 	
 	private boolean stop=false;
-
+	
+	
+	
+	
+///////////////////////////////////////////////////////////////////
+// Windows builder
+	
 	private Map<String, MapWidgetOverlayCMO> neighborhood  =   new HashMap<String, MapWidgetOverlayCMO>();
 
 	
-	public Image loadCarImage()   {
+	private Image loadCarImage()   {
 		return new Image(display,  getClass().getResourceAsStream("resources/twingo.png"));
 	}
-	
-	public Image loadMyCarImage()   {
+
+	private Image loadMyCarImage()   {
 		return new Image(display,  getClass().getResourceAsStream("resources/twingo_green.png"));
 	}	
 	
-	public Image loadNeighborhoodCarImage()   {
+	private Image loadNeighborhoodCarImage()   {
 		return new Image(display,  getClass().getResourceAsStream("resources/twingo_red.png"));
 	}		
 	
-	public Image loadHomeImage()  {
+	private Image loadHomeImage()  {
 		return new Image(display, getClass().getResourceAsStream("resources/home.png"));
 	}	
 	
-	public Image loadSemaphoreGreen()  {
+	private Image loadSemaphoreGreen()  {
 		return new Image(display, getClass().getResourceAsStream("resources/feux_vert.png"));
 	}		
 	
-	public Image loadSemaphoreOrange()  {
+	private Image loadSemaphoreOrange()  {
 		return new Image(display, getClass().getResourceAsStream("resources/feux_orange.png"));
 	}		
 	
-	public Image loadSemaphoreRed()  {
+	private Image loadSemaphoreRed()  {
 		return new Image(display, getClass().getResourceAsStream("resources/feux_rouge.png"));
 	}			
 	
+	
+    //////////////////////////////
+    // init the options panel 
 	private Composite initOptions(Composite parent){
 		Composite c= new Composite(parent, SWT.NONE);
 		
@@ -287,12 +306,13 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		return table;
 	}	
 	
-	//tableCMO
 	
     //////////////////////////////
     // init the map 
-	void initMap(Composite parent){
-		map = new MapWidget(parent, SWT.NONE, MapWidget.computePosition(home,defaultZoom),defaultZoom);
+	private void initMap(Composite parent){
+		
+		//map = new MapWidget(parent, SWT.NONE, MapWidget.computePosition(home,defaultZoom),defaultZoom);
+		map = new MapWidget(parent, SWT.NONE, MapWidget.computePosition(new PointD(3.12780, 50.61164),16),16);
 
 		MapWidgetOverlayCMO.setImg(loadNeighborhoodCarImage(),CMOHeader.CMO_TYPE_CAR);
 		MapWidgetOverlayCMO.setImg(loadCarImage(),(short)-1);		
@@ -307,6 +327,19 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				new MapWidgetOverlayImage ( home.x, home.y, 
 						MapWidgetOverlayImage.REFERENCE_WORLD,
 						loadHomeImage()) );	
+	}
+	
+
+	
+	//associate a control to a expand bar
+	private ExpandItem associateToExpandBar(ExpandBar bar, int id,Composite parent, String text, boolean expand){
+    	ExpandItem item = new ExpandItem (bar, SWT.NONE, id);
+    	item.setText(text);
+    	item.setHeight(parent.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+    	item.setControl(parent);
+    	item.setExpanded(expand);
+    	
+    	return item;
 	}
 	
 	private void enableTimer(boolean enable){
@@ -327,18 +360,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	        		}
 	        ,0, updateInterval);
 		}
-	}
-	
-	//associate a control to a expand bar
-	private ExpandItem associateToExpandBar(ExpandBar bar, int id,Composite parent, String text, boolean expand){
-    	ExpandItem item = new ExpandItem (bar, SWT.NONE, id);
-    	item.setText(text);
-    	item.setHeight(parent.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-    	item.setControl(parent);
-    	item.setExpanded(expand);
-    	
-    	return item;
-	}
+	}		
 	
 	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Composite parent, int style){
 		super(parent, style);
@@ -359,8 +381,6 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
         //create the left expandbar
         ExpandBar bar = new ExpandBar (sashForm, SWT.V_SCROLL);
         
-
-  
         //create the dashboard and the alert icon
         dashboard = initDashboard(bar);
         associateToExpandBar(bar, 0, alert,"Alert",true).setHeight(200);
@@ -386,7 +406,6 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
     	//create the options panel
     	associateToExpandBar(bar, 3, initOptions(bar),"Options",false);
     	
-    	
         //create the map
         initMap(sashForm);  
 
@@ -398,7 +417,26 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
   
 	}
 	
-	public String[] getTextsTableItemCMO(CMOTableEntry entry){
+	//clean
+	public void dispose(){
+		stop = true;
+		alert.dispose();
+		map.dispose();
+		tableInfo.dispose();
+		tableCMO.dispose();
+		display.dispose();
+		expandItemCMOTable.dispose();
+	}	
+//
+// end of window builder
+///////////////////////////////////////////////////
+	
+	
+	
+	
+//////////////////////////////////////////////////
+// windows update
+	private String[] getTextsTableItemCMO(CMOTableEntry entry){
 		return new String[] {
 				entry.getCmoID(),  
 				CMOHeader.typeToString(entry.getCmoType()),
@@ -406,8 +444,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				String.format("%01.1f km/h", entry.getSpeed()) ,
 				String.format("%01.0f°", entry.getTrack())};
 	}
-
-	public void updateTableCMO(){
+	
+	private void updateTableCMO(){
 		//create a hashtable for associate a primary key with the TableItems
 		Map<String,TableItem> entryInTheWidgetTable = new HashMap<String,TableItem>(tableCMO.getItemCount());
 		for (TableItem i : tableCMO.getItems())
@@ -442,13 +480,13 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}
 	
-	public void updateTableInfo(){
+	private void updateTableInfo(){
 		int i=0;
 		for (Indicator id : dashboard.getIndicators())
 			tableInfo.getItem(i++).setText(1, id.toString());
 	}
 	
-	public void updateNeighborhood(){
+	private void updateNeighborhood(){
 		
 		for (CMOTableEntry entry : cmoMgt.getTable()){
 			MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
@@ -457,41 +495,48 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}
 	
-	public void updateAll(){
+	private void updateAll(){
 		if(stop) return;
 		
-		//discret position
-		WGS84 discretPos = geo.getLastPos();
+		if(geo.isReady()){
 		
-		//extrapolate continue position
-		WGS84 currentPos = geo.getCurrentPos();
-		
-		//last pos in pixel
-		Point lastPos;
-
-		if(extrapolePosition){
-			//use the extrapolate position
-			myCar.setDx(currentPos.longitude());
-			myCar.setDy(currentPos.latitude());	
+			//discret position
+			WGS84 discretPos = geo.getLastPos();
 			
-			//compute the current position in pixel
-		    lastPos = new Point(
-					MapWidget.lon2position(currentPos.longitude(), map.getZoom()), 
-					MapWidget.lat2position(currentPos.latitude(), map.getZoom())
-			);
-		}else{
-			myCar.setDx(discretPos.longitude());
-			myCar.setDy(discretPos.latitude());
+			//extrapolate continue position
+			WGS84 currentPos = geo.getCurrentPos();
 			
-			//compute the current position in pixel
+			
+			//last pos in pixel
+			Point lastPos;
+	
+			if(extrapolePosition){
+				//use the extrapolate position
+				myCar.setDx(currentPos.longitude());
+				myCar.setDy(currentPos.latitude());	
+				
+				//compute the current position in pixel
+			   /* lastPos = new Point(
+						MapWidget.lon2position(currentPos.longitude(), map.getZoom()), 
+						MapWidget.lat2position(currentPos.latitude(), map.getZoom())
+				);*/
+			}else{
+				myCar.setDx(discretPos.longitude());
+				myCar.setDy(discretPos.latitude());
+				
+				//compute the current position in pixel
+	
+			}
+			
 			lastPos = new Point(
 					MapWidget.lon2position(discretPos.longitude(), map.getZoom()), 
 					MapWidget.lat2position(discretPos.latitude(), map.getZoom())
 			);
-		}
+			
+			if(mapCenter)
+				map.setCenterPosition( lastPos );
 		
-		if(mapCenter)
-			map.setCenterPosition( lastPos );
+		}
 		
 		updateTableCMO();
 		updateTableInfo();
@@ -508,18 +553,24 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}
 	
-	public void updateAsyncAll(){
+	private void updateAsyncAll(){
 		if(!stop && !display.isDisposed())
 			//see http://www.eclipse.org/swt/faq.php#uithread
 			display.syncExec(new UpdateAll());
 	}
 	
-	public void updateOnExternalEvent(){
+	private void updateOnExternalEvent(){
 		if(syncOnExternalEvent)
 			updateAsyncAll();
 	}
-
+// end of window update
+//////////////////////////////////////////////////
 	
+	
+//////////////////////////////////////////////////
+// process events
+//   connect event on window update method
+
 	/**
 	 * update the table and the map position
 	 */
@@ -532,9 +583,6 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}	
 	
-
-
-
 	/** 
 	 * @see fr.inrets.leost.geolocation.GeolocationListener#positionChanged(fr.inrets.leost.geolocation.WGS84, java.lang.Double, java.lang.Double)
 	 */
@@ -581,19 +629,137 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		updateOnExternalEvent();
 	}
+
+// end of process event
+//////////////////////////////////////////////////
+
 	
-	public void dispose(){
-		stop = true;
-		alert.dispose();
-		map.dispose();
-		tableInfo.dispose();
-		tableCMO.dispose();
-		display.dispose();
-		expandItemCMOTable.dispose();
+
+	
+	
+	
+	
+	
+	
+	
+	
+/////////////////////////////////////////////////////////////////////////
+// entry point and associate statics methods	
+
+	//record for Gis option
+	public static final class GisOptions{
+		public String strInterface = "fake"; //network interface  (default : lo)
+		
+		public boolean gen = true; //run beacon generator generator
+		public boolean fwd = true; //run beacon forwarder
+
+		public String cmoId; //CMO id (default : hostname)
+		public short cmoType = CMOHeader.CMO_TYPE_CAR; //type of CMO
+		public int beaconInterval = 500; //send interval of beacon in ms = t
+		
+		public boolean gui = true; //start a gui (default : true)
+
+		public GisOptions(){
+			try{
+				cmoId = InetAddress.getLocalHost().getHostName();
+			}catch (UnknownHostException e){
+				cmoId = "N/A";
+			}
+		}
+		
+		/**
+		 * determine forwarder and generator according to cmo type
+		 */
+		public void setAutoFwdGen(){
+
+			switch(cmoType){
+				case CMOHeader.CMO_TYPE_CAR:
+				case CMOHeader.CMO_TYPE_TRUCK:
+				case CMOHeader.CMO_TYPE_BUS:
+				case CMOHeader.CMO_TYPE_MOTORBIKE:
+					gen = true; fwd = true; break;
+					
+				case CMOHeader.CMO_TYPE_WALKER :
+				case CMOHeader.CMO_TYPE_BIKE :
+					gen = true; fwd = false; break;
+					
+				case CMOHeader.CMO_TYPE_SPOT :
+					gen = true; fwd = true; break;
+
+			}
+
+		}
+
+		@Override
+		public String toString() {
+			return "GisOptions [beaconInterval=" + beaconInterval + ", cmoId="
+					+ cmoId + ", cmoType=" + cmoType + ", fwd=" + fwd
+					+ ", gen=" + gen + ", gui=" + gui + ", strInterface="
+					+ strInterface + "]";
+		}
+		
+
+		
 	}
 	
-	public static BeaconRecv createBeaconRecv(String strDevice){
-		if(strDevice.compareToIgnoreCase("fake")==0){
+	/**
+	 * parse the arguments command line
+	 * @param args
+	 * @return the options
+	 */
+	public static GisOptions parseArgs(String[] args){
+		GisOptions opt = new GisOptions();
+		
+		Options options = new Options();
+		options.addOption("i","interface", true, "network interface");
+		options.addOption("g","generator", false, "force run beacon generator");
+		options.addOption("f", "forwarder", false, "force run beacon forawarder");
+		//options.addOption("a","auto", false, "determine generator and forwarder according to cmo type");
+		options.addOption("n", "id", true, "cmo id");
+		options.addOption("t", "type", true, "cmo type");
+		options.addOption("b", "beacon-inter", true, "interval between beacon sending (millisecond)");
+		options.addOption("d", "daemon", false, "run withou GUI");
+		options.addOption("h", "--help", false, "show help");
+		
+		try{
+			CommandLine cmd = new GnuParser().parse( options, args);
+			
+			if(cmd.hasOption("h")){
+				new HelpFormatter().printHelp( "gis", options );
+				System.exit(0);
+			}
+			
+			try{
+				opt.cmoId = cmd.getOptionValue("n", InetAddress.getLocalHost().getHostName());
+			}catch (UnknownHostException e){}		
+			
+			opt.strInterface = cmd.getOptionValue("i", "fake");
+			opt.gen = cmd.hasOption("g");
+			opt.fwd = cmd.hasOption("f");
+			opt.cmoType = CMOHeader.typeFromString(cmd.getOptionValue("t", "car"));
+			
+		    if(opt.cmoType==-1){		    
+		    	System.out.println("The CMO type " + cmd.getOptionValue("t", "car")  + " doesn't exist");
+		    	System.out.println("\tCMO type available " + CMOHeader.getTypeAvailable());
+		    	System.exit(1);
+		    }
+			
+			opt.beaconInterval = Integer.parseInt(cmd.getOptionValue("b", "500"));
+			opt.gui = ! cmd.hasOption("d");
+			
+			opt.setAutoFwdGen();
+			
+		}catch (ParseException e){
+			System.err.println(e.getMessage());
+			new HelpFormatter().printHelp( "gis", options );
+			System.exit(1);
+		}
+
+		return opt;
+	}
+	
+	private static BeaconRecv createBeaconRecvFake(){
+
 			BeaconRecvFake recvf = new BeaconRecvFake();		
 			recvf.addFixedCMO(new CMOState(
 					new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
@@ -613,87 +779,130 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			
 			return recvf;
 
-		}else{
-			//create the beacon receiver
-			BeaconRecv recv = BeaconRecvEthernet.loopPacketFromDevice(strDevice);
-			
-			if(recv==null){
-				System.err.println("Can't initialize the beacon receiver");
-				System.exit(1);
-			}
-			return recv;
-		}		
+	
 	}
 
 	/**
-	 * show the GIS window
-	 * @param strDevice device name for intercept the neighborhood 
-	 *        CMO beacon, or fake for un fake receiver
+	 * start GIS
+	 * @param opt options
 	 * @throws IOException Gps reader problem
 	 * @throws SecurityException illegal thread interrupt
 	 */
-	public static void startGIS(String strDevice) throws IOException,SecurityException{
+	public static void startGIS(GisOptions opt) throws IOException,SecurityException, InterruptedException{
 		
-		//create the parent window
-		Display display = new Display ();
-		Shell shell = new Shell(display);
-		shell.setText("Global Information System");
-		shell.setSize(1245, 700);
-		shell.setLocation(30, 10);
-		shell.setLayout (new FillLayout());
+		NetworkInterface device = null;
+		BeaconRecv recv = null;
 
-		//create the beacon receiver
-		BeaconRecv recv = createBeaconRecv(strDevice);
+		//if fake, create a fake recv
+		if(opt.strInterface.compareToIgnoreCase("fake")==0){
+			recv = createBeaconRecvFake();
+		}
+		else
+		{
+			//else create a recv with Ethernet
+			device = PcapsTool.toNetworkInterface(opt.strInterface);
+		
+		    if(device==null){
+		    	System.out.println("The interface " + opt.strInterface + " doesn't exist");
+		    	PcapsTool.printDevice();
+		    	return;
+		    }
+		    
+		    //create the Ethernet beacon receiver
+			recv = new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20));
+
+		}
+		
+		
 
 		//create the GPS
-		Geolocation gps = new Gps();
+		Geolocation loc = new Gps();
+
+
+		//run generator and forwarder, if needed
+		BeaconGenerator gen = null;
+		BeaconForward fwd = null;
 		
-		//create the CMO management
-		CMOManagement cmoMgt = new CMOManagement();
+		if((device != null) && (opt.gen || opt.fwd)){
+			JpcapSender sender = JpcapSender.openDevice(device);
+			
+			if(opt.gen){
+				gen = new BeaconGenerator(sender, loc, opt.cmoId, opt.cmoType, opt.beaconInterval);
+				gen.start();
+				System.out.println("Run generator");
+			}
+			if(opt.fwd){
+				fwd = new BeaconForward(sender);
+				recv.addListener(fwd);
+				System.out.println("Run forwarder");
+			}
+		}
 
-		//link the CMO Management with the beaconning receiver
-		recv.addListener(cmoMgt);
+		GIS gis = null;
+		Shell shell = null;
+		Display display = null;
+		if(opt.gui){
+			//create the parent window
+			display = new Display ();
+			
+			shell = new Shell(display);
+			shell.setText("Global Information System");
+			shell.setSize(1245, 700);
+			shell.setLocation(30, 10);
+			shell.setLayout (new FillLayout());
+			
+			//create the CMO management
+			CMOManagement cmoMgt = new CMOManagement();
 
-		//create the GIS window
-		GIS gis= new GIS(display, gps, cmoMgt, shell, SWT.NONE);
+			//link the CMO Management with the beaconing receiver
+			recv.addListener(cmoMgt);
+			
+			//create the GIS window
+			gis= new GIS(display, loc, cmoMgt, shell, SWT.NONE);
+		}
 
 		//start the beaconning receiver
 		recv.start();
 
 		//start the GPS
-		gps.start();	      
+		loc.start();	  
 
-		//show the window
-		shell.open ();
-
-		//event loop
-		while (!shell.isDisposed ()) {
-			if (!display.readAndDispatch ()) {
-				display.sleep ();
+		if(opt.gui){
+			//show the window
+			shell.open ();
+	
+			//event loop
+			while (!shell.isDisposed ()) {
+				if (!display.readAndDispatch ()) {
+					display.sleep ();
+				}
 			}
+			
+			loc.interrupt();
+			recv.interrupt();
+			
+			if(gen !=null) gen.interrupt();
+		}else{
+			loc.join();
+			recv.join();
+			if(gen !=null) gen.join();	
 		}
-
-		gps.dispose();
-
-		//clean
-		gps.interrupt();
-		recv.interrupt();
 		
-		gis.dispose();
+	
+
+
+		loc.dispose();
 		
-		display.dispose ();	
+		if(gis != null){
+			gis.dispose();
+			display.dispose ();	
+		}
 
 	}
 	
 	public static void main (String [] args) throws Exception {
-
-		if(args.length<1){
-			System.out.println("Not enough arguments");
-			System.out.println("Usage : java GIS <device>");			
-			System.exit(1);
-		}	
-
-		startGIS(args[0]); 
+		//System.out.println(parseArgs(args));
+		startGIS(parseArgs(args)); 
 		System.exit(0);
 	}
 }

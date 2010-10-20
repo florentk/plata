@@ -20,7 +20,6 @@ public class Fixe  extends Geolocation  {
 
 		
 		//init the variable
-		setUpdateInterval(DEFAULT_UPDATA_INTERVAL);
 		setCurrentPos(pos);
 		setCurrentSpeed(speed);
 		setCurrentTrack(track);		

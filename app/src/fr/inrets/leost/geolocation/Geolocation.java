@@ -23,12 +23,9 @@ public abstract class  Geolocation extends Thread {
 	
 	public static final int DEFAULT_UPDATA_INTERVAL = 250;	
 	
-	/** interval (in ms) between two gpsd request*/
-	private int updateInterval;
-
 	
 	/** current position in WGC84 format */
-	private WGS84 currentPos;
+	private WGS84 currentPos = null;
 	
 	/** velocity in unit by second   */
 	private WGS84 velocity = null;
@@ -43,10 +40,10 @@ public abstract class  Geolocation extends Thread {
 	LinkedList<WGS84> accs = new LinkedList<WGS84>();	*/
 	
 	/** current speed in meter per second */
-	private Double currentSpeed;
+	private Double currentSpeed=0.0;
 	
 	/** current orientation in degree (0 to 360) */
-	private Double currentTrack;
+	private Double currentTrack=0.0;
 	
 	/** system time when the data has received*/
 	private Date sysTime;
@@ -54,25 +51,14 @@ public abstract class  Geolocation extends Thread {
 	/** time when the device has started*/
 	private Date startTime = new Date();	
 	
+	private boolean ready = false;
+	
 	/** collection of listener for receive a event on position changing*/
 	private final Collection<GeolocationListener> gpsListeners = new ArrayList<GeolocationListener>();
 
 	
 	
-	/**
-	 * Connect to gpsd in localhost with 2947  port
-	 * @throws IOException
-	 */
-	public Geolocation() {
 
-		
-		//init the variable
-		setUpdateInterval(DEFAULT_UPDATA_INTERVAL);
-		setCurrentPos(new WGS84());
-		setCurrentSpeed(0.0);
-		setCurrentTrack(0.0);		
-		
-	}	
 	
 	/**
 	 * must be call when the current position change
@@ -84,21 +70,7 @@ public abstract class  Geolocation extends Thread {
 	}	
 	
 
-	/**
-	 * get the interval update value of position 
-	 * @return interval in ms
-	 */
-	public int getUpdateInterval() {
-		return updateInterval;
-	}
 
-	/**
-	 * set the interval update value of position  
-	 * @param updateInterval interval in ms
-	 */
-	public void setUpdateInterval(int updateInterval) {
-		this.updateInterval = updateInterval;
-	}  
 	
 	/**
 	 * get the current position with extrapolation
@@ -110,6 +82,10 @@ public abstract class  Geolocation extends Thread {
 	
 	
 	private WGS84 getPredictPos() {
+		if(! ready){
+			return new WGS84();
+		}
+		
 		if(velocity == null)
 			//no velocity, assume no moving
 			return currentPos;
@@ -141,6 +117,9 @@ public abstract class  Geolocation extends Thread {
 	 * @return the last position
 	 */
 	public WGS84 getLastPos() {
+		if(! ready)
+			return new WGS84();
+		
 		return currentPos;
 	}
 	
@@ -190,7 +169,7 @@ public abstract class  Geolocation extends Thread {
 		
 	}
 	
-static int n =0;
+//static int n =0;
 	/**
 	 * set the current position
 	 * @param currentPos the current position in WGS84 format
@@ -216,6 +195,8 @@ static int n =0;
 				
 			//update the current velocity
 			velocity=newVelocity;
+			
+
 		}		
 		
 		
@@ -223,6 +204,7 @@ static int n =0;
 		this.currentPos = currentPos;
 		sysTime = new Date();
 		positionChanged();
+		ready = true;
 	}	
 	
 	/**
@@ -291,7 +273,16 @@ static int n =0;
 		this.devTime = currentTime;
 	}		*/
 	
+	/**
+	 * devise is ready
+	 */
+	public boolean isReady() {
+		return ready;
+	}
+	
+	/**
+	 * call for clean the devise
+	 */
 	public abstract void dispose();
-
 
 }

@@ -170,22 +170,20 @@ public class BeaconGenerator extends Thread{
 	/*--------------------------------------------------------------------------------
 	 * Unit testing / IHM
 	 */
+	
 
-	public static void runGenerator(JpcapSender sender,String strId, String strType, String strBeaconInter){
+	public static void runGenerator(JpcapSender sender,String strId, short type, int beaconInter){
 
-	    short type=CMOHeader.typeFromString(strType);
 	    
 	    if(type==-1){		    
-	    	System.out.println("The CMO type " + strType + " doesn't exist");
+	    	System.out.println("The CMO type doesn't exist");
 	    	System.out.println("\tCMO type available " + CMOHeader.getTypeAvailable());
 	    	return;
 	    }
 	    
-	    int beaconInter = Integer.parseInt(strBeaconInter);
 	    
 		try{
 			Geolocation loc = new Gps();
-			loc.setUpdateInterval((int)((float)beaconInter/2.0));
 			loc.start();
 
 			
@@ -201,7 +199,7 @@ public class BeaconGenerator extends Thread{
 	}
 	
 	
-	public static void runGeneratorFromDevice(String strDevice, String strId, String strType, String strBeaconInter) {
+	public static void runGeneratorFromDevice(String strDevice, String strId, short type, int beaconInter) {
 		    NetworkInterface device = PcapsTool.toNetworkInterface(strDevice);
 		    
 		    if(device==null){
@@ -212,7 +210,7 @@ public class BeaconGenerator extends Thread{
 			
 		    try{
 
-		    	runGenerator(JpcapSender.openDevice(device), strId, strType, strBeaconInter);
+		    	runGenerator(JpcapSender.openDevice(device), strId, type, beaconInter);
 		    	
 		    }catch (java.io.IOException e){
 		    	System.out.println("Cannot open network interface : "+e);
@@ -232,7 +230,7 @@ public class BeaconGenerator extends Thread{
 			System.exit(1);
 		}
 		
-		runGeneratorFromDevice(args[0],args[1],args[2],args[3]);
+		runGeneratorFromDevice(args[0],args[1], Short.parseShort(args[2]), Integer.parseInt(args[3]) );
 
 	}
 

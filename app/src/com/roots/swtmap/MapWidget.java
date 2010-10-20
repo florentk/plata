@@ -684,6 +684,7 @@ public class MapWidget extends Canvas {
         Point oldMapPosition = getMapPosition();
         mapPosition.x = x;
         mapPosition.y = y;
+        
         pcs.firePropertyChange("mapPosition", oldMapPosition, getMapPosition());
     }
     
