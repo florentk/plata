@@ -789,7 +789,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 * @throws SecurityException illegal thread interrupt
 	 */
 	public static void startGIS(GisOptions opt) throws IOException,SecurityException, InterruptedException{
-		
+		System.out.println(opt);
 		NetworkInterface device = null;
 		BeaconRecv recv = null;
 
