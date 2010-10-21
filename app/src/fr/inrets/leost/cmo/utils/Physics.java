@@ -57,7 +57,7 @@ public class Physics {
 		double a=  trackToRadians(track);
 		double p = dx*Math.cos(a) + dy*Math.sin(a);
 		
-		System.out.println(dx + " " + dy + " " + track + " " + a + " " + p);
+		//System.out.println(dx + " " + dy + " " + track + " " + a + " " + p);
 		
 		return p > 0.0;
 	}
