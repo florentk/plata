@@ -27,6 +27,7 @@ public class BeaconRecvEthernet extends  BeaconRecv implements PacketReceiver {
 	
 
 	public BeaconRecvEthernet(JpcapCaptor jpcap, int delay, String myCmoId){
+		super();
 		this.jpcap = jpcap;
 		this.delay = delay;
 		this.myCmoId = myCmoId;
