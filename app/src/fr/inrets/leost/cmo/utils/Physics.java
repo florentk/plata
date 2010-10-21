@@ -1,5 +1,7 @@
 package fr.inrets.leost.cmo.utils;
 
+import fr.inrets.leost.geolocation.WGS84;
+
 public class Physics {
 	
 	public static final double MAX_ANGLE_SAME_DIRECTION = 90; 	
@@ -56,6 +58,31 @@ public class Physics {
 		return dx*Math.cos(a) + dy*Math.sin(a) > 0.0;
 	}
 	
+	
+	/**
+	 * compute the Cartesian distance between p1 and p2
+	 * @param lg1 longitude of p1
+	 * @param lg1 latitude of p1
+	 * @param lg2 longitude of p2
+	 * @param lg2 latitude of p2
+	 * @return the distance in meter
+	 */
+	static public double cartesianDistance(double lg1, double lt1, double lg2, double lt2){
+		double dx = lg1 - lg2;
+		double dy = lt1 - lt2;
+		return cartesianDistance(dx,dy);	
+	}		
+	
+	/**
+	 * compute the Cartesian distance
+	 * @param dx longitude difference
+	 * @param dy latitude difference
+	 * @return the distance in meter
+	 */
+	static public double cartesianDistance(double dx, double dy){
+		return (double) Math.sqrt(  dx*dx + dy*dy  ) * ((Math.PI * WGS84.a / 180.0)) ;			
+	}		
+
 	/**
 	 * extrapolate the longitude with the current speed
 	 * @param time difference between actual time and t0

@@ -55,7 +55,7 @@ public class ClosestCMO implements Indicator {
 				// CMO candidate in front ?
 				if(Physics.inFront(dx,dy,t)){
 					//compute the Cartesian distance
-					dist = (float) Math.sqrt(  dx*dx + dy*dy  );
+					dist = Physics.cartesianDistance(dx,dy);
 	
 					//if the CMO candidate is the closest update the actual closest CMO
 					if(closest == null || closestDist.compareTo( dist ) > 0 ){
@@ -70,28 +70,18 @@ public class ClosestCMO implements Indicator {
 		return closest;
 	}	
 	
-	/**
-	 * compute the Cartesian distance of closest CMO
-	 * @return the distance in meter
-	 */
-	private double distanceToClosestCMO(){
-		double dx = (closestCMO.getLongitude().doubleValue() -  geo.getCurrentPos().longitude().doubleValue());
-		double dy = (closestCMO.getLatitude().doubleValue() -  geo.getCurrentPos().latitude().doubleValue());
-		return (double) Math.sqrt(  dx*dx + dy*dy  ) * ((Math.PI * WGS84.a / 180.0)) ;			
-	}	
+
 	
 	@Override
 	public void update() {
 		closestCMO = closestCMOInFront( geo.getCurrentPos().longitude(), geo.getCurrentPos().latitude(), geo.getCurrentTrack());
 
-		if(closestCMO!=null) {
-			distance = distanceToClosestCMO();
+		/*if(closestCMO!=null) {
 		
 			//no take in account if too far or the track is not accurate (low speed)
-			/*if( distance > 1000.0 ||  geo.getCurrentSpeed() < 3.0)
-					closestCMO = null;*/
-
-		}
+			if( distance > 1000.0 ||  geo.getCurrentSpeed() < 3.0)
+					closestCMO = null;
+		}*/
 	}
 	
 
