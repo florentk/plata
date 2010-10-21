@@ -55,7 +55,11 @@ public class Physics {
 	 */
 	static public boolean inFront(double dx, double dy, double track){
 		double a=  trackToRadians(track);
-		return dx*Math.cos(a) + dy*Math.sin(a) > 0.0;
+		double p = dx*Math.cos(a) + dy*Math.sin(a);
+		
+		System.out.println(dx + " " + dy + " " + track + " " + a + " " + p);
+		
+		return p > 0.0;
 	}
 	
 	
