@@ -66,6 +66,7 @@ public class ClosestCMO implements Indicator {
 			}
 		}
 		
+		distance = closestDist;
 		
 		return closest;
 	}	
