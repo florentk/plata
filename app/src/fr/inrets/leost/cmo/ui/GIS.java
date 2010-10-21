@@ -41,6 +41,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import com.roots.swtmap.MapWidget;
 import com.roots.swtmap.MapWidgetOverlayImage;
 import com.roots.swtmap.MapWidget.PointD;
+import com.roots.swtmap.MapWidget.TileServer;
 
 import fr.inrets.leost.cmo.beaconning.BeaconForward;
 import fr.inrets.leost.cmo.beaconning.BeaconGenerator;
@@ -327,6 +328,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				new MapWidgetOverlayImage ( home.x, home.y, 
 						MapWidgetOverlayImage.REFERENCE_WORLD,
 						loadHomeImage()) );	
+		
+		map.setTileServer(new TileServer("file://" + "/var/cache/osm/tiles/", 18));
+		
 	}
 	
 
@@ -762,7 +766,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 			BeaconRecvFake recvf = new BeaconRecvFake();		
 			recvf.addFixedCMO(new CMOState(
-					new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
+					new CMOHeader((byte)100, 0, 5000, "test_spot",CMOHeader.CMO_TYPE_SPOT ),
 					3.13061f,
 					50.61789f,
 					0.0f,
@@ -770,7 +774,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 					0.0f,0));
 
 			recvf.addFixedCMO(new CMOState(
-						new CMOHeader((byte)100, 0, 5000, "AZ-197-UY",CMOHeader.CMO_TYPE_CAR ),
+						new CMOHeader((byte)100, 0, 5000, "test_car",CMOHeader.CMO_TYPE_CAR ),
 						3.12586784363f,
 						50.6021995544f,
 						0.0f,
@@ -789,7 +793,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 * @throws SecurityException illegal thread interrupt
 	 */
 	public static void startGIS(GisOptions opt) throws IOException,SecurityException, InterruptedException{
-		System.out.println(opt);
+		//System.out.println(opt);
 		NetworkInterface device = null;
 		BeaconRecv recv = null;
 

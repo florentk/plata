@@ -122,7 +122,7 @@ public class MapWidget extends Canvas {
         private final int maxZoom;
         private boolean broken;
 
-        private TileServer(String url, int maxZoom) {
+        public TileServer(String url, int maxZoom) {
             this.url = url;
             this.maxZoom = maxZoom;
         }
@@ -397,8 +397,7 @@ public class MapWidget extends Canvas {
     }
 
     /* constants ... */
-    public static final TileServer[] TILESERVERS = {
-        new TileServer("file://" + System.getProperty("user.home") + "/var/osm/tiles/", 18),    	
+    public static final TileServer[] TILESERVERS = {    
         new TileServer("http://tile.openstreetmap.org/", 18),
         new TileServer("http://tah.openstreetmap.org/Tiles/tile/", 17),
     };
@@ -479,9 +478,9 @@ public class MapWidget extends Canvas {
         
         /// TODO: check tileservers
         
-        System.out.println("Using tile server : ");
+        /*System.out.println("Using tile server : ");
         for (TileServer t : TILESERVERS)
-        	System.out.println("\t" + t.getURL());
+        	System.out.println("\t" + t.getURL());*/
     }
     
     protected void paintControl(PaintEvent e) {
