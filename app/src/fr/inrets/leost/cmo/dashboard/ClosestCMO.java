@@ -49,8 +49,8 @@ public class ClosestCMO implements Indicator {
 			if ( Physics.inSameDirection(t, e.getTrack().floatValue()) ){
 			
 				//position difference with the CMO candidate
-				dx = (e.getLongitude().doubleValue() - lt);
-				dy = (e.getLatitude().doubleValue() - lg);
+				dx = (e.getLongitude().doubleValue() - lg);
+				dy = (e.getLatitude().doubleValue() - lt);
 
 				// CMO candidate in front ?
 				if(Physics.inFront(dx,dy,t)){
