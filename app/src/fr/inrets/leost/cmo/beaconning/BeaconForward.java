@@ -24,7 +24,7 @@ import fr.inrets.leost.cmo.utils.PcapsTool;
 public class BeaconForward implements BeaconRecvListener {
 
 	/** interval between two expired entry check (in ms) */
-	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;
+	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 30000;
 	
 	private JpcapSender sender;
 	
