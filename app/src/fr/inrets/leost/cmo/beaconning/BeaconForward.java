@@ -24,7 +24,7 @@ import fr.inrets.leost.cmo.utils.PcapsTool;
 public class BeaconForward implements BeaconRecvListener {
 
 	/** interval between two expired entry check (in ms) */
-	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 30000;
+	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;
 	
 	private JpcapSender sender;
 	
@@ -166,7 +166,7 @@ public class BeaconForward implements BeaconRecvListener {
 	
 		packetFwd.put(pfk, new PacketForwardedValue(stat.getLifetime()));
 		
-		System.out.println("Forward packet : "+pfk);
+		System.out.println("Forward packet : "+pfk + " " + stat);
 	}
 	
 	public void deleteExpiredEntry(){

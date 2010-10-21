@@ -58,7 +58,7 @@ public class BeaconRecvEthernet extends  BeaconRecv implements PacketReceiver {
 				//decode packet
 				CMOState cmo = new CMOState(packet.data);
 				
-				//drop packet from me
+				//drop packet from me and expired packet
 				if(cmo.getCmoID().compareTo(myCmoId)!=0){
 					//notify the listerners
 					notifyListener(cmo);
