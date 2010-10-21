@@ -42,8 +42,8 @@ public class Physics {
 	 * @return the track in radian
 	 */
 	static public double trackToRadians(double track){
-		//TODO 360 - track ???
-		return Math.toRadians(360.0-track);
+		//North match Pi/2 : (360-track) + 90
+		return Math.toRadians((450 - track)%360);
 	}
 
 	/**

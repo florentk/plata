@@ -81,7 +81,7 @@ public class CMOManagement implements BeaconRecvListener {
 		if( table.containsKey(newStat.getCmoID())){
 			entry = table.get(newStat.getCmoID());
 			entry.updateEntry(
-							new Double (newStat.getLongitude().doubleValue()),
+							new Double (newStat.getLongitude()),
 							new Double (newStat.getLatitude()),
 							new Double (newStat.getH()),
 							new Double (newStat.getSpeed()),
@@ -96,7 +96,7 @@ public class CMOManagement implements BeaconRecvListener {
 							newStat.getCmoID(),
 							newStat.getCmoType(),
 							
-							new Double (newStat.getLongitude().doubleValue()),
+							new Double (newStat.getLongitude()),
 							new Double (newStat.getLatitude()),
 							new Double (newStat.getH()),
 							new Double (newStat.getSpeed()),
