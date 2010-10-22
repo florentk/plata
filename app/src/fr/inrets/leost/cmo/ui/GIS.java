@@ -111,34 +111,48 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	
 	private Map<String, MapWidgetOverlayCMO> neighborhood  =   new HashMap<String, MapWidgetOverlayCMO>();
 
-	
+
 	private Image loadCarImage()   {
 		return new Image(display,  getClass().getResourceAsStream("resources/twingo.png"));
 	}
-
 	private Image loadMyCarImage()   {
 		return new Image(display,  getClass().getResourceAsStream("resources/twingo_green.png"));
 	}	
-	
 	private Image loadNeighborhoodCarImage()   {
 		return new Image(display,  getClass().getResourceAsStream("resources/twingo_red.png"));
 	}		
-	
 	private Image loadHomeImage()  {
 		return new Image(display, getClass().getResourceAsStream("resources/home.png"));
 	}	
-	
 	private Image loadSemaphoreGreen()  {
 		return new Image(display, getClass().getResourceAsStream("resources/feux_vert.png"));
 	}		
-	
 	private Image loadSemaphoreOrange()  {
 		return new Image(display, getClass().getResourceAsStream("resources/feux_orange.png"));
-	}		
-	
+	}	
 	private Image loadSemaphoreRed()  {
 		return new Image(display, getClass().getResourceAsStream("resources/feux_rouge.png"));
-	}			
+	}	
+	private Image loadBikeImage()  {
+		return new Image(display, getClass().getResourceAsStream("resources/feux_rouge.png"));
+	}	
+	private Image loadBusImage()  {
+		return new Image(display, getClass().getResourceAsStream("resources/bus.png"));
+	}	
+	private Image loadMotorbikeImage()  {
+		return new Image(display, getClass().getResourceAsStream("resources/motorbike.png"));
+	}	
+	private Image loadSpotImage()  {
+		return new Image(display, getClass().getResourceAsStream("resources/ap.png"));
+	}	
+	private Image loadTruckImage()  {
+		return new Image(display, getClass().getResourceAsStream("resources/truck.png"));
+	}	
+	private Image loadWalkerImage()  {
+		return new Image(display, getClass().getResourceAsStream("resources/walker.png"));
+	}	
+	
+	
 	
 	
     //////////////////////////////
@@ -316,7 +330,17 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		map = new MapWidget(parent, SWT.NONE, MapWidget.computePosition(new PointD(3.12780, 50.61164),16),16);
 
 		MapWidgetOverlayCMO.setImg(loadNeighborhoodCarImage(),CMOHeader.CMO_TYPE_CAR);
-		MapWidgetOverlayCMO.setImg(loadCarImage(),(short)-1);		
+		MapWidgetOverlayCMO.setImg(loadBikeImage(),CMOHeader.CMO_TYPE_BIKE);		
+		MapWidgetOverlayCMO.setImg(loadBusImage(),CMOHeader.CMO_TYPE_BUS);
+		MapWidgetOverlayCMO.setImg(loadMotorbikeImage(),CMOHeader.CMO_TYPE_MOTORBIKE);
+		MapWidgetOverlayCMO.setImg(loadSpotImage(),CMOHeader.CMO_TYPE_SPOT);
+		MapWidgetOverlayCMO.setImg(loadTruckImage(),CMOHeader.CMO_TYPE_TRUCK);
+		MapWidgetOverlayCMO.setImg(loadWalkerImage(),CMOHeader.CMO_TYPE_WALKER);
+				
+				
+				
+				
+		MapWidgetOverlayCMO.setImg(loadCarImage(),(short)-1);	
 		MapWidgetOverlayCMO.setFont(new Font(display,"Arial",14,SWT.BOLD));	
 		
 		map.addOverlay( 
