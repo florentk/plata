@@ -13,8 +13,8 @@
     <path id="app.classpath">
         <pathelement location="bin"/>
         <pathelement location="lib/json_simple-1.1.jar"/>
-        <pathelement location="../../../../usr/share/java/swt-gtk-3.5.1.jar"/>
-        <pathelement location="../../../../usr/share/java/commons-cli.jar"/>
+        <pathelement location="/usr/share/java/swt-gtk-3.5.1.jar"/>
+        <pathelement location="/usr/share/java/commons-cli.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
