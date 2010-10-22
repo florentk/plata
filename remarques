@@ -99,3 +99,25 @@ Point du 20 octobre
 - voir le coté broadcast pour la météo (interfacage avec le materiel et gui)
 - pb : raw socket sur la plateforme
 - test sur le terrain le 27 octobre (sous reserve)
+
+Téléconférence
+--------------
+
+- IP pour broadcast via DAB (météo)
+- possibilité de raw_socket pour v2v
+
+Format de données météos existantes
+-----------------------------------
+
+- METAR (METéorological Airport Report)
+- NDFD (National Digital Forecast Database) XML : http://www.weather.gov/forecasts/xml
+- wheather.com (XML) : http://xoap.weather.com/weather/local/FRXX0076?cc=*&dayf=5&link=xoap&prod=xoap&par=1215958633&key=2c274a9a3263bb28
+- json : http://www.geonames.org/export/JSON-webservices.html
+
+
+Java library for METAR
+----------------------
+
+- Java METAR : http://www.koders.com/java/fid766D22AB88B0F068E46C68401CBBF860EE192FDF.aspx?s=string#L21
+- jweather : http://sourceforge.net/projects/jweather/
+
