@@ -23,6 +23,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
+import com.roots.swtmap.MapWidget.PointD;
+import com.roots.swtmap.MapWidget.TileServer;
+
 /**
  * @author stepan.rutz@gmx.de
  * @version $Revision$
@@ -44,7 +47,9 @@ public class MapBrowser extends Composite {
         sashForm.setLayout(new FillLayout());
 
         pageContainer = new PageContainer(sashForm, SWT.NONE);
-        mapWidget = new MapWidget(sashForm, SWT.NONE);
+        mapWidget = new MapWidget(sashForm, SWT.NONE, MapWidget.computePosition(new PointD(3.12780, 50.61164),16),16);
+   
+        mapWidget.setTileServer(new TileServer("file://" + "/var/cache/osm/tiles/", 18));
         
         sashForm.setWeights(new int[] { 100, 200 });
          

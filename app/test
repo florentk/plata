@@ -1,0 +1,14 @@
+#!/bin/sh
+JAVA_ARG="-classpath bin/:lib/json_simple-1.1.jar:/usr/share/java/swt-gtk-3.5.1.jar:/usr/share/java/commons-cli.jar fr.inrets.leost.cmo.ui.GIS"
+
+
+java $JAVA_ARG -d -n "AA-368-ER" -t truck -p "50°37'7.10\"N 3°07'35.38\"E" -i lo &
+P1=$!
+java $JAVA_ARG -d -n "V2 CC" -t spot -p "50°37'5.12\"N 3°07'49.23\"E" -i lo &
+P2=$!
+
+java $JAVA_ARG -i lo -p "50°36'58.93\"N 3°07'41.37\"E"
+
+kill $P1
+kill $P2
+

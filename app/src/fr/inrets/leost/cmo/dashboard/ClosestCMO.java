@@ -1,5 +1,6 @@
 package fr.inrets.leost.cmo.dashboard;
 
+import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
 import fr.inrets.leost.cmo.management.CMOManagement;
 import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.utils.Physics;
@@ -117,7 +118,7 @@ public class ClosestCMO implements Indicator {
 			return "N/A";
 		
 
-		return String.format("Closest CMO (%d) at %01.1f m : %s", closestCMO.getCmoType(),distance, closestCMO.getCmoID() ); 
+		return String.format("Closest CMO : %s (%s) at %01.1f m",closestCMO.getCmoID(), CMOHeader.typeToString(closestCMO.getCmoType()),distance  ); 
 
 	}
 

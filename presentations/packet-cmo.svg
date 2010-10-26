@@ -10,11 +10,11 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="744.09448"
-   height="600"
+   height="500"
    id="svg4610"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="cmo packet.svg">
+   sodipodi:docname="packet-cmo.svg">
   <defs
      id="defs3">
     <marker
@@ -249,16 +249,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
+     inkscape:zoom="0.98994949"
      inkscape:cx="377.37254"
-     inkscape:cy="150.60194"
+     inkscape:cy="305.29376"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1478"
-     inkscape:window-height="906"
-     inkscape:window-x="1492"
+     inkscape:window-width="1440"
+     inkscape:window-height="825"
+     inkscape:window-x="0"
      inkscape:window-y="24"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata4">
     <rdf:RDF>
@@ -267,7 +267,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -275,7 +275,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-452.36218)">
+     transform="translate(0,-552.36218)">
     <text
        xml:space="preserve"
        style="font-size:12px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:AlArabiya Bold"
@@ -287,7 +287,7 @@
          id="tspan4620"
          x="69.898476"
          y="499.12866"
-         style="font-size:24px">CMO Packet in payload of ethernet trame (type 0x0870)</tspan></text>
+         style="font-size:24px" /></text>
     <rect
        style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect4622"
@@ -510,7 +510,7 @@
          sodipodi:role="line"
          id="tspan5932"
          x="171.98192"
-         y="575.58527">2 octets</tspan></text>
+         y="575.58527">2 bytes</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.99921262;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend)"
        d="m 361.38551,584.21554 158.59396,0"
@@ -526,7 +526,7 @@
          sodipodi:role="line"
          id="tspan5932-1"
          x="414.92358"
-         y="577.14447">1 octets</tspan></text>
+         y="577.14447">1 bytes</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.99921262;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend)"
        d="m 525.03022,584.21554 158.59396,0"
@@ -542,7 +542,7 @@
          sodipodi:role="line"
          id="tspan5932-1-3"
          x="578.5683"
-         y="577.14447">1 octets</tspan></text>
+         y="577.14447">1 bytes</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.99921262;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend)"
        d="m 40.594954,1042.115 643.667226,0"
@@ -558,6 +558,6 @@
          sodipodi:role="line"
          id="tspan5932-7"
          x="341.4725"
-         y="1033.0237">4 octets</tspan></text>
+         y="1033.0237">4 bytes</tspan></text>
   </g>
 </svg>

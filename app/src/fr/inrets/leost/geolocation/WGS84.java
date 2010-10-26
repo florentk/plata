@@ -47,6 +47,37 @@ public class WGS84 {
 		this.latitude = latitude;
 		this.h = h;
 	}
+	
+
+	/**
+	 * constructor for input string like 50°37'57.41"N 3°5'8.26"E
+	 * @param pos string like 50°37'57.41"N 3°5'8.26"E
+	 */
+	public WGS84(String pos) {
+		pos.trim();
+		
+		
+		
+		String delims = " ";
+		String[] tokens = pos.split(delims);
+		
+		//for each coordinate
+		for ( String coord:tokens ){
+
+			//parse coordinate
+			StringParser p = new StringParser(coord);
+			
+			//init corresponding value
+			if(p.getType() == StringParser.LATITUDE)
+				this.latitude = p.getValue();
+			
+			if(p.getType() == StringParser.LONGITUDE)
+				this.longitude = p.getValue();			
+		}
+		
+		this.h = 0.0;
+	}	
+	
 
 	/**
 	 * returns longitude angle in radian

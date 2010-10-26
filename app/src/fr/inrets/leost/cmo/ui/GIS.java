@@ -55,6 +55,7 @@ import fr.inrets.leost.cmo.management.CMOTableListener;
 import fr.inrets.leost.cmo.utils.PcapsTool;
 import fr.inrets.leost.cmo.beaconning.packet.*;
 
+import fr.inrets.leost.geolocation.Fixe;
 import fr.inrets.leost.geolocation.Geolocation;
 import fr.inrets.leost.geolocation.GeolocationListener;
 import fr.inrets.leost.geolocation.Gps;
@@ -684,6 +685,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		public String cmoId; //CMO id (default : hostname)
 		public short cmoType = CMOHeader.CMO_TYPE_CAR; //type of CMO
 		public int beaconInterval = 500; //send interval of beacon in ms = t
+		public WGS84 fixedPosition = null; //fixed position instead GPS
 		
 		public boolean gui = true; //start a gui (default : true)
 
@@ -741,13 +743,15 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		Options options = new Options();
 		options.addOption("i","interface", true, "network interface");
 		options.addOption("g","generator", false, "force run beacon generator");
-		options.addOption("f", "forwarder", false, "force run beacon forawarder");
+		options.addOption("f", "forwarder", false, "force run beacon forwarder");
 		//options.addOption("a","auto", false, "determine generator and forwarder according to cmo type");
 		options.addOption("n", "id", true, "cmo id");
 		options.addOption("t", "type", true, "cmo type");
 		options.addOption("b", "beacon-inter", true, "interval between beacon sending (millisecond)");
-		options.addOption("d", "daemon", false, "run withou GUI");
-		options.addOption("h", "--help", false, "show help");
+		options.addOption("d", "daemon", false, "run without GUI");
+		options.addOption("p", "fixed-position", true, "fixed position instead GPS. The arg is form 50°37'57.41\"N 3°5'8.26\"E");		
+		
+		options.addOption("h", "help", false, "show help");
 		
 		try{
 			CommandLine cmd = new GnuParser().parse( options, args);
@@ -774,6 +778,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			
 			opt.beaconInterval = Integer.parseInt(cmd.getOptionValue("b", "500"));
 			opt.gui = ! cmd.hasOption("d");
+			
+			if(cmd.hasOption("p"))
+				opt.fixedPosition = new WGS84(cmd.getOptionValue("p", "50°37'57.41\"N 3°5'8.26\"E"));
+					
 			
 			opt.setAutoFwdGen();
 			
@@ -841,10 +849,14 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 		}
 		
+		Geolocation loc = null;
 		
-
-		//create the GPS
-		Geolocation loc = new Gps();
+		if(opt.fixedPosition==null)
+			loc = new Gps();
+		else
+			loc = new Fixe(opt.fixedPosition, 0.0, 0.0);
+		
+		
 
 
 		//run generator and forwarder, if needed
@@ -929,7 +941,6 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	}
 	
 	public static void main (String [] args) throws Exception {
-		//System.out.println(parseArgs(args));
 		startGIS(parseArgs(args)); 
 		System.exit(0);
 	}
