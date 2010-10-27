@@ -470,7 +470,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				entry.getCmoID(),  
 				CMOHeader.typeToString(entry.getCmoType()),
 				new WGS84(entry.getLongitude(), entry.getLatitude(), entry.getAltitude()).toString(),
-				String.format("%01.1f km/h", entry.getSpeed()) ,
+				String.format("%01.1f km/h", entry.getSpeed() * 3.6) ,
 				String.format("%01.0f°", entry.getTrack())};
 	}
 	
@@ -742,9 +742,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		Options options = new Options();
 		options.addOption("i","interface", true, "network interface");
-		options.addOption("g","generator", false, "force run beacon generator");
-		options.addOption("f", "forwarder", false, "force run beacon forwarder");
-		//options.addOption("a","auto", false, "determine generator and forwarder according to cmo type");
+		options.addOption("g","generator", false, "run beacon generator (with manual option)");
+		options.addOption("f", "forwarder", false, "run beacon forwarder (with manual option)");
+		options.addOption("m","manual", false, "don't determine generator and forwarder with CMO type");
 		options.addOption("n", "id", true, "cmo id");
 		options.addOption("t", "type", true, "cmo type");
 		options.addOption("b", "beacon-inter", true, "interval between beacon sending (millisecond)");
@@ -782,8 +782,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			if(cmd.hasOption("p"))
 				opt.fixedPosition = new WGS84(cmd.getOptionValue("p", "50°37'57.41\"N 3°5'8.26\"E"));
 					
-			
-			opt.setAutoFwdGen();
+			if(!cmd.hasOption("m"))
+				opt.setAutoFwdGen();
 			
 		}catch (ParseException e){
 			System.err.println(e.getMessage());

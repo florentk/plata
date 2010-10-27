@@ -72,9 +72,9 @@ public class Gps  extends Geolocation  {
 	 * @param speed in knot
 	 * @return speed in meter per second
 	 */
-	static private Double knotToSI(Double speed){
+	/*static private Double knotToSI(Double speed){
 		return new Double (0.514444 * speed.doubleValue());
-	}
+	}*/
 	
 	static private Double checkDoubleNull(Double val){
 		if (val == null)
@@ -129,7 +129,7 @@ public class Gps  extends Geolocation  {
 				Double lat   = checkDoubleNull((Double)dict.get("lat"));
 				Double lon   = checkDoubleNull((Double)dict.get("lon"));		
 				Double alt   = checkDoubleNull((Double)dict.get("alt"));	
-				Double speed = knotToSI(checkDoubleNull((Double)dict.get("speed")));		
+				Double speed = checkDoubleNull((Double)dict.get("speed"));		
 				Double track = checkDoubleNull((Double)dict.get("track"));	
 				Double t = checkDoubleNull((Double)dict.get("time"));	
 				

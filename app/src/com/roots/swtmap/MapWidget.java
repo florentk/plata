@@ -34,11 +34,13 @@ import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -321,6 +323,28 @@ public class MapWidget extends Canvas {
             }
         }
     }
+    
+    private class MapKeyboardListener implements KeyListener{
+
+		@Override
+		public void keyPressed(KeyEvent k) {
+			// TODO Auto-generated method stub
+			if (k.character == '+')
+					zoomIn( new Point(0, 0));
+			else if (k.character == '-')
+					zoomOut( new Point(0, 0));				
+				
+		}
+
+		@Override
+		public void keyReleased(KeyEvent k) {
+			// TODO Auto-generated method stub
+			
+		}
+    	
+    	
+    }
+    
    
     private class MapMouseListener implements MouseListener, MouseWheelListener, MouseMoveListener, MouseTrackListener {
         private Point mouseCoords = new Point(0, 0);
@@ -431,6 +455,7 @@ public class MapWidget extends Canvas {
     private TileCache cache = new TileCache();
     private Stats stats = new Stats();
     private MapMouseListener mouseListener = new MapMouseListener();
+    private MapKeyboardListener keyListener = new MapKeyboardListener();
     
     private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
     private ThreadFactory threadFactory = new ThreadFactory( ) {
@@ -475,6 +500,7 @@ public class MapWidget extends Canvas {
         addMouseMoveListener(mouseListener);
         addMouseWheelListener(mouseListener);
         addMouseTrackListener(mouseListener);
+        addKeyListener(keyListener);
         
         /// TODO: check tileservers
         
