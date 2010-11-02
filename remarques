@@ -121,3 +121,19 @@ Java library for METAR
 - Java METAR : http://www.koders.com/java/fid766D22AB88B0F068E46C68401CBBF860EE192FDF.aspx?s=string#L21
 - jweather : http://sourceforge.net/projects/jweather/
 
+Réunion Munich
+--------------
+
+- D5.3
+	- internal loopback devise :
+	testing with direct TPEG Message extract via UDP/IP datagrams
+
+	- DAB :
+
+		- TPEG : udp packet build in NASMESH
+		- IP multicast over DAB
+
+- Next meeting at livic : 27 and 28 jan or 3 and 4 fev
+
+- joelle.besnier@lcpc.fr
+
