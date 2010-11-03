@@ -793,7 +793,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	}
 	
 	private static void log(String module, String message){
-		System.out.println((new Date()).getTime() + "["  + module + "]" + message);
+		System.out.println((new Date()).getTime() + " ["  + module + "] " + message);
 	}
 
 	/**
