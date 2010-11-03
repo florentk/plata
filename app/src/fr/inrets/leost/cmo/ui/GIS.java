@@ -229,44 +229,6 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		return c;
 	}
 	
-    //////////////////////////////
-    // init the dashboard 
-	private Dashboard initDashboard(Composite parent){
-
-		Dashboard db = new Dashboard();
-		
-		//link the  dashboard with the geolocation system
-		geo.addPositionListener(db);
-		
-		//link the  dashboard with the CMO Mangement		
-		cmoMgt.addListener(db);
-		
-		//alow receive the dashboardUpdate
-		db.addListener(this);
-
-		//add indicator
-		StoppingDistance sDistance = new StoppingDistance(geo);
-		BrakingDistance bDistance = new BrakingDistance(geo);		
-		ClosestCMO closestCMO = new ClosestCMO(geo, cmoMgt);
-		Alert dbAlert=new Alert(geo, closestCMO, sDistance, bDistance);
-		
-		db.addIndicator(new Position(geo));
-		db.addIndicator(new Speed(geo));
-		db.addIndicator(new Track(geo));
-		db.addIndicator(bDistance);
-		db.addIndicator(sDistance);
-		db.addIndicator(closestCMO);   
-		db.addIndicator(dbAlert);     	
-        
-		alert = new AlertWidget(parent, SWT.NONE, dbAlert);
-		alert.setImg(loadSemaphoreGreen(), 0);
-		alert.setImg(loadSemaphoreOrange(), 1);
-		alert.setImg(loadSemaphoreRed(), 2);
-		
-		
-		
-        return db;
-	}
 	
 	//////////////////////////////
 	// init the table info (indicators)
@@ -391,12 +353,13 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}		
 	
-	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Composite parent, int style){
+	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Dashboard db, Alert dbAlert, Composite parent, int style){
 		super(parent, style);
 		
 		this.display = display;
 		this.geo = geo;
 		this.cmoMgt = cmoMgt;
+        this.dashboard = db;
 		
 		geo.addPositionListener(this);
 		cmoMgt.addListener(this);
@@ -410,8 +373,11 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
         //create the left expandbar
         ExpandBar bar = new ExpandBar (sashForm, SWT.V_SCROLL);
         
-        //create the dashboard and the alert icon
-        dashboard = initDashboard(bar);
+        //create the alert icon
+		alert = new AlertWidget(bar, SWT.NONE, dbAlert);
+		alert.setImg(loadSemaphoreGreen(), 0);
+		alert.setImg(loadSemaphoreOrange(), 1);
+		alert.setImg(loadSemaphoreRed(), 2);
         associateToExpandBar(bar, 0, alert,"Alert",true).setHeight(200);
         
         //create the information table
@@ -519,8 +485,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		for (CMOTableEntry entry : cmoMgt.getTable()){
 			MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
-			over.setDx(entry.getLongitude());
-			over.setDy(entry.getLatitude());
+			if(over!=null){
+				over.setDx(entry.getLongitude());
+				over.setDy(entry.getLatitude());
+			}
 		}
 	}
 	
@@ -688,7 +656,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		public WGS84 fixedPosition = null; //fixed position instead GPS
 		
 		public boolean gui = true; //start a gui (default : true)
-
+		public boolean verbose = false; //verbose mode 
+		
 		public GisOptions(){
 			try{
 				cmoId = InetAddress.getLocalHost().getHostName();
@@ -750,6 +719,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		options.addOption("b", "beacon-inter", true, "interval between beacon sending (millisecond)");
 		options.addOption("d", "daemon", false, "run without GUI");
 		options.addOption("p", "fixed-position", true, "fixed position instead GPS. The arg is form 50°37'57.41\"N 3°5'8.26\"E");		
+		options.addOption("v", "verbose", false, "write the dashboard in std out");		
+		
 		
 		options.addOption("h", "help", false, "show help");
 		
@@ -778,6 +749,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			
 			opt.beaconInterval = Integer.parseInt(cmd.getOptionValue("b", "500"));
 			opt.gui = ! cmd.hasOption("d");
+			opt.verbose = cmd.hasOption("v");
 			
 			if(cmd.hasOption("p"))
 				opt.fixedPosition = new WGS84(cmd.getOptionValue("p", "50°37'57.41\"N 3°5'8.26\"E"));
@@ -817,6 +789,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 	
 	}
+	
+
 
 	/**
 	 * start GIS
@@ -828,6 +802,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		//System.out.println(opt);
 		NetworkInterface device = null;
 		BeaconRecv recv = null;
+		
+		java.util.Locale.setDefault(java.util.Locale.US);
 
 		//if fake, create a fake recv
 		if(opt.strInterface.compareToIgnoreCase("fake")==0){
@@ -881,15 +857,12 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		GIS gis = null;
 		Shell shell = null;
 		Display display = null;
-		if(opt.gui){
-			//create the parent window
-			display = new Display ();
+
+		
+		if (opt.gui ||opt.verbose){
 			
-			shell = new Shell(display);
-			shell.setText("Global Information System");
-			shell.setSize(1245, 700);
-			shell.setLocation(30, 10);
-			shell.setLayout (new FillLayout());
+			//init the dashboard
+			final Dashboard db = new Dashboard();
 			
 			//create the CMO management
 			CMOManagement cmoMgt = new CMOManagement();
@@ -897,8 +870,61 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			//link the CMO Management with the beaconing receiver
 			recv.addListener(cmoMgt);
 			
-			//create the GIS window
-			gis= new GIS(display, loc, cmoMgt, shell, SWT.NONE);
+			//link the  dashboard with the geolocation system
+			loc.addPositionListener(db);
+			
+			//link the  dashboard with the CMO Mangement		
+			cmoMgt.addListener(db);
+			
+
+
+			//add indicator
+			StoppingDistance sDistance = new StoppingDistance(loc);
+			BrakingDistance bDistance = new BrakingDistance(loc);		
+			ClosestCMO closestCMO = new ClosestCMO(loc, cmoMgt);
+			Alert dbAlert=new Alert(loc, closestCMO, sDistance, bDistance);
+			
+			db.addIndicator(new Position(loc));
+			db.addIndicator(new Speed(loc));
+			db.addIndicator(new Track(loc));
+			db.addIndicator(bDistance);
+			db.addIndicator(sDistance);
+			db.addIndicator(closestCMO);   
+			db.addIndicator(dbAlert);    
+			
+			
+			//init the gui
+			if(opt.gui){
+				//create the parent window
+				display = new Display ();
+				
+				shell = new Shell(display);
+				shell.setText("Global Information System");
+				shell.setSize(1245, 700);
+				shell.setLocation(30, 10);
+				shell.setLayout (new FillLayout());
+
+				//create the GIS window
+				gis= new GIS(display, loc, cmoMgt, db, dbAlert,  shell, SWT.NONE);
+				
+				//alow receive the dashboardUpdate
+				db.addListener(gis);
+			}
+			
+			//show verbose information
+			if(opt.verbose){
+				System.out.print("#");
+				for (Indicator id : db.getIndicators())
+					System.out.print(id.name()+";");		
+				System.out.println();	
+				//event when dashboard updated
+				db.addListener(new DashboardListener() {
+						public void dashboardUpdate(){
+							//System.out.print("\033[2J");
+							System.out.println("Dashboard : " + db);
+						}
+				});
+			}
 		}
 
 		//start the beaconning receiver
