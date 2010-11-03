@@ -48,6 +48,7 @@ import fr.inrets.leost.cmo.beaconning.BeaconGenerator;
 import fr.inrets.leost.cmo.beaconning.BeaconRecv;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvEthernet;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
+import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
 import fr.inrets.leost.cmo.dashboard.*;
 import fr.inrets.leost.cmo.management.CMOManagement;
 import fr.inrets.leost.cmo.management.CMOTableEntry;
@@ -845,12 +846,12 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			if(opt.gen){
 				gen = new BeaconGenerator(sender, loc, opt.cmoId, opt.cmoType, opt.beaconInterval);
 				gen.start();
-				System.out.println("Run generator");
+				if (opt.verbose) System.out.println("Init : Run generator");
 			}
 			if(opt.fwd){
 				fwd = new BeaconForward(sender);
 				recv.addListener(fwd);
-				System.out.println("Run forwarder");
+				if (opt.verbose) System.out.println("Init : Run forwarder");
 			}
 		}
 
@@ -913,17 +914,25 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			
 			//show verbose information
 			if(opt.verbose){
-				System.out.print("#");
+				/*System.out.print("#");
 				for (Indicator id : db.getIndicators())
 					System.out.print(id.name()+";");		
-				System.out.println();	
+				System.out.println();	*/
+				
 				//event when dashboard updated
 				db.addListener(new DashboardListener() {
-						public void dashboardUpdate(){
-							//System.out.print("\033[2J");
-							System.out.println("Dashboard : " + db);
-						}
+					public void dashboardUpdate(){
+						//System.out.print("\033[2J");
+						System.out.println("Dashboard : " + db);
+					}
 				});
+
+				recv.addListener(new BeaconRecvListener() {
+					public void cmoStatChanged(CMOState stat) {
+						System.out.println("Receive packet : "+stat.getCmoID() + ";" + stat.getSeq() + ";" + stat.getTTL());
+					}
+				});
+
 			}
 		}
 

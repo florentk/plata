@@ -106,7 +106,7 @@ public class BeaconGenerator extends Thread{
 	 */
 	private void broadcastCMOStatPacket(int t, WGS84 position, Double speed, Double track) {
 
-		System.out.println("Beacon " + t + " " + position + " " +  speed + " " + track);
+		//System.out.println("Beacon " + t + " " + position + " " +  speed + " " + track);
 		
 		sender.sendPacket(createCMOStatPacket(
 				new Float(position.longitude()), 

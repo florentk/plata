@@ -164,7 +164,7 @@ public class BeaconRecv extends Thread{
 		for ( BeaconRecvListener l : listerners )
 			l.cmoStatChanged(stat);	
 		
-		System.out.println("Receive packet : "+stat.getCmoID() + " " + stat.getSeq() + " " + stat.getTTL());
+		//System.out.println("Receive packet : "+stat.getCmoID() + " " + stat.getSeq() + " " + stat.getTTL());
 		
 		packetFwd.put(pfk, new PacketForwardedValue(stat.getLifetime()));		
 	
