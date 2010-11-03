@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Date;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -791,7 +792,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	
 	}
 	
-
+	private static void log(String module, String message){
+		System.out.println((new Date()).getTime() + "["  + module + "]" + message);
+	}
 
 	/**
 	 * start GIS
@@ -816,7 +819,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			device = PcapsTool.toNetworkInterface(opt.strInterface);
 		
 		    if(device==null){
-		    	System.out.println("The interface " + opt.strInterface + " doesn't exist");
+		    	System.err.println("The interface " + opt.strInterface + " doesn't exist");
 		    	PcapsTool.printDevice();
 		    	return;
 		    }
@@ -846,12 +849,12 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			if(opt.gen){
 				gen = new BeaconGenerator(sender, loc, opt.cmoId, opt.cmoType, opt.beaconInterval);
 				gen.start();
-				if (opt.verbose) System.out.println("Init : Run generator");
+				if (opt.verbose) log("Init","Run generator");
 			}
 			if(opt.fwd){
 				fwd = new BeaconForward(sender);
 				recv.addListener(fwd);
-				if (opt.verbose) System.out.println("Init : Run forwarder");
+				if (opt.verbose) log("Init","Run forwarder");
 			}
 		}
 
@@ -866,7 +869,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			final Dashboard db = new Dashboard();
 			
 			//create the CMO management
-			CMOManagement cmoMgt = new CMOManagement();
+			final CMOManagement cmoMgt = new CMOManagement();
 
 			//link the CMO Management with the beaconing receiver
 			recv.addListener(cmoMgt);
@@ -880,10 +883,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 
 			//add indicator
-			StoppingDistance sDistance = new StoppingDistance(loc);
-			BrakingDistance bDistance = new BrakingDistance(loc);		
-			ClosestCMO closestCMO = new ClosestCMO(loc, cmoMgt);
-			Alert dbAlert=new Alert(loc, closestCMO, sDistance, bDistance);
+			final StoppingDistance sDistance = new StoppingDistance(loc);
+			final BrakingDistance bDistance = new BrakingDistance(loc);		
+			final ClosestCMO closestCMO = new ClosestCMO(loc, cmoMgt);
+			final Alert dbAlert=new Alert(loc, closestCMO, sDistance, bDistance);
 			
 			db.addIndicator(new Position(loc));
 			db.addIndicator(new Speed(loc));
@@ -923,13 +926,13 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				db.addListener(new DashboardListener() {
 					public void dashboardUpdate(){
 						//System.out.print("\033[2J");
-						System.out.println("Dashboard : " + db);
+						log("Dashboard" , db.toString());
 					}
 				});
 
 				recv.addListener(new BeaconRecvListener() {
 					public void cmoStatChanged(CMOState stat) {
-						System.out.println("Receive packet : "+stat.getCmoID() + ";" + stat.getSeq() + ";" + stat.getTTL());
+						log("Receive packet",stat.getCmoID() + ";" + stat.getSeq() + ";" + stat.getTTL());
 					}
 				});
 
