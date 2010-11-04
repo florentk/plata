@@ -15,23 +15,12 @@ import fr.inrets.leost.cmo.management.CMOTableEntry;
  * Draw a CMO neighborhood
  * @author florent
  * @depend - - - CMOTableEntry
+ * @depend - - - CMOImg
  */
 public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
-	private static final Map<Short, Image> cmoimg =  new HashMap<Short, Image>();
-
-	
+	private static CMOImg cmoimg;
 	private static Font ft = null; 
 
-	/**
-	 * set a image representing a CMO
-	 * @param image a image representing a CMO
-	 */
-	public static void setImg(Image image, short cmoType) {
-		cmoimg.put(cmoType, image);
-	}
-	
-	
-	
 	/**
 	 * set the text font for the CMO description
 	 * @param font text font for the CMO description
@@ -39,6 +28,10 @@ public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
 	public static void setFont(Font font) {
 		ft = font;
 	}	
+	
+	public static void setCMOImg( CMOImg images) {
+		cmoimg = images;
+	}		
 
 	public MapWidgetOverlayCMO(double dx, double dy, CMOTableEntry cmo) {
 		super(dx, dy, MapWidgetOverlay.REFERENCE_WORLD, cmo);
@@ -51,7 +44,7 @@ public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
 	public void drawOverlay(GC gc, Object overlay, int x, int y) {
 		CMOTableEntry cmo = (CMOTableEntry)overlay;
 		
-		Image img = cmoimg.get(cmo.getCmoType());
+		Image img = cmoimg.getImg(cmo.getCmoType());
 		
 		if(img != null)
 			gc.drawImage(img, x -  img.getBounds().width / 2, y - img.getBounds().height);

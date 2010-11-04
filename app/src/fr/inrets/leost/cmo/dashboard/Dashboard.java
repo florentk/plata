@@ -159,17 +159,14 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		//link the  dashboard with the CMO Mangement		
 		cmoMgt.addListener(db);
 		
-		//create the indicator of the dashboard
-		StoppingDistance sDistance = new StoppingDistance(geo);
-		BrakingDistance bDistance = new BrakingDistance(geo);		
-		ClosestCMO closestCMO = new ClosestCMO(geo, cmoMgt);
+		//create the indicator of the dashboard	
 		db.addIndicator(new Position(geo));
 		db.addIndicator(new Speed(geo));
 		db.addIndicator(new Track(geo));
-		db.addIndicator(bDistance);
-		db.addIndicator(sDistance);
-		db.addIndicator(closestCMO);   
-		db.addIndicator(new Alert(geo, closestCMO, sDistance, bDistance));     
+		db.addIndicator(new BrakingDistance(geo));
+		db.addIndicator(new StoppingDistance(geo));
+		db.addIndicator(new ClosestCMO(geo, cmoMgt));   
+  
 		
 		for (Indicator id : db.getIndicators())
 			System.out.print(id.name()+";");		

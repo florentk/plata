@@ -21,8 +21,10 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -71,6 +73,7 @@ import fr.inrets.leost.geolocation.WGS84;
  * @has 1 - - Dashboard
  * @has 1 - - AlertWidget
  * @has 1 - - MapWidget
+ * @has 1 - - CMOImg
  * @depend 1 - - StoppingDistance
  * @depend 1 - - BrakingDistance
  * @depend 1 - - ClosestCMO
@@ -89,6 +92,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	private CMOManagement cmoMgt;
 	private Dashboard dashboard;	
 	private AlertWidget alert;
+	private ClosestCMOWidget wClosestCMO;
 	
 	private MapWidget map;
 	private Table tableInfo;
@@ -96,6 +100,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	private Display display;
 	private ExpandItem expandItemCMOTable;
 	private MapWidgetOverlayImage myCar;
+	
+	private static final CMOImg cmoImg = new CMOImg();
 	
 	private boolean syncOnExternalEvent = true;
 	private boolean mapCenter = true;	
@@ -137,7 +143,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		return new Image(display, getClass().getResourceAsStream("resources/feux_rouge.png"));
 	}	
 	private Image loadBikeImage()  {
-		return new Image(display, getClass().getResourceAsStream("resources/feux_rouge.png"));
+		return new Image(display, getClass().getResourceAsStream("resources/bike.png"));
 	}	
 	private Image loadBusImage()  {
 		return new Image(display, getClass().getResourceAsStream("resources/bus.png"));
@@ -294,18 +300,16 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		//map = new MapWidget(parent, SWT.NONE, MapWidget.computePosition(home,defaultZoom),defaultZoom);
 		map = new MapWidget(parent, SWT.NONE, MapWidget.computePosition(new PointD(3.12780, 50.61164),16),16);
 
-		MapWidgetOverlayCMO.setImg(loadNeighborhoodCarImage(),CMOHeader.CMO_TYPE_CAR);
-		MapWidgetOverlayCMO.setImg(loadBikeImage(),CMOHeader.CMO_TYPE_BIKE);		
-		MapWidgetOverlayCMO.setImg(loadBusImage(),CMOHeader.CMO_TYPE_BUS);
-		MapWidgetOverlayCMO.setImg(loadMotorbikeImage(),CMOHeader.CMO_TYPE_MOTORBIKE);
-		MapWidgetOverlayCMO.setImg(loadSpotImage(),CMOHeader.CMO_TYPE_SPOT);
-		MapWidgetOverlayCMO.setImg(loadTruckImage(),CMOHeader.CMO_TYPE_TRUCK);
-		MapWidgetOverlayCMO.setImg(loadWalkerImage(),CMOHeader.CMO_TYPE_WALKER);
-				
-				
-				
-				
-		MapWidgetOverlayCMO.setImg(loadCarImage(),(short)-1);	
+		cmoImg.setImg(loadNeighborhoodCarImage(),CMOHeader.CMO_TYPE_CAR);
+		cmoImg.setImg(loadBikeImage(),CMOHeader.CMO_TYPE_BIKE);		
+		cmoImg.setImg(loadBusImage(),CMOHeader.CMO_TYPE_BUS);
+		cmoImg.setImg(loadMotorbikeImage(),CMOHeader.CMO_TYPE_MOTORBIKE);
+		cmoImg.setImg(loadSpotImage(),CMOHeader.CMO_TYPE_SPOT);
+		cmoImg.setImg(loadTruckImage(),CMOHeader.CMO_TYPE_TRUCK);
+		cmoImg.setImg(loadWalkerImage(),CMOHeader.CMO_TYPE_WALKER);
+		cmoImg.setImg(loadCarImage(),(short)-1);	
+		
+		MapWidgetOverlayCMO.setCMOImg(cmoImg);
 		MapWidgetOverlayCMO.setFont(new Font(display,"Arial",14,SWT.BOLD));	
 		
 		map.addOverlay( 
@@ -355,7 +359,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}		
 	
-	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Dashboard db, Alert dbAlert, Composite parent, int style){
+	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Dashboard db, ClosestCMO closestCMO, Composite parent, int style){
 		super(parent, style);
 		
 		this.display = display;
@@ -375,12 +379,36 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
         //create the left expandbar
         ExpandBar bar = new ExpandBar (sashForm, SWT.V_SCROLL);
         
+        
+        //create alert information
+        Composite alertInfo = new Composite(bar, SWT.NONE);
+        
+        GridLayout l = new GridLayout();   
+        l.numColumns = 2;
+        l.marginRight = 20;
+        alertInfo.setLayout(l);    
+
+		//create closestCMO textuel informations
+        wClosestCMO = new ClosestCMOWidget(alertInfo, SWT.PUSH, closestCMO);
+        wClosestCMO.setFont(new Font(display,"Arial",32,SWT.BOLD));  
+        GridData gridData = new GridData();
+        gridData.verticalAlignment = GridData.FILL;
+        gridData.grabExcessVerticalSpace = true;
+        gridData.horizontalAlignment = GridData.FILL;
+        gridData.grabExcessHorizontalSpace = true;
+        wClosestCMO.setLayoutData(gridData);      
+
+
+  
+        
         //create the alert icon
-		alert = new AlertWidget(bar, SWT.NONE, dbAlert);
+		alert = new AlertWidget(alertInfo, SWT.PUSH, closestCMO);
 		alert.setImg(loadSemaphoreGreen(), 0);
 		alert.setImg(loadSemaphoreOrange(), 1);
 		alert.setImg(loadSemaphoreRed(), 2);
-        associateToExpandBar(bar, 0, alert,"Alert",true).setHeight(200);
+
+
+        associateToExpandBar(bar, 0, alertInfo,"Alert",true).setHeight(210);
         
         //create the information table
         tableInfo = initTableInfo(bar,dashboard);
@@ -542,6 +570,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		updateNeighborhood();
 		map.redraw();
 		alert.redraw();
+		wClosestCMO.redraw();
 	}
 	
 	class UpdateAll implements Runnable{
@@ -881,20 +910,14 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			cmoMgt.addListener(db);
 			
 
-
-			//add indicator
-			final StoppingDistance sDistance = new StoppingDistance(loc);
-			final BrakingDistance bDistance = new BrakingDistance(loc);		
-			final ClosestCMO closestCMO = new ClosestCMO(loc, cmoMgt);
-			final Alert dbAlert=new Alert(loc, closestCMO, sDistance, bDistance);
-			
 			db.addIndicator(new Position(loc));
 			db.addIndicator(new Speed(loc));
 			db.addIndicator(new Track(loc));
-			db.addIndicator(bDistance);
-			db.addIndicator(sDistance);
-			db.addIndicator(closestCMO);   
-			db.addIndicator(dbAlert);    
+			db.addIndicator(new BrakingDistance(loc));
+			db.addIndicator(new StoppingDistance(loc));
+			
+			ClosestCMO closestCMO =  new ClosestCMO(loc, cmoMgt);
+			db.addIndicator(closestCMO);    
 			
 			
 			//init the gui
@@ -909,7 +932,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				shell.setLayout (new FillLayout());
 
 				//create the GIS window
-				gis= new GIS(display, loc, cmoMgt, db, dbAlert,  shell, SWT.NONE);
+				gis= new GIS(display, loc, cmoMgt, db, closestCMO,  shell, SWT.NONE);
 				
 				//alow receive the dashboardUpdate
 				db.addListener(gis);

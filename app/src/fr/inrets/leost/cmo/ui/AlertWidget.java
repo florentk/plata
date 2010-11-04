@@ -6,34 +6,28 @@ import java.util.Map;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-
-import fr.inrets.leost.cmo.dashboard.Alert;
+import fr.inrets.leost.cmo.dashboard.ClosestCMO;
 
 /**
  * Widget for representing a Alert indicator
  * @author florent kaisser
- * @had 1 - - Alert
+ * @had 1 - - ClosestCMO
  */
-public class AlertWidget extends Canvas {
-
-	private Alert dbAlert;
+public class AlertWidget extends Canvas implements PaintListener {
+	private ClosestCMO closestCMO;
 	
 	private  Map<Integer, Image> alertImg =  new HashMap<Integer, Image>();	
-		
 	
-	public AlertWidget(Composite arg0, int arg1, Alert dbAlert) {
+	public AlertWidget(Composite arg0, int arg1, ClosestCMO closestCMO) {
 		super(arg0, arg1);
 		
-		this.dbAlert = dbAlert;
+		this.closestCMO = closestCMO;
 		
-        addPaintListener(new PaintListener() {
-            public void paintControl(PaintEvent e) {
-            	AlertWidget.this.paintControl(e);
-            }
-        });		
+        addPaintListener(this);		
 	}
 	
 	/**
@@ -45,11 +39,29 @@ public class AlertWidget extends Canvas {
 		alertImg.put(alert, image);
 	}	
 	
-    private void paintControl(PaintEvent e) {
-    	Image img= alertImg.get(dbAlert.getDecision());
+    public void paintControl(PaintEvent e) {
+    	Image img= alertImg.get(closestCMO.getDecision());
     	e.gc.drawImage(img , getSize().x/2 - img.getBounds().width / 2,0);
-    }	
+    }
 
+	@Override
+	public Point computeSize(int wHint, int hHint, boolean changed) {
+		
+		   checkWidget ();
+		   int width = 0, height = 0, border = getBorderWidth ();
 
+		   for (Image img : alertImg.values()){
+			   if (width < img.getBounds().width)
+				   width = img.getBounds().width;
+			   if (height < img.getBounds().height)
+				   height = img.getBounds().height;			   
+		   }
+		   
+		   width += border * 2; 
+		   height += border * 2;
+		   return new Point (width, height);
+	}	
+
+    
 
 }
