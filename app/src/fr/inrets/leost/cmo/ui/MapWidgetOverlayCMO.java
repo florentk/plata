@@ -47,15 +47,15 @@ public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
 		Image img = cmoimg.getImg(cmo.getCmoType());
 		
 		if(img != null)
-			gc.drawImage(img, x -  img.getBounds().width / 2, y - img.getBounds().height);
+			gc.drawImage(img, Math.max(x -  img.getBounds().width / 2,0), Math.max(y - img.getBounds().height,0));
 		
 		if(ft != null)
 			gc.setFont(ft);
 		
 		//get the weight text display
 		int tw = gc.stringExtent(cmo.getCmoID()).x;
-
+		
 		//draw the text in the center
-		gc.drawString(cmo.getCmoID(), Math.max(x - tw, 0) / 2,y,true); 
+		gc.drawString(cmo.getCmoID(),Math.max(x - tw / 2, 0),y,true); 
 	}
 }
