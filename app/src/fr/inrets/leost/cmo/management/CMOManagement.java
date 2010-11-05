@@ -1,6 +1,7 @@
 package fr.inrets.leost.cmo.management;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.TimerTask;
@@ -130,7 +131,7 @@ public class CMOManagement implements BeaconRecvListener {
 	
 
 	public Collection<CMOTableEntry> getTable() {
-		return table.values();
+		return new ArrayList<CMOTableEntry>(table.values());
 	}	
 	
 	public CMOTableEntry getEntry(String id) {
@@ -142,7 +143,7 @@ public class CMOManagement implements BeaconRecvListener {
 	}
 	
 	public Set<String> getCMOIds(){
-		return table.keySet();
+		return new HashSet<String>(table.keySet());
 	}
 	
 	public void addListener(CMOTableListener l){
