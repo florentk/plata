@@ -56,6 +56,6 @@ public final class MapWidgetOverlayCMO extends MapWidgetOverlay{
 		int tw = gc.stringExtent(cmo.getCmoID()).x;
 
 		//draw the text in the center
-		gc.drawString(cmo.getCmoID(),x - tw / 2,y,true); 
+		gc.drawString(cmo.getCmoID(), Math.max(x - tw, 0) / 2,y,true); 
 	}
 }
