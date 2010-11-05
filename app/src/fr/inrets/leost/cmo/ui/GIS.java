@@ -470,7 +470,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				String.format("%01.0f°", entry.getTrack())};
 	}
 	
-	private void updateTableCMO(){
+	synchronized private void updateTableCMO(){
 		//create a hashtable for associate a primary key with the TableItems
 		Map<String,TableItem> entryInTheWidgetTable = new HashMap<String,TableItem>(tableCMO.getItemCount());
 		for (TableItem i : tableCMO.getItems())
@@ -505,13 +505,13 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}
 	
-	private void updateTableInfo(){
+	synchronized private void updateTableInfo(){
 		int i=0;
 		for (Indicator id : dashboard.getIndicators())
 			tableInfo.getItem(i++).setText(1, id.toString());
 	}
 	
-	private void updateNeighborhood(){
+	synchronized private void updateNeighborhood(){
 		
 		for (CMOTableEntry entry : cmoMgt.getTable()){
 			MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
@@ -522,7 +522,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}
 	
-	synchronized private void updateAll(){
+	private void updateAll(){
 		if(stop) return;
 		
 		if(geo.isReady()){
