@@ -470,7 +470,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				String.format("%01.0f°", entry.getTrack())};
 	}
 	
-	synchronized private void updateTableCMO(){
+	private void updateTableCMO(){
 		//create a hashtable for associate a primary key with the TableItems
 		Map<String,TableItem> entryInTheWidgetTable = new HashMap<String,TableItem>(tableCMO.getItemCount());
 		for (TableItem i : tableCMO.getItems())
@@ -505,19 +505,20 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}
 	
-	synchronized private void updateTableInfo(){
+	private void updateTableInfo(){
 		int i=0;
 		for (Indicator id : dashboard.getIndicators())
 			tableInfo.getItem(i++).setText(1, id.toString());
 	}
 	
-	synchronized private void updateNeighborhood(){
-		
-		for (CMOTableEntry entry : cmoMgt.getTable()){
-			MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
-			if(over!=null){
-				over.setDx(entry.getLongitude());
-				over.setDy(entry.getLatitude());
+	private void updateNeighborhood(){
+		synchronized (neighborhood) {
+			for (CMOTableEntry entry : cmoMgt.getTable()){
+				MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
+				if(over!=null){
+					over.setDx(entry.getLongitude());
+					over.setDy(entry.getLatitude());
+				}
 			}
 		}
 	}
@@ -624,11 +625,14 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 */
 	@Override
 	public void tableChanged(CMOTableEntry entry) {
-		MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
 		
-		if(over==null){
-			tableCMOAdded(entry);
-			return;
+		synchronized (neighborhood) {
+			MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());		
+
+			if(over==null){
+				tableCMOAdded(entry);
+				return;
+			}
 		}
 		
 		updateOnExternalEvent();
@@ -641,8 +645,12 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	public void tableCMOAdded(CMOTableEntry entry) {
 
 		MapWidgetOverlayCMO over =  new MapWidgetOverlayCMO(entry.getLongitude(), entry.getLatitude(), entry);
+		
 		map.addOverlay(over);
-		neighborhood.put(entry.getCmoID(),over);
+		
+		synchronized (neighborhood) {
+			neighborhood.put(entry.getCmoID(),over);
+		}
 		
 		updateOnExternalEvent();
 	}
@@ -652,8 +660,12 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 */
 	@Override
 	public void tableCMORemoved(CMOTableEntry entry) {
+		
 		map.removeOverlay(neighborhood.get(entry.getCmoID()));
-		neighborhood.remove(entry.getCmoID());
+		
+		synchronized (neighborhood) {
+			neighborhood.remove(entry.getCmoID());
+		}
 		
 		updateOnExternalEvent();
 	}

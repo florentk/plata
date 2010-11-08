@@ -74,76 +74,85 @@ public class CMOManagement implements BeaconRecvListener {
 	 * @see CMOStateListener#cmoStatChanged(CMOState)
 	 */
 	@Override
-	synchronized public void cmoStatChanged(CMOState newStat) {
+	public void cmoStatChanged(CMOState newStat) {
 		CMOTableEntry entry;
 
 		
+			if( table.containsKey(newStat.getCmoID())){
+				entry = table.get(newStat.getCmoID());
+				
+				entry.updateEntry(
+								new Double (newStat.getLongitude()),
+								new Double (newStat.getLatitude()),
+								new Double (newStat.getH()),
+								new Double (newStat.getSpeed()),
+								new Double (newStat.getTrack()),
+								newStat.getLifetime(),
+								newStat.getTime());
+				
+				notifyListenerChanged(entry);
+			}else{
+				synchronized (table) {
+					table.put(newStat.getCmoID(), 
+							entry = new CMOTableEntry(
+									newStat.getCmoID(),
+									newStat.getCmoType(),
+									
+									new Double (newStat.getLongitude()),
+									new Double (newStat.getLatitude()),
+									new Double (newStat.getH()),
+									new Double (newStat.getSpeed()),
+									new Double (newStat.getTrack()),
+									newStat.getLifetime(),
+									newStat.getTime()
+								));
+				}
 		
-		if( table.containsKey(newStat.getCmoID())){
-			entry = table.get(newStat.getCmoID());
-			entry.updateEntry(
-							new Double (newStat.getLongitude()),
-							new Double (newStat.getLatitude()),
-							new Double (newStat.getH()),
-							new Double (newStat.getSpeed()),
-							new Double (newStat.getTrack()),
-							newStat.getLifetime(),
-							newStat.getTime());
-			
-			notifyListenerChanged(entry);
-		}else{
-			table.put(newStat.getCmoID(), 
-					entry = new CMOTableEntry(
-							newStat.getCmoID(),
-							newStat.getCmoType(),
-							
-							new Double (newStat.getLongitude()),
-							new Double (newStat.getLatitude()),
-							new Double (newStat.getH()),
-							new Double (newStat.getSpeed()),
-							new Double (newStat.getTrack()),
-							newStat.getLifetime(),
-							newStat.getTime()
-						));
-	
-			notifyListenerAdd(entry);
-		
-		}	
+				notifyListenerAdd(entry);
+		}
 	}
 	
 	/**
 	 * check in regular interval the expired entry
 	 */
-	synchronized public void deleteExpiredEntry(){
-		
-		
-		for(Iterator<CMOTableEntry> i = table.values().iterator();i.hasNext();){
-			CMOTableEntry entry = i.next();
-			
-			//expired entry ?
-			if(entry.isExpired()){
-				//notify the listener of the removed entry				
-				i.remove();
-				notifyListenerRemove(entry);
+	public void deleteExpiredEntry(){
+		synchronized (table) {
+			for(Iterator<CMOTableEntry> i = table.values().iterator();i.hasNext();){
+				CMOTableEntry entry = i.next();
+				
+				//expired entry ?
+				if(entry.isExpired()){
+					//notify the listener of the removed entry				
+					i.remove();
+					notifyListenerRemove(entry);
+				}
 			}
 		}
 	}
 	
 
 	public Collection<CMOTableEntry> getTable() {
-		return new ArrayList<CMOTableEntry>(table.values());
+		synchronized (table) {
+			return new ArrayList<CMOTableEntry>(table.values());
+		}
 	}	
 	
 	public CMOTableEntry getEntry(String id) {
-		return table.get(id);
+		synchronized (table) {
+			return table.get(id);
+		}
 	}		
 	
 	public boolean cmoInTable(String id){
-		return table.containsKey(id);
+		synchronized (table) {
+			return table.containsKey(id);
+		}
 	}
 	
 	public Set<String> getCMOIds(){
-		return new HashSet<String>(table.keySet());
+		synchronized (table) {
+			return new HashSet<String>(table.keySet());
+		}
 	}
 	
 	public void addListener(CMOTableListener l){

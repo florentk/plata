@@ -156,26 +156,29 @@ public class BeaconRecv extends Thread{
 	
 		PacketForwardedKey pfk = new PacketForwardedKey(stat.getCmoID(), stat.getSeq());
 		
-		//not notify twice for same packet
-		if(packetFwd.containsKey(pfk))
-			return;		
-		
+		synchronized (packetFwd) {
+			//not notify twice for same packet
+			if(packetFwd.containsKey(pfk))
+				return;		
+		}
 		
 		for ( BeaconRecvListener l : listerners )
 			l.cmoStatChanged(stat);	
 		
-		//System.out.println("Receive packet : "+stat.getCmoID() + " " + stat.getSeq() + " " + stat.getTTL());
-		
-		packetFwd.put(pfk, new PacketForwardedValue(stat.getLifetime()));		
+		synchronized (packetFwd) {
+			packetFwd.put(pfk, new PacketForwardedValue(stat.getLifetime()));	
+		}
 	
 	}
 	
 	public void deleteExpiredEntry(){
-		for(Iterator<PacketForwardedValue> i = packetFwd.values().iterator();i.hasNext();){
-			PacketForwardedValue entry = i.next();
-			if(entry.isExpired()){
-				//System.out.println("Remove entry : "+entry);
-				i.remove();
+		synchronized (packetFwd) {
+			for(Iterator<PacketForwardedValue> i = packetFwd.values().iterator();i.hasNext();){
+				PacketForwardedValue entry = i.next();
+				if(entry.isExpired()){
+					//System.out.println("Remove entry : "+entry);
+					i.remove();
+				}
 			}
 		}
 	}

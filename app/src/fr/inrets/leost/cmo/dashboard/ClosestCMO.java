@@ -47,7 +47,7 @@ public class ClosestCMO implements Indicator {
 	 * @param track track  of CMO
 	 * @return the table entry of closest CMO
 	 */
-	synchronized public void updateClosestCMOInFront(Double longitude, Double latitude, Double track){
+	public void updateClosestCMOInFront(Double longitude, Double latitude, Double track){
 		CMOTableEntry closest=null;
 		Double closestDist= null;
 		double lg=longitude.doubleValue(),lt=latitude.doubleValue(),t=track.doubleValue();
