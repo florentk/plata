@@ -626,14 +626,14 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	@Override
 	public void tableChanged(CMOTableEntry entry) {
 		
-		synchronized (neighborhood) {
-			MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());		
 
-			if(over==null){
-				tableCMOAdded(entry);
-				return;
-			}
+		MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());		
+
+		if(over==null){
+			tableCMOAdded(entry);
+			return;
 		}
+		
 		
 		updateOnExternalEvent();
 	}

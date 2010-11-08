@@ -138,15 +138,11 @@ public class CMOManagement implements BeaconRecvListener {
 	}	
 	
 	public CMOTableEntry getEntry(String id) {
-		synchronized (table) {
 			return table.get(id);
-		}
 	}		
 	
 	public boolean cmoInTable(String id){
-		synchronized (table) {
 			return table.containsKey(id);
-		}
 	}
 	
 	public Set<String> getCMOIds(){

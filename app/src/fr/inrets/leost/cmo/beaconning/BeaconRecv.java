@@ -156,11 +156,11 @@ public class BeaconRecv extends Thread{
 	
 		PacketForwardedKey pfk = new PacketForwardedKey(stat.getCmoID(), stat.getSeq());
 		
-		synchronized (packetFwd) {
-			//not notify twice for same packet
-			if(packetFwd.containsKey(pfk))
-				return;		
-		}
+
+		//not notify twice for same packet
+		if(packetFwd.containsKey(pfk))
+			return;		
+
 		
 		for ( BeaconRecvListener l : listerners )
 			l.cmoStatChanged(stat);	
