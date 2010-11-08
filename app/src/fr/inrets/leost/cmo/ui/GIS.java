@@ -644,9 +644,12 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 		MapWidgetOverlayCMO over =  new MapWidgetOverlayCMO(entry.getLongitude(), entry.getLatitude(), entry);
 		
-		map.addOverlay(over);
 		
-		neighborhood.put(entry.getCmoID(),over);
+		synchronized (neighborhood) {
+			map.addOverlay(over);
+			neighborhood.put(entry.getCmoID(),over);			
+		}
+
 		
 		updateOnExternalEvent();
 	}
@@ -656,9 +659,11 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 */
 	@Override
 	public void tableCMORemoved(CMOTableEntry entry) {
-		map.removeOverlay(neighborhood.get(entry.getCmoID()));
 		
-		neighborhood.remove(entry.getCmoID());
+		synchronized (neighborhood) {
+			map.removeOverlay(neighborhood.get(entry.getCmoID()));
+			neighborhood.remove(entry.getCmoID());
+		}
 		
 		updateOnExternalEvent();
 	}
