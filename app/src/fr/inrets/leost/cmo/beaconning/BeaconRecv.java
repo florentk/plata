@@ -3,7 +3,7 @@ package fr.inrets.leost.cmo.beaconning;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,7 +24,7 @@ public class BeaconRecv extends Thread{
 	/** interval between two expired entry check (in ms) */
 	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;	
 	
-	private Hashtable<PacketForwardedKey, PacketForwardedValue>  packetFwd = new Hashtable<PacketForwardedKey, PacketForwardedValue>();
+	private HashMap<PacketForwardedKey, PacketForwardedValue>  packetFwd = new HashMap<PacketForwardedKey, PacketForwardedValue>();
 	
 	private static final class PacketForwardedKey{	
 		private String CMOId;
@@ -172,6 +172,7 @@ public class BeaconRecv extends Thread{
 	}
 	
 	public void deleteExpiredEntry(){
+
 		synchronized (packetFwd) {
 			for(Iterator<PacketForwardedValue> i = packetFwd.values().iterator();i.hasNext();){
 				PacketForwardedValue entry = i.next();

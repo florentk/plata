@@ -75,24 +75,25 @@ public class CMOManagement implements BeaconRecvListener {
 	 */
 	@Override
 	public void cmoStatChanged(CMOState newStat) {
-		CMOTableEntry entry;
+			CMOTableEntry entry;
 
 		
 			if( table.containsKey(newStat.getCmoID())){
-				entry = table.get(newStat.getCmoID());
+				synchronized (table){
+					entry = table.get(newStat.getCmoID());
 				
-				entry.updateEntry(
-								new Double (newStat.getLongitude()),
-								new Double (newStat.getLatitude()),
-								new Double (newStat.getH()),
-								new Double (newStat.getSpeed()),
-								new Double (newStat.getTrack()),
-								newStat.getLifetime(),
-								newStat.getTime());
-				
+					entry.updateEntry(
+									new Double (newStat.getLongitude()),
+									new Double (newStat.getLatitude()),
+									new Double (newStat.getH()),
+									new Double (newStat.getSpeed()),
+									new Double (newStat.getTrack()),
+									newStat.getLifetime(),
+									newStat.getTime());
+				}
 				notifyListenerChanged(entry);
 			}else{
-				synchronized (table) {
+				synchronized (table){
 					table.put(newStat.getCmoID(), 
 							entry = new CMOTableEntry(
 									newStat.getCmoID(),
@@ -107,7 +108,6 @@ public class CMOManagement implements BeaconRecvListener {
 									newStat.getTime()
 								));
 				}
-		
 				notifyListenerAdd(entry);
 		}
 	}
@@ -116,37 +116,42 @@ public class CMOManagement implements BeaconRecvListener {
 	 * check in regular interval the expired entry
 	 */
 	public void deleteExpiredEntry(){
-		synchronized (table) {
+		ArrayList<CMOTableEntry> entryDeleted = new ArrayList<CMOTableEntry>();
+		
+		synchronized (table){
 			for(Iterator<CMOTableEntry> i = table.values().iterator();i.hasNext();){
 				CMOTableEntry entry = i.next();
 				
 				//expired entry ?
 				if(entry.isExpired()){
-					//notify the listener of the removed entry				
 					i.remove();
-					notifyListenerRemove(entry);
+					entryDeleted.add(entry);
 				}
 			}
 		}
+		
+		//notify the listener of the removed entry				
+		for (CMOTableEntry entry:entryDeleted)
+			notifyListenerRemove(entry);
 	}
 	
 
 	public Collection<CMOTableEntry> getTable() {
-		synchronized (table) {
+		synchronized (table){
 			return new ArrayList<CMOTableEntry>(table.values());
 		}
 	}	
 	
 	public CMOTableEntry getEntry(String id) {
-			return table.get(id);
+		return table.get(id);
 	}		
 	
 	public boolean cmoInTable(String id){
-			return table.containsKey(id);
+		return table.containsKey(id);
 	}
 	
-	public Set<String> getCMOIds(){
-		synchronized (table) {
+	synchronized public Set<String> getCMOIds(){
+		synchronized (table){
 			return new HashSet<String>(table.keySet());
 		}
 	}

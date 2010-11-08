@@ -1,10 +1,5 @@
 package fr.inrets.leost.cmo.beaconning;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Hashtable;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import jpcap.JpcapCaptor;
 import jpcap.JpcapSender;

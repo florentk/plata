@@ -471,7 +471,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	}
 	
 	private void updateTableCMO(){
-		//create a hashtable for associate a primary key with the TableItems
+		//create a hashmap for associate a primary key with the TableItems
 		Map<String,TableItem> entryInTheWidgetTable = new HashMap<String,TableItem>(tableCMO.getItemCount());
 		for (TableItem i : tableCMO.getItems())
 			entryInTheWidgetTable.put( ((CMOTableEntry)i.getData()).getCmoID(), i);
@@ -512,13 +512,11 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	}
 	
 	private void updateNeighborhood(){
-		synchronized (neighborhood) {
-			for (CMOTableEntry entry : cmoMgt.getTable()){
-				MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
-				if(over!=null){
-					over.setDx(entry.getLongitude());
-					over.setDy(entry.getLatitude());
-				}
+		for (CMOTableEntry entry : cmoMgt.getTable()){
+			MapWidgetOverlayCMO over = neighborhood.get(entry.getCmoID());
+			if(over!=null){
+				over.setDx(entry.getLongitude());
+				over.setDy(entry.getLatitude());
 			}
 		}
 	}
@@ -648,9 +646,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		map.addOverlay(over);
 		
-		synchronized (neighborhood) {
-			neighborhood.put(entry.getCmoID(),over);
-		}
+		neighborhood.put(entry.getCmoID(),over);
 		
 		updateOnExternalEvent();
 	}
@@ -660,12 +656,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	 */
 	@Override
 	public void tableCMORemoved(CMOTableEntry entry) {
-		
 		map.removeOverlay(neighborhood.get(entry.getCmoID()));
 		
-		synchronized (neighborhood) {
-			neighborhood.remove(entry.getCmoID());
-		}
+		neighborhood.remove(entry.getCmoID());
 		
 		updateOnExternalEvent();
 	}
