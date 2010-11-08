@@ -150,7 +150,7 @@ public class CMOManagement implements BeaconRecvListener {
 		return table.containsKey(id);
 	}
 	
-	synchronized public Set<String> getCMOIds(){
+	public Set<String> getCMOIds(){
 		synchronized (table){
 			return new HashSet<String>(table.keySet());
 		}
