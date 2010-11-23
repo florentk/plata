@@ -13,8 +13,9 @@
     <path id="app.classpath">
         <pathelement location="bin"/>
         <pathelement location="lib/json_simple-1.1.jar"/>
-        <pathelement location="/usr/share/java/swt-gtk-3.5.1.jar"/>
-        <pathelement location="/usr/share/java/commons-cli.jar"/>
+        <pathelement location="../../../../usr/share/java/swt-gtk-3.5.1.jar"/>
+        <pathelement location="../../../../usr/share/java/commons-cli.jar"/>
+        <pathelement location="../../../../usr/share/java/log4j-1.2.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -52,13 +53,29 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
+    <target name="Gps">
+        <java classname="fr.inrets.leost.geolocation.Gps" failonerror="true" fork="yes">
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
+    <target name="StringParser">
+        <java classname="fr.inrets.leost.geolocation.StringParser" failonerror="true" fork="yes">
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
     <target name="GpsMonitor">
         <java classname="fr.inrets.leost.cmo.ui.GpsMonitor" failonerror="true" fork="yes">
             <classpath refid="app.classpath"/>
         </java>
     </target>
+    <target name="MapBrowser">
+        <java classname="com.roots.swtmap.MapBrowser" failonerror="true" fork="yes">
+            <classpath refid="app.classpath"/>
+        </java>
+    </target>
     <target name="GIS">
         <java classname="fr.inrets.leost.cmo.ui.GIS" failonerror="true" fork="yes">
+            <arg line="-n &quot;V2 CC&quot; -t spot -p &quot;50°37'4.02\&quot;N 3°7'51.38\&quot;E&quot;"/>
             <classpath refid="app.classpath"/>
         </java>
     </target>
