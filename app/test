@@ -1,5 +1,5 @@
 #!/bin/sh
-JAVA_ARG="-classpath bin/:lib/json_simple-1.1.jar:/usr/share/java/swt-gtk-3.5.1.jar:/usr/share/java/commons-cli.jar fr.inrets.leost.cmo.ui.GIS"
+JAVA_ARG="-classpath bin/:lib/json_simple-1.1.jar:/usr/share/java/swt-gtk-3.5.1.jar:/usr/share/java/commons-cli.jar:/usr/share/java/log4j-1.2.jar fr.inrets.leost.cmo.ui.GIS"
 
 
 java $JAVA_ARG -d -n "AA-368-ER" -t truck -p "50°37'7.10\"N 3°07'35.38\"E" -i lo &

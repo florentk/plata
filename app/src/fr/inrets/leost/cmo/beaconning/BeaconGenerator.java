@@ -1,6 +1,8 @@
 package fr.inrets.leost.cmo.beaconning;
 
 
+import org.apache.log4j.Logger;
+
 import jpcap.*;
 import jpcap.packet.EthernetPacket;
 import jpcap.packet.Packet;
@@ -40,6 +42,9 @@ public class BeaconGenerator extends Thread{
 	
 	private static int seq=0;
 
+	/** init the logger */
+	private static Logger logger = Logger.getLogger(BeaconGenerator.class);		
+	
 	private String id;
 	private short type;
 	private int beaconFreq;
@@ -106,7 +111,7 @@ public class BeaconGenerator extends Thread{
 	 */
 	private void broadcastCMOStatPacket(int t, WGS84 position, Double speed, Double track) {
 
-		//System.out.println("Beacon " + t + " " + position + " " +  speed + " " + track);
+		logger.info("send_cmo_packet: " + t + " " + position + " " +  speed + " " + track);
 		
 		sender.sendPacket(createCMOStatPacket(
 				new Float(position.longitude()), 

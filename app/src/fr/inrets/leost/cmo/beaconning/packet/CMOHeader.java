@@ -177,11 +177,11 @@ public class CMOHeader {
 	public String toString(){
 		String s="";
 		
-		s+="TTL : "+getTTL()+"\n";
-		s+="Sequence number : "+getSeq()+"\n";
-		s+="Lifetime : "+getLifetime()+"\n";
-		s+="Identity : "+getCmoID()+"\n";
-		s+="Type : "+typeToString(getCmoType())+"\n";
+		s+="TTL : "+getTTL()+",";
+		s+="Sequence number : "+getSeq()+",";
+		s+="Lifetime : "+getLifetime()+",";
+		s+="Identity : "+getCmoID()+",";
+		s+="Type : "+typeToString(getCmoType())+",";
 		
 		return s;
 	}

@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="lib/json_simple-1.1.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/swt-gtk-3.5.1.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/commons-cli.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/log4j-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -13,7 +13,9 @@ import jpcap.JpcapCaptor;
 import jpcap.JpcapSender;
 import jpcap.NetworkInterface;
 
+
 import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -87,6 +89,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	
 	private static final PointD home = new PointD(3.13252, 50.60689);
 	private static int defaultZoom = 16;
+	
+	/** init the logger */
+	private static Logger logger = Logger.getLogger(GIS.class);		
 
 	private Geolocation geo;
 	private CMOManagement cmoMgt;
@@ -811,7 +816,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 			BeaconRecvFake recvf = new BeaconRecvFake();		
 			recvf.addFixedCMO(new CMOState(
-					new CMOHeader((byte)100, 0, 5000, "test_spot",CMOHeader.CMO_TYPE_SPOT ),
+					new CMOHeader((byte)100, 0, 5000, "test_spot       ",CMOHeader.CMO_TYPE_SPOT ),
 					3.13061f,
 					50.61789f,
 					0.0f,
@@ -819,7 +824,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 					0.0f,0));
 
 			recvf.addFixedCMO(new CMOState(
-						new CMOHeader((byte)100, 0, 5000, "test_car",CMOHeader.CMO_TYPE_CAR ),
+						new CMOHeader((byte)100, 0, 5000, "test_car        ",CMOHeader.CMO_TYPE_CAR ),
 						3.12586784363f,
 						50.6021995544f,
 						0.0f,
@@ -833,6 +838,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	
 	private static void log(String module, String message){
 		System.out.println((new Date()).getTime() + " ["  + module + "] " + message);
+		logger.info(module + " " + message);
 	}
 
 	/**
@@ -846,7 +852,13 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		NetworkInterface device = null;
 		BeaconRecv recv = null;
 		
+		//point separator for reel number
 		java.util.Locale.setDefault(java.util.Locale.US);
+		
+
+		//init logger
+		org.apache.log4j.PropertyConfigurator.configure("log.config");
+
 
 		//if fake, create a fake recv
 		if(opt.strInterface.compareToIgnoreCase("fake")==0){

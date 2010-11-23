@@ -1,6 +1,8 @@
 package fr.inrets.leost.cmo.beaconning;
 
 
+import org.apache.log4j.Logger;
+
 import jpcap.JpcapCaptor;
 import jpcap.JpcapSender;
 import jpcap.NetworkInterface;
@@ -22,7 +24,8 @@ public class BeaconForward implements BeaconRecvListener {
 	
 	private JpcapSender sender;
 
-
+	/** init the logger */
+	private static Logger logger = Logger.getLogger(BeaconForward.class);		
 	
 	public BeaconForward(JpcapSender sender) {
 		this.sender = sender;
@@ -39,6 +42,8 @@ public class BeaconForward implements BeaconRecvListener {
 		
 		if(stat.getTTL()==0)
 			return;
+		
+		logger.info("forward_cmo_packet: " + stat.getCmoID() + " " + stat.getSeq()+ " " + stat.getTTL());
 		
 		sender.sendPacket(BeaconGenerator.createCMOStatPacket( (byte)((int)stat.getTTL()-1), stat.getSeq(), stat.getLifetime(), stat.getCmoID(), stat.getCmoType(), stat.getLongitude(), stat.getLatitude(), stat.getH(), stat.getSpeed(), stat.getTrack(), stat.getTime()));
 	

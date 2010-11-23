@@ -2,6 +2,8 @@ package fr.inrets.leost.cmo.beaconning;
 
 
 
+import org.apache.log4j.Logger;
+
 import jpcap.*;
 import jpcap.packet.Packet;
 import jpcap.packet.EthernetPacket;
@@ -24,7 +26,8 @@ public class BeaconRecvEthernet extends  BeaconRecv implements PacketReceiver {
 	int delay;
 	String myCmoId;
 	
-	
+	/** init the logger */
+	private static Logger logger = Logger.getLogger(BeaconRecvEthernet.class);	
 
 	public BeaconRecvEthernet(JpcapCaptor jpcap, int delay, String myCmoId){
 		super();
@@ -58,6 +61,8 @@ public class BeaconRecvEthernet extends  BeaconRecv implements PacketReceiver {
 
 				//decode packet
 				CMOState cmo = new CMOState(packet.data);
+				
+				logger.info("receive_cmo_packet: "+cmo);
 				
 				//drop packet from me and expired packet
 				if(cmo.getCmoID().compareTo(myCmoId)!=0){

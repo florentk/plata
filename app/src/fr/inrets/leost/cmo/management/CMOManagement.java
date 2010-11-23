@@ -8,11 +8,13 @@ import java.util.TimerTask;
 import java.util.Timer;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 
 import fr.inrets.leost.cmo.beaconning.BeaconRecvEthernet;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
 import fr.inrets.leost.cmo.beaconning.packet.CMOState;
-import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
+import fr.inrets.leost.geolocation.Gps;
+
 
 
 /**
@@ -35,11 +37,12 @@ public class CMOManagement implements BeaconRecvListener {
 	/** interval between two expired entry check (in ms) */
 	public static final int CHECK_EXPIRED_ENTRY_INTERVAL = 1000;
 	
-	private CMOTable table;
-	 
-	//private static boolean tableLock = false;
+	/** init the logger */
+	private static Logger logger = Logger.getLogger(CMOManagement.class);
 	
-
+	
+	private CMOTable table;
+	
 	private final Collection<CMOTableListener> listerners = new ArrayList<CMOTableListener>();
 
 	
@@ -53,18 +56,24 @@ public class CMOManagement implements BeaconRecvListener {
 	
 	
 	private void notifyListenerChanged(CMOTableEntry cmo){
+		logger.info("entry_chaged: "+cmo);
+		
 		//notify the listerners
 		for (CMOTableListener l : listerners)
 			l.tableChanged(cmo);		
 	}
 	
 	private void notifyListenerRemove(CMOTableEntry cmo){
+		logger.info("entry_removed: "+cmo);
+		
 		//notify the listerners
 		for (CMOTableListener l : listerners)
 			l.tableCMORemoved(cmo);		
 	}	
 	
 	private void notifyListenerAdd(CMOTableEntry cmo){
+		logger.info("entry_added: "+cmo);
+		
 		//notify the listerners
 		for (CMOTableListener l : listerners)
 			l.tableCMOAdded(cmo);		
@@ -172,6 +181,10 @@ public class CMOManagement implements BeaconRecvListener {
 	}
 
 	public static void main(String[] args) throws Exception {
+		
+		//init logger
+		org.apache.log4j.BasicConfigurator.configure();
+		logger.setLevel(org.apache.log4j.Level.DEBUG);
 		
 		BeaconRecvEthernet recv = BeaconRecvEthernet.loopPacketFromDevice(args[0]);
 		/*BeaconRecvFake recv = new BeaconRecvFake();

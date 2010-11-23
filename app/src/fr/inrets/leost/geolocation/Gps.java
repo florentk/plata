@@ -9,11 +9,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Collection;
-import java.util.ArrayList;
 
 import org.json.simple.parser.*;
-
+import org.apache.log4j.Logger;
 
 
 /**
@@ -44,6 +42,8 @@ public class Gps  extends Geolocation  {
 	/** writer buffer for read the data from gpsd*/
 	private BufferedWriter gpsBW;	
 	
+	/** init the logger */
+	private static Logger logger = Logger.getLogger(Gps.class);
 
 
 	/**
@@ -114,12 +114,11 @@ public class Gps  extends Geolocation  {
 	 */
 	static private GpsData decodeGPSDataJson(String str){
 		
+		logger.info("receive_gps_data: " + str);
 		
 		try{
 			//convert JSON string in Java Map
 			Map dict=(Map)(new JSONParser()).parse(str);
-			
-			//System.out.println(dict);
 			
 			//TPV class for get position, speed and track (see gpsd spec)
 			String fClass = (String)dict.get("class");
@@ -234,19 +233,23 @@ public class Gps  extends Geolocation  {
 	public static void main (String[] args) throws IOException{
 		Geolocation geo = new Gps();
 		
+		//init logger
+		org.apache.log4j.BasicConfigurator.configure();
+		logger.setLevel(org.apache.log4j.Level.DEBUG);
+		
+		//point separator for real
 		java.util.Locale.setDefault(java.util.Locale.US);
 		
 		geo.addPositionListener(new GeolocationListener() {
 
 			public void positionChanged(WGS84 position, Double speed, Double track) {
-				//System.out.println(position + " Speed : " + speed + " Track : " + track);
+				logger.debug("position_changed: "+ position + " " + speed + " "+ track );
 			}
 
 		});
 		
 		geo.run();
 		geo.dispose();
-		
 	}
 
 

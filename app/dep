@@ -3,3 +3,4 @@ jpcap
 org.eclipse.swt
 org.json.simple
 org.apache.commons.cli
+org.apache.log4j

@@ -123,12 +123,12 @@ public final class CMOState extends CMOHeader{
 	public String toString(){
 		String s=super.toString();
 	
-		s+="Longitude : "+getLongitude()+"\n";
-		s+="Latitude : "+getLatitude()+"\n";
-		s+="Altitude : "+getH()+"\n";
-		s+="Speed : "+getSpeed()+"\n";
-		s+="Orientation : "+getTrack()+"\n";
-		s+="Time : "+getTime()+"\n";		
+		s+="Longitude : "+getLongitude()+",";
+		s+="Latitude : "+getLatitude()+",";
+		s+="Altitude : "+getH()+",";
+		s+="Speed : "+getSpeed()+",";
+		s+="Orientation : "+getTrack()+",";
+		s+="Time : "+getTime();		
 		
 		return s;
 	}

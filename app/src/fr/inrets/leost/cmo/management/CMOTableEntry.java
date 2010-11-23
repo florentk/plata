@@ -180,13 +180,13 @@ public class CMOTableEntry {
 	public String toString(){
 		String s="";
 		
-		s+="CMO Id : "+	getCmoID()+"\n";
-		s+="CMO Type : "+ CMOHeader.typeToString(getCmoType()) + "\n";
-		s+="Longitude : "+getLongitude()+"\n";
-		s+="Latitude : "+getLatitude()+"\n";
-		s+="Altitude : "+getAltitude()+"\n";
-		s+="Speed : "+getSpeed()+"\n";
-		s+="Orientation : "+getTrack()+"\n";		
+		s+="CMO Id : "+	getCmoID()+",";
+		s+="CMO Type : "+ CMOHeader.typeToString(getCmoType()) + ",";
+		s+="Longitude : "+getLongitude()+",";
+		s+="Latitude : "+getLatitude()+",";
+		s+="Altitude : "+getAltitude()+",";
+		s+="Speed : "+getSpeed()+",";
+		s+="Orientation : "+getTrack()+",";		
 		s+="Entry date : " + getDateEntry();
 		
 		return s;
