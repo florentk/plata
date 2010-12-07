@@ -1,0 +1,23 @@
+Dépendances Ubuntu 10.04 LTS :
+------------------------------
+sudo apt-get install gpsd default-jdk libswt-gtk-3.5-java libcommons-cli-java liblog4j1.2-java
+
+sudo dpkg -i lib/jpcap-0.7.deb
+
+
+Installation des cartes
+-----------------------
+sudo mkdir /var/cache/osm
+sudo tar -C /var/cache/osm -xzf tiles-npc.tgz 
+
+Pour une autre région : suivre les instructions de cette page
+pour générer vos propre "tiles" :
+http://wiki.openstreetmap.org/wiki/Creating_your_own_tiles
+
+Démarrer l'application
+----------------------
+sudo ./gis -i <interface>
+
+interface : network intarface, ex : wlan0
+
+
