@@ -109,7 +109,7 @@ Téléconférence
 Format de données météos existantes
 -----------------------------------
 
-- METAR (METéorological Airport Report)
+- METAR (METéorological Airport Report) : en moyenne 70 caractères ASCII
 - NDFD (National Digital Forecast Database) XML : http://www.weather.gov/forecasts/xml
 - wheather.com (XML) : http://xoap.weather.com/weather/local/FRXX0076?cc=*&dayf=5&link=xoap&prod=xoap&par=1215958633&key=2c274a9a3263bb28
 - json : http://www.geonames.org/export/JSON-webservices.html
@@ -136,4 +136,12 @@ Réunion Munich
 - Next meeting at livic : 27 and 28 jan or 3 and 4 fev
 
 - joelle.besnier@lcpc.fr
+
+Pour le 1er Mars
+----------------
+
+- Voir à quel moment la couche mac sature
+- Essayer avec plus de noeud (1000)
+- Implementer broadcasting
+* Infrastrucutre fixe dans scénario
 

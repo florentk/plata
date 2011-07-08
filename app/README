@@ -1,9 +1,12 @@
 Dépendances Ubuntu 10.04 LTS :
 ------------------------------
-sudo apt-get install gpsd default-jdk libswt-gtk-3.5-java libcommons-cli-java liblog4j1.2-java
+sudo apt-get install gpsd default-jdk 
 
 sudo dpkg -i lib/jpcap-0.7.deb
 
+Compilation
+-----------
+mvn compile
 
 Installation des cartes
 -----------------------
@@ -19,5 +22,4 @@ Démarrer l'application
 sudo ./gis -i <interface>
 
 interface : network intarface, ex : wlan0
-
 

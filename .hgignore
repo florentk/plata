@@ -3,3 +3,7 @@ tmp/*
 app/bin/*
 app/doc/*
 app/diagrammes/*
+app/log/*
+
+syntax: regexp
+^.*/target/.*

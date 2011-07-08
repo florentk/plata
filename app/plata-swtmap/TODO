@@ -1,0 +1,1 @@
+add <profile> in pom.xml file to provide os specific option for swt : maven.apache.org/guides/MavenQuickReferenceCard.pdf
