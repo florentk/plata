@@ -127,43 +127,43 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 
 	private Image loadCarImage()   {
-		return new Image(display,  getClass().getResourceAsStream("resources/twingo.png"));
+		return new Image(display,  getClass().getResourceAsStream("/twingo.png"));
 	}
 	private Image loadMyCarImage()   {
-		return new Image(display,  getClass().getResourceAsStream("resources/twingo_green.png"));
+		return new Image(display,  getClass().getResourceAsStream("/twingo_green.png"));
 	}	
 	private Image loadNeighborhoodCarImage()   {
-		return new Image(display,  getClass().getResourceAsStream("resources/twingo_red.png"));
+		return new Image(display,  getClass().getResourceAsStream("/twingo_red.png"));
 	}		
 	private Image loadHomeImage()  {
-		return new Image(display, getClass().getResourceAsStream("resources/home.png"));
+		return new Image(display, getClass().getResourceAsStream("/home.png"));
 	}	
 	private Image loadSemaphoreGreen()  {
-		return new Image(display, getClass().getResourceAsStream("resources/feux_vert.png"));
+		return new Image(display, getClass().getResourceAsStream("/feux_vert.png"));
 	}		
 	private Image loadSemaphoreOrange()  {
-		return new Image(display, getClass().getResourceAsStream("resources/feux_orange.png"));
+		return new Image(display, getClass().getResourceAsStream("/feux_orange.png"));
 	}	
 	private Image loadSemaphoreRed()  {
-		return new Image(display, getClass().getResourceAsStream("resources/feux_rouge.png"));
+		return new Image(display, getClass().getResourceAsStream("/feux_rouge.png"));
 	}	
 	private Image loadBikeImage()  {
-		return new Image(display, getClass().getResourceAsStream("resources/bike.png"));
+		return new Image(display, getClass().getResourceAsStream("/bike.png"));
 	}	
 	private Image loadBusImage()  {
-		return new Image(display, getClass().getResourceAsStream("resources/bus.png"));
+		return new Image(display, getClass().getResourceAsStream("/bus.png"));
 	}	
 	private Image loadMotorbikeImage()  {
-		return new Image(display, getClass().getResourceAsStream("resources/motorbike.png"));
+		return new Image(display, getClass().getResourceAsStream("/motorbike.png"));
 	}	
 	private Image loadSpotImage()  {
-		return new Image(display, getClass().getResourceAsStream("resources/ap.png"));
+		return new Image(display, getClass().getResourceAsStream("/ap.png"));
 	}	
 	private Image loadTruckImage()  {
-		return new Image(display, getClass().getResourceAsStream("resources/truck.png"));
+		return new Image(display, getClass().getResourceAsStream("/truck.png"));
 	}	
 	private Image loadWalkerImage()  {
-		return new Image(display, getClass().getResourceAsStream("resources/walker.png"));
+		return new Image(display, getClass().getResourceAsStream("/walker.png"));
 	}	
 	
 	

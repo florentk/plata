@@ -1,2 +1,3 @@
 #!/bin/bash
-java -classpath bin/:lib/json_simple-1.1.jar:/usr/share/java/swt-gtk-3.5.1.jar:/usr/share/java/commons-cli.jar:/usr/share/java/log4j-1.2.jar fr.inrets.leost.cmo.ui.GIS "$@" 
+. scripts/classpath
+java -classpath $CP fr.inrets.leost.cmo.ui.GIS "$@" 

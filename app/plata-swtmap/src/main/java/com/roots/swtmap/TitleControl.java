@@ -53,7 +53,7 @@ public class TitleControl extends Canvas {
         gradient2Color = new Color(getDisplay(), 205, 224, 244);
         bottomLineColor = new Color(getDisplay(), 200, 195, 216);
         writingColor = new Color(getDisplay(), 60, 60, 60);
-        image = new Image(getDisplay(), getClass().getResourceAsStream("resources/world.png"));
+        image = new Image(getDisplay(), getClass().getResourceAsStream("/world.png"));
         measureSize("M");
     }
     

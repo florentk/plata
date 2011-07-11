@@ -48,7 +48,7 @@ public abstract class AbstractPage implements Page {
                    AbstractPage.this.widgetDisposed(e);
                 }
             });
-            actionImage = new Image(composite.getDisplay(), getClass().getResourceAsStream("resources/action.gif"));
+            actionImage = new Image(composite.getDisplay(), getClass().getResourceAsStream("/action.gif"));
             
             composite.setLayout(new GridLayout(2, false));
             container.adapt(composite);
