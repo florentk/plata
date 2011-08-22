@@ -36,12 +36,16 @@
 	</build>
 	
   <dependencies>
-  
+		<dependency>  
+			<groupId>fr.inrets.leost.weather</groupId>
+			<artifactId>plata-dab-weather</artifactId>
+			<version>1.0-SNAPSHOT</version>
+  		</dependency>  
 		<dependency>  
 			<groupId>fr.inrets.leost.geolocation</groupId>
 			<artifactId>plata-geolocation</artifactId>
 			<version>1.0-SNAPSHOT</version>
-  	</dependency>
+  		</dependency>
   	
 		<dependency>  
 			<groupId>com.roots.swtmap</groupId>

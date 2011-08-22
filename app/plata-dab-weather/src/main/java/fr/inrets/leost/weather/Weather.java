@@ -3,7 +3,7 @@ package fr.inrets.leost.weather;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class Weather {
+public abstract class Weather extends Thread {
 	/** collection of listener for receive a event on weather condition change*/
 	private final Collection<WeatherListener> weatherListeners = new ArrayList<WeatherListener>();
 	private WeatherData currentCondition = null;
@@ -42,7 +42,7 @@ public abstract class Weather {
 	 */
 	public void addWeatherListener(WeatherListener l){
 		weatherListeners.add(l);
-		l.weatherChanged(currentCondition);
+		if (currentCondition!=null) l.weatherChanged(currentCondition);
 	}
 	
 	/**
@@ -51,5 +51,10 @@ public abstract class Weather {
 	 */
 	public void removeWeatherListener(WeatherListener l){
 		weatherListeners.remove(l);
-	}	
+	}
+	
+	/**
+	 * call for clean the devise
+	 */
+	public abstract void dispose();		
 }

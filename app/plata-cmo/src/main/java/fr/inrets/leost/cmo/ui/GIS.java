@@ -61,11 +61,9 @@ import fr.inrets.leost.cmo.management.CMOTableListener;
 import fr.inrets.leost.cmo.utils.PcapsTool;
 import fr.inrets.leost.cmo.beaconning.packet.*;
 
-import fr.inrets.leost.geolocation.Fixe;
-import fr.inrets.leost.geolocation.Geolocation;
-import fr.inrets.leost.geolocation.GeolocationListener;
-import fr.inrets.leost.geolocation.Gps;
-import fr.inrets.leost.geolocation.WGS84;
+import fr.inrets.leost.geolocation.*;
+import fr.inrets.leost.weather.*;
+import fr.inrets.leost.weather.dab.*;
 
 /**
  * show a map with associated information from Geolocation and CMOMangement
@@ -887,8 +885,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		else
 			loc = new Fixe(opt.fixedPosition, 0.0, 0.0);
 		
-		
-
+		//Weather weather = new Fake("LFPG 191400Z 30005KT 250V320 9999 FEW046 BKN250 24/11 Q1020 NOSIG");
+		Weather weather = new WeatherDAB(InetAddress.getLocalHost(),6666);
 
 		//run generator and forwarder, if needed
 		BeaconGenerator gen = null;
@@ -931,6 +929,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			//link the  dashboard with the CMO Mangement		
 			cmoMgt.addListener(db);
 			
+			//link the  dashboard with the weather system		
+			weather.addWeatherListener(db);
+			
 
 			db.addIndicator(new Position(loc));
 			db.addIndicator(new Speed(loc));
@@ -940,6 +941,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			
 			ClosestCMO closestCMO =  new ClosestCMO(loc, cmoMgt);
 			db.addIndicator(closestCMO);    
+			
+			db.addIndicator(new WeatherIndicator(weather));
 			
 			
 			//init the gui
@@ -988,7 +991,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		recv.start();
 
 		//start the GPS
-		loc.start();	  
+		loc.start();	
+		
+		//start weather system
+		weather.start(); 
 
 		if(opt.gui){
 			//show the window
@@ -1003,6 +1009,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			
 			loc.interrupt();
 			recv.interrupt();
+			weather.interrupt();
 			
 			if(gen !=null) gen.interrupt();
 		}else{
@@ -1013,7 +1020,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 	
 
-
+		weather.dispose();
 		loc.dispose();
 		
 		if(gis != null){

@@ -11,6 +11,7 @@ import fr.inrets.leost.cmo.management.CMOManagement;
 import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.management.CMOTableListener;
 import fr.inrets.leost.geolocation.*;
+import fr.inrets.leost.weather.*;
 
 /**
  * Collection of Indicator and update notification
@@ -32,7 +33,7 @@ import fr.inrets.leost.geolocation.*;
  * @has 0..* - - DashboardListener
  *
  */
-public class Dashboard implements CMOTableListener, GeolocationListener{
+public class Dashboard implements CMOTableListener, GeolocationListener, WeatherListener {
 
 	private Collection<Indicator> indicators =new ArrayList<Indicator>();
 
@@ -69,6 +70,10 @@ public class Dashboard implements CMOTableListener, GeolocationListener{
 		for (DashboardListener l : listeners) l.dashboardUpdate();
 	}
 	
+	
+	public void weatherChanged(WeatherData data) {
+		setUpdate();
+	}
 	
 	/**
 	 * @see fr.inrets.leost.geolocation.GeolocationListener#positionChanged(fr.inrets.leost.geolocation.WGS84, java.lang.Double, java.lang.Double)

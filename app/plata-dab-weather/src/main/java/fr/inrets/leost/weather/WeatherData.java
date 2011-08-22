@@ -27,7 +27,7 @@ public class WeatherData {
 		this.metar = metar;
 	}
 	
-	String getMetar() {
+	public String getMetar() {
 		return metar;
 	}
 	

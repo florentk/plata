@@ -20,4 +20,6 @@ public class Fake extends Weather {
 		});
 	}	
 
+
+	public  void dispose(){}
 } 
