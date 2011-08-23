@@ -1,11 +1,13 @@
 package fr.inrets.leost.cmo.dashboard;
 
 import fr.inrets.leost.weather.*;
+import net.sf.jweather.metar.*;
 
 public class WeatherIndicator implements Indicator {
 	private Weather weather;
 
-	private String metar="";
+	private String station="";
+	private Metar data;
 	
 	public WeatherIndicator(Weather weather) {
 		this.weather = weather;
@@ -13,13 +15,13 @@ public class WeatherIndicator implements Indicator {
 
 	@Override
 	public void update() {
-		WeatherData data = weather.getCurrentCondition();
+		data = weather.getCurrentCondition();
 		if (data != null)
-			metar = data.getMetar();
+			station = data.getStationID();
 	}
 	
-	public String getMetar(){
-		return metar;
+	public Metar getMetar(){
+		return data;
 	}
 	
 	
@@ -29,7 +31,7 @@ public class WeatherIndicator implements Indicator {
 	}
 	
 	public String toString(){
-		return metar;
+		return station;
 	}
 
 }

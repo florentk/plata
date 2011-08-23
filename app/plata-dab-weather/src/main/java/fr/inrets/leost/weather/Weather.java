@@ -3,10 +3,12 @@ package fr.inrets.leost.weather;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.sf.jweather.metar.*;
+
 public abstract class Weather extends Thread {
 	/** collection of listener for receive a event on weather condition change*/
 	private final Collection<WeatherListener> weatherListeners = new ArrayList<WeatherListener>();
-	private WeatherData currentCondition = null;
+	private Metar currentCondition = null;
 	
 	/**
 	 * must be call when the current weather change
@@ -22,7 +24,7 @@ public abstract class Weather extends Thread {
 	 * set the current condition
 	 * @param currentPos the current position in WGS84 format
 	 */
-	protected void setCurrentCondition(WeatherData currentCondition) {
+	protected void setCurrentCondition(Metar currentCondition) {
 		this.currentCondition = currentCondition;
 		weatherChanged();
 	}
@@ -31,7 +33,7 @@ public abstract class Weather extends Thread {
 	 * get the current condition 
 	 * @return the current weather
 	 */
-	public WeatherData getCurrentCondition() {
+	public Metar getCurrentCondition() {
 		return currentCondition;
 	}
 	

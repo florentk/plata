@@ -699,6 +699,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		public int beaconInterval = 500; //send interval of beacon in ms = t
 		public WGS84 fixedPosition = null; //fixed position instead GPS
 		
+		public String weatherURIService;
+		public InetAddress weatherUDPAddress;
+		public int weatherUDPPort = 6666;
+		
 		public boolean gui = true; //start a gui (default : true)
 		public boolean verbose = false; //verbose mode 
 		
@@ -762,10 +766,11 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		options.addOption("t", "type", true, "cmo type");
 		options.addOption("b", "beacon-inter", true, "interval between beacon sending (millisecond)");
 		options.addOption("d", "daemon", false, "run without GUI");
-		options.addOption("p", "fixed-position", true, "fixed position instead GPS. The arg is form 50°37'57.41\"N 3°5'8.26\"E");		
+		options.addOption("p", "fixed-position", true, "fixed position instead GPS. The arg is form 50°37'57.41\"N 3°5'8.26\"E");	
+		options.addOption("w", "weather-uri-service", true, "URI of weather service controleur (Etch serveur). Ex : tcp://127.0.0.1:5000");
+		options.addOption("x", "weather-udp-address", true, "UDP weather address, ex : 127.0.0.1");
+		options.addOption("y", "weather-udp-port", true, "UDP weather port");							
 		options.addOption("v", "verbose", false, "write the dashboard in std out");		
-		
-		
 		options.addOption("h", "help", false, "show help");
 		
 		try{
@@ -792,6 +797,11 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		    }
 			
 			opt.beaconInterval = Integer.parseInt(cmd.getOptionValue("b", "500"));
+			
+			opt.weatherURIService = cmd.getOptionValue("w", "fake");
+			opt.weatherUDPAddress = InetAddress.getByName(cmd.getOptionValue("x", "localhost"));	
+			opt.weatherUDPPort = Integer.parseInt(cmd.getOptionValue("y", "6666"));		
+			
 			opt.gui = ! cmd.hasOption("d");
 			opt.verbose = cmd.hasOption("v");
 			
@@ -804,6 +814,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}catch (ParseException e){
 			System.err.println(e.getMessage());
 			new HelpFormatter().printHelp( "gis", options );
+			System.exit(1);
+		}catch (UnknownHostException e){
+			System.err.println(e.getMessage());
 			System.exit(1);
 		}
 
@@ -859,7 +872,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 
 		//if fake, create a fake recv
-		if(opt.strInterface.compareToIgnoreCase("fake")==0){
+		if(opt.strInterface.compareToIgnoreCase("fake") == 0){
 			recv = createBeaconRecvFake();
 		}
 		else
@@ -885,9 +898,16 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		else
 			loc = new Fixe(opt.fixedPosition, 0.0, 0.0);
 		
-		//Weather weather = new Fake("LFPG 191400Z 30005KT 250V320 9999 FEW046 BKN250 24/11 Q1020 NOSIG");
-		Weather weather = new WeatherDAB(InetAddress.getLocalHost(),6666);
-
+		Weather weather = null;
+		WeatherDAB weatherDab = null;
+		
+		if (opt.weatherURIService.compareToIgnoreCase("fake") == 0)
+			weather = new Fake("XXXX 191400Z 30005KT 250V320 9999 FEW046 BKN250 24/11 Q1020 NOSIG");
+		else{
+			weatherDab = new WeatherDAB(opt.weatherURIService, opt.weatherUDPAddress, opt.weatherUDPPort);
+			weather = weatherDab.getWeather();
+		}
+		
 		//run generator and forwarder, if needed
 		BeaconGenerator gen = null;
 		BeaconForward fwd = null;
@@ -1020,7 +1040,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 	
 
-		weather.dispose();
+		if(weatherDab == null)
+			weather.dispose();
+		else
+			weatherDab.close();
 		loc.dispose();
 		
 		if(gis != null){

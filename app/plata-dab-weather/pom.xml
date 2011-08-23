@@ -24,6 +24,26 @@
         </build>
 
   <dependencies>
+  
+<dependency>
+    <groupId>net.sourceforge.jweather</groupId>
+    <artifactId>jweather</artifactId>
+    <version>0.3.0</version>
+</dependency>  
+  
+    <dependency>
+      <groupId>org.apache.etch</groupId>
+      <artifactId>apache-etch-java-runtime</artifactId>
+      <version>1.2.0-incubating</version>
+    </dependency>
+
+
+     <dependency>
+      <groupId>DABInterface</groupId>
+      <artifactId>dab-controller</artifactId>
+      <version>0.1</version>
+    </dependency>   
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

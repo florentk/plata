@@ -1,11 +1,15 @@
 package fr.inrets.leost.weather;
 
+import net.sf.jweather.metar.*;
+
 public class Fake extends Weather {
 
 	public Fake(String metar){
-		WeatherData data = new WeatherData(metar);
-		
-		setCurrentCondition(data);
+		try {
+			Metar data = MetarParser.parseReport(metar);
+			setCurrentCondition(data);
+		}catch (MetarParseException e){
+		}
 	}
 
 	public static void main (String[] args) throws Exception{
@@ -13,8 +17,8 @@ public class Fake extends Weather {
 		
 		w.addWeatherListener(new WeatherListener() {
 
-			public void weatherChanged(WeatherData data) {
-				System.out.println("Weather : " + data);
+			public void weatherChanged(Metar data) {
+				System.out.println("Weather : " + data.getStationID());
 			}
 
 		});

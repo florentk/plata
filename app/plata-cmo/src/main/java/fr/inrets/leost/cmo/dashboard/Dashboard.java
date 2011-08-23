@@ -12,6 +12,7 @@ import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.management.CMOTableListener;
 import fr.inrets.leost.geolocation.*;
 import fr.inrets.leost.weather.*;
+import net.sf.jweather.metar.*;
 
 /**
  * Collection of Indicator and update notification
@@ -71,7 +72,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 	}
 	
 	
-	public void weatherChanged(WeatherData data) {
+	public void weatherChanged(Metar data) {
 		setUpdate();
 	}
 	

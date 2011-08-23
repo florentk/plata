@@ -1,11 +1,12 @@
 Dépendances Ubuntu 10.04 LTS :
 ------------------------------
-sudo apt-get install gpsd default-jdk libswt-gtk-3.5-java libcommons-cli-java liblog4j1.2-java
-
+sudo apt-get install gpsd default-jdk maven2 libswt-gtk-3.5-java libcommons-cli-java liblog4j1.2-java liboro-java
 sudo dpkg -i lib/jpcap-0.7.deb
 
 Compilation
 -----------
+mvn install:install-file -Dfile=lib/apache-etch-java-runtime-1.2.0-incubating.jar -DgroupId=org.apache.etch -DartifactId=apache-etch-java-runtime -Dversion=1.2.0-incubating -Dpackaging=jar
+mvn install:install-file -Dfile=lib/dab-controller-0.1.jar -DgroupId=DABInterface -DartifactId=dab-controller -Dversion=0.1 -Dpackaging=jar
 mvn install
 
 Installation des cartes
