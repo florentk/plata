@@ -51,14 +51,14 @@ public class WeatherIndicator implements Indicator {
 			Iterator i = data.getWeatherConditions().iterator();
 			while (i.hasNext()) {
 				WeatherCondition weatherCondition = (WeatherCondition)i.next();
-				str.append(weatherCondition.getNaturalLanguageString());
+				str.append(weatherCondition.getNaturalLanguageString() + " ");
 			}
 		}
 		if (data.getSkyConditions() != null) {
 			Iterator i = data.getSkyConditions().iterator();
 			while (i.hasNext()) {
 				SkyCondition skyCondition = (SkyCondition)i.next();
-				str.append(skyCondition.getNaturalLanguageString());
+				str.append(skyCondition.getNaturalLanguageString() + " ");
 			}
 		}
 		

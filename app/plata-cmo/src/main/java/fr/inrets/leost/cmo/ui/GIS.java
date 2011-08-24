@@ -95,6 +95,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	private CMOManagement cmoMgt;
 	private Dashboard dashboard;	
 	private AlertWidget alert;
+	private WeatherWidget wWeather;
 	private ClosestCMOWidget wClosestCMO;
 	
 	private MapWidget map;
@@ -165,6 +166,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	}	
 	
 	
+	
+		
 	
 	
     //////////////////////////////
@@ -362,7 +365,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}		
 	
-	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Dashboard db, ClosestCMO closestCMO, Composite parent, int style){
+	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Weather weather, Dashboard db, ClosestCMO closestCMO, Composite parent, int style){
 		super(parent, style);
 		
 		this.display = display;
@@ -389,7 +392,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
         GridLayout l = new GridLayout();   
         l.numColumns = 2;
         l.marginRight = 20;
-        alertInfo.setLayout(l);    
+        alertInfo.setLayout(l);
 
 		//create closestCMO textuel informations
         wClosestCMO = new ClosestCMOWidget(alertInfo, SWT.PUSH, closestCMO);
@@ -399,7 +402,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
         gridData.grabExcessVerticalSpace = true;
         gridData.horizontalAlignment = GridData.FILL;
         gridData.grabExcessHorizontalSpace = true;
-        wClosestCMO.setLayoutData(gridData);      
+        wClosestCMO.setLayoutData(gridData);  
 
 
   
@@ -411,15 +414,20 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		alert.setImg(loadSemaphoreRed(), 2);
 
 
-        associateToExpandBar(bar, 0, alertInfo,"Alert",true).setHeight(210);
+        associateToExpandBar(bar, 0, alertInfo,"Alert",true).setHeight(210);         
         
         //create the information table
         tableInfo = initTableInfo(bar,dashboard);
     	associateToExpandBar(bar, 1, tableInfo,"Informations",false);
+    	
+    	    	
   
     	//create the CMO table
         tableCMO = initTableCMO(bar);
     	expandItemCMOTable = associateToExpandBar(bar, 2, tableCMO,"Neighborhood",false);
+    	
+    	
+       	
     	
     	//adapt the Expand item to size of table
     	tableCMO.addListener(SWT.MeasureItem, new Listener() {
@@ -431,8 +439,14 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
     		}
     	});
     	
+    	
+      //create weather widget    	
+    	  //Composite weatherInfo = new Composite(bar, SWT.NONE);        
+        wWeather = new WeatherWidget(bar, SWT.NONE, display, weather);
+     	  associateToExpandBar(bar, 3, wWeather,"Weather",false).setHeight(310);   
+    	
     	//create the options panel
-    	associateToExpandBar(bar, 3, initOptions(bar),"Options",false);
+    	associateToExpandBar(bar, 4, initOptions(bar),"Options",false);
     	
         //create the map
         initMap(sashForm);  
@@ -449,6 +463,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	public void dispose(){
 		stop = true;
 		alert.dispose();
+		wWeather.dispose();
 		map.dispose();
 		tableInfo.dispose();
 		tableCMO.dispose();
@@ -572,6 +587,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		updateNeighborhood();
 		map.redraw();
 		alert.redraw();
+		wWeather.redraw();
 		wClosestCMO.redraw();
 	}
 	
@@ -977,7 +993,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				shell.setLayout (new FillLayout());
 
 				//create the GIS window
-				gis= new GIS(display, loc, cmoMgt, db, closestCMO,  shell, SWT.NONE);
+				gis= new GIS(display, loc, cmoMgt, weather, db, closestCMO,   shell, SWT.NONE);
 				
 				//alow receive the dashboardUpdate
 				db.addListener(gis);
