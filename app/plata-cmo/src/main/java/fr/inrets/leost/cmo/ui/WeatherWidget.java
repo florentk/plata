@@ -16,18 +16,17 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 
 import fr.inrets.leost.weather.*;
-import net.sf.jweather.metar.*;
+
 
 /**
  * Widget for representing weather icon
  * @author florent kaisser
  */
-public class WeatherWidget extends Canvas implements PaintListener {
-	public static final double KMH = 1.609344d;
-	
+public class WeatherWidget extends Canvas implements PaintListener {	
 	private Image sun,cloud,fog,moon,overcloud,rain,rainfall,snow,snowfall,thunder;
 	private Weather w;
 	private Font font;
+	private int decalage=0;
 	
 	public WeatherWidget(Composite arg0, int arg1, Display d, Weather w) {
 		super(arg0, arg1);
@@ -49,121 +48,71 @@ public class WeatherWidget extends Canvas implements PaintListener {
 		
             addPaintListener(this);		
 	}
-	
-    private void addSky(Set set, SkyCondition sc){
-    
-            Image astre = sun;
-    
- 		if (sc.isClear()) {
-                  set.add(astre);
-		} else if (sc.isFewClouds() || sc.isScatteredClouds() || sc.isBrokenClouds()) {
-                  set.add(astre);		
-                  set.add(cloud);              
-		} else if (sc.isOvercast()) {
-                  set.add(cloud);
-                  set.add(overcloud); 
-		} else if (sc.isNoSignificantClouds()) {
-                  set.add(astre);
-            }
-    
-    }
-    
-    
-    private void addWeather(Set set, WeatherCondition wc){
-    
-
-            if (wc.isThunderstorms()) {
-			set.add(thunder);
-            }
-
-		if (wc.isDrizzle()) {
-			set.add(rain);
-			if (wc.isHeavy()) set.add(rainfall);
-		} else if (wc.isShowers() || wc.isRain() || wc.isHail() || wc.isSmallHail()) {
-			set.add(rain);
-			if (wc.isHeavy()) set.add(rainfall);
-		} else if (wc.isSnow() || wc.isSnowGrains() || wc.isIceCrystals() || wc.isIcePellets()) {
-			set.add(snow);
-			if (wc.isHeavy()) set.add(snowfall);
-		} else if (wc.isMist() || wc.isFog()) {
-			set.add(fog);
-		} 
-    
-    }    
-
-    public boolean checkAndDraw(GC gc, Set set, Image img){
-      if(set.contains(img)) {
+    public void checkAndDraw(GC gc, boolean show, Image img){
+      if(show) {
             gc.drawImage(img , getSize().x/2 - sun.getBounds().width / 2,0);
-            return true;
       }
-      
-      return false;
     }
 
-	private int mphToKmh (double s){
-		return new Double(s*KMH).intValue();
+	public void updateDecalage() {
+    	if (w.validData()){
+    		decalage = -100;
+    	    if(	w.isThunderstorms() ||
+            	w.isFog() ||
+            	w.isRain() ||
+            	w.isSnow()
+            ) decalage += 50; 
+            
+            if(	w.isThunderstorms() ||
+            	w.isFog() ||
+            	w.isRainfall() ||
+            	w.isSnowfall()
+            ) decalage += 50;
+        }	
 	}
     
-    public void drawTemp(GC gc, Metar m, boolean up) {
+    public void drawTemp(GC gc) {
             int x,y;
     		StringBuffer str = new StringBuffer();
-		str.append(m.getTemperatureMostPreciseInCelsius() + " °C ");		
-		str.append(mphToKmh(m.getWindSpeedInMPH()) + " km/h ");
+			str.append(w.getTemperature() + " °C ");		
+			
+			if (w.getWindSpeed() != 0) str.append(w.getWindSpeed() + " km/h ");
             gc.setFont(font); 
 
             x = getSize().x/2 - gc.textExtent(str.toString()).x / 2;
-            y = sun.getBounds().height + 2;
-            if(up) y -= 100;
-
+            y = sun.getBounds().height + 2 + decalage;
             
             gc.drawText( str.toString(), x, y); 
     }
 	
     public void paintControl(PaintEvent e) { 
-      Metar m = w.getCurrentCondition();
-      Set<Image> set = new HashSet<Image>();
-      boolean up = true;
-  
-      	if(m != null) {
-		if (m.getWeatherConditions() != null) {
-			Iterator i = m.getWeatherConditions().iterator();
-			while (i.hasNext()) 
-				addWeather(set, (WeatherCondition)i.next());
-		}
-		if (m.getSkyConditions() != null) {
-			Iterator i = m.getSkyConditions().iterator();
-			while (i.hasNext()) 
-				addSky(set, (SkyCondition)i.next());
-		}  
-		
-		
-	}
-    
-    	checkAndDraw(e.gc,set,sun);
-    	checkAndDraw(e.gc,set,moon);   
- 
-    	checkAndDraw(e.gc,set,overcloud);      	
-    	checkAndDraw(e.gc,set,cloud); 
-  	
-     	up = !checkAndDraw(e.gc,set,thunder) && up;    	  
-    	up = !checkAndDraw(e.gc,set,fog) && up;
+    	if (w.validData()){
+			updateDecalage();
+    	
+			checkAndDraw(e.gc,w.isSun(),sun);
+			checkAndDraw(e.gc,w.isMoon(),moon);   
+	 
+			checkAndDraw(e.gc,w.isOvercloud(),overcloud);      	
+			checkAndDraw(e.gc,w.isCloud(),cloud); 
+	  	
+		 	checkAndDraw(e.gc,w.isThunderstorms(), thunder);    	  
+			checkAndDraw(e.gc,w.isFog(), fog);
 
-    	up = !checkAndDraw(e.gc,set,rain) && up;   
-    	up = !checkAndDraw(e.gc,set,rainfall) && up;
-    	
-    	up = !checkAndDraw(e.gc,set,snow) && up;   
-    	up = !checkAndDraw(e.gc,set,snowfall) && up;	
-    	
-    	if(m != null) drawTemp(e.gc,m,up);
+			checkAndDraw(e.gc,w.isRain(),rain);   
+			checkAndDraw(e.gc,w.isRainfall(),rainfall);
+			
+			checkAndDraw(e.gc,w.isSnow(),snow);   
+			checkAndDraw(e.gc,w.isSnowfall(),snowfall);	
+			
+			drawTemp(e.gc);
+    	}
     }
 
 	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
+		  updateDecalage();
 		   checkWidget ();
 		   int width = 0, height = 0, border = getBorderWidth ();
-		   return new Point (sun.getBounds().width + border * 2, sun.getBounds().height + border * 2 + 30);
-	}	
-
-    
-
+		   return new Point (sun.getBounds().width + border * 2, sun.getBounds().height + border * 2 + 30 + decalage);
+	}
 }

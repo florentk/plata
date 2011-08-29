@@ -1,16 +1,9 @@
 package fr.inrets.leost.cmo.dashboard;
 
 import fr.inrets.leost.weather.*;
-import java.util.Iterator;
-import net.sf.jweather.metar.*;
 
 public class WeatherIndicator implements Indicator {
-	public static final double KMH = 1.609344d;
-
 	private Weather weather;
-
-	private String station="";
-	private Metar data;
 	
 	public WeatherIndicator(Weather weather) {
 		this.weather = weather;
@@ -18,58 +11,51 @@ public class WeatherIndicator implements Indicator {
 
 	@Override
 	public void update() {
-		data = weather.getCurrentCondition();
-		if (data != null)
-			station = data.getStationID();
 	}
-	
-	public Metar getMetar(){
-		return data;
-	}
-	
 	
 	@Override
 	public String name(){
 		return "Weather";
 	}
 	
-	private int mphToKmh (double s){
-		return new Double(s*KMH).intValue();
-	}
+
 	
 	private String makeString(){
 		StringBuffer str = new StringBuffer();
 		
-		str.append(mphToKmh(data.getWindSpeedInMPH()) + " km/h ");
+		if (weather.validData()){ 
 		
-		if(data.getWindGustsInMPH() != null)
-			str.append("(" + mphToKmh(data.getWindGustsInMPH())  + ") ");		
+			if(weather.getWindSpeed() != 0)
+				str.append(weather.getWindSpeed() + " km/h ");
 		
-		str.append(data.getTemperatureMostPreciseInCelsius() + "°C ");
+			if(weather.getWindGusts() != 0)
+				str.append("(" + weather.getWindGusts()  + ") ");		
 		
-		if (data.getWeatherConditions() != null) {
-			Iterator i = data.getWeatherConditions().iterator();
-			while (i.hasNext()) {
-				WeatherCondition weatherCondition = (WeatherCondition)i.next();
-				str.append(weatherCondition.getNaturalLanguageString() + " ");
-			}
+			str.append(weather.getTemperature() + "°C ");
+
+			if( weather.isSun() ) str.append("Sun with ");
+			if( weather.isMoon() ) str.append("Moon with ");		
+		
+			if(weather.isOvercloud()) str.append(" Overcast");
+		 		else if(weather.isCloud()) str.append(" cloud");
+		 		
+		 	if(weather.isThunderstorms()) str.append(" thunderstorms ");
+		 	if(weather.isFog()) str.append(" fog ");	 	
+		 	
+		 	if(weather.isRain()) str.append(" rain ");
+		 	
+		 	if(weather.isSnow()) str.append(" snow ");
+		 	
+		 	if(weather.isRainfall() || weather.isSnowfall()) str.append(" fall ");	 			
 		}
-		if (data.getSkyConditions() != null) {
-			Iterator i = data.getSkyConditions().iterator();
-			while (i.hasNext()) {
-				SkyCondition skyCondition = (SkyCondition)i.next();
-				str.append(skyCondition.getNaturalLanguageString() + " ");
-			}
-		}
-		
 		return str.toString();
 	}
 	
 	public String toString(){
-		if (data == null)
-			return "N/A";
-		else
+		if (weather.validData())
 			return makeString();
+		else
+			return "N/A";
 	}
 
 }

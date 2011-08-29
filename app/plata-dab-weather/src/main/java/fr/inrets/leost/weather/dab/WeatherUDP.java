@@ -46,20 +46,6 @@ public class WeatherUDP extends Weather {
 		actif = false;
 		socket.close();
 	}
-	
-	public static void main (String[] args) throws IOException{
-		WeatherUDP w = new WeatherUDP(InetAddress.getLocalHost(),6666);
-		
-		w.addWeatherListener(new WeatherListener() {
-			public void weatherChanged(Metar data) {
-				System.out.println("Weather : " + data.getStationID());
-			}
-
-		});
-		
-		w.run();
-	}
-
 }
 
 

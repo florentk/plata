@@ -12,7 +12,6 @@ import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.management.CMOTableListener;
 import fr.inrets.leost.geolocation.*;
 import fr.inrets.leost.weather.*;
-import net.sf.jweather.metar.*;
 
 /**
  * Collection of Indicator and update notification
@@ -72,7 +71,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 	}
 	
 	
-	public void weatherChanged(Metar data) {
+	public void weatherChanged(Weather data) {
 		setUpdate();
 	}
 	
@@ -134,8 +133,9 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 	public static void startDashboard(String device)  throws IOException,InterruptedException {
 		
 		//Geolocation geo = new Fixe(new WGS84(),1.0,45.0);
-		Geolocation geo = new Gps();
+		Geolocation loc = new Gps();
 		BeaconRecv recv = BeaconRecvEthernet.loopPacketFromDevice(device);
+		Weather weather = new Fake("XXXX 191400Z 30005KT 250V320 9999 FEW046 BKN250 24/11 Q1020 NOSIG");
 		
 		/*recv.addFixedCMO(new CMOState(
 				new CMOHeader((byte)100, 0, 5000, "CC",CMOHeader.CMO_TYPE_SPOT ),
@@ -160,18 +160,25 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 		recv.addListener(cmoMgt);
 		
 		//link the  dashboard with the geolocation system
-		geo.addPositionListener(db);
+		loc.addPositionListener(db);
 		
 		//link the  dashboard with the CMO Mangement		
 		cmoMgt.addListener(db);
 		
+		weather.addWeatherListener(db);
+		
 		//create the indicator of the dashboard	
-		db.addIndicator(new Position(geo));
-		db.addIndicator(new Speed(geo));
-		db.addIndicator(new Track(geo));
-		db.addIndicator(new BrakingDistance(geo));
-		db.addIndicator(new StoppingDistance(geo));
-		db.addIndicator(new ClosestCMO(geo, cmoMgt));   
+		CoefFriction cf = new CoefFriction(weather);
+		ClosestCMO closestCMO =  new ClosestCMO(loc, cmoMgt, cf);
+			
+		db.addIndicator(new Position(loc));
+		db.addIndicator(new Speed(loc));
+		db.addIndicator(new Track(loc));
+		db.addIndicator(cf);						
+		db.addIndicator(new ReactionDistance(loc));
+		db.addIndicator(new StoppingDistance(loc,cf));
+		db.addIndicator(new WeatherIndicator(weather));
+		db.addIndicator(closestCMO);    
   
 		
 		for (Indicator id : db.getIndicators())
@@ -189,14 +196,17 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 		recv.start();
 		
 		//start the geolocation system 
-		geo.start();
+		loc.start();
+		
+		weather.start();
 		
 		//GpsMonitor.gpsGUI(geo);
 		
 		//wait the end
-		geo.join();recv.join();		
+		loc.join();recv.join();weather.join();
 		
-		geo.dispose();
+		loc.dispose();
+		weather.dispose();
 	}
 	
 	

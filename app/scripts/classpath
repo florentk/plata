@@ -2,6 +2,6 @@ SYS=/usr/share/java
 
 CP_TARGET=plata-dab-weather/target/plata-dab-weather-1.0-SNAPSHOT.jar:plata-cmo/target/plata-cmo-0.8-SNAPSHOT.jar:plata-swtmap/target/plata-swtmap-1.02-PLATA.jar:plata-geolocation/target/plata-geolocation-1.0-SNAPSHOT.jar
 CP_LIB=lib/json_simple-1.1.jar:lib/apache-etch-java-runtime-1.2.0-incubating.jar:lib/dab-controller-0.1.jar:lib/jweather-0.3.0.jar:oro-2.0.8.jar
-CP_SYS=$SYS/swt-gtk-3.5.1.jar:$SYS/commons-cli.jar:$SYS/log4j-1.2.jar:$SYS/log4j-1.2-1.2.15.jar:$SYS/oro.jar
+CP_SYS=$SYS/swt.jar:$SYS/commons-cli.jar:$SYS/log4j-1.2.jar:$SYS/log4j-1.2-1.2.15.jar:$SYS/oro.jar
 
 export CP=$CP_TARGET:$CP_LIB:$CP_SYS

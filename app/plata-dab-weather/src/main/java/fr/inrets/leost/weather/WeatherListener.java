@@ -12,6 +12,6 @@ public interface WeatherListener {
 	 * the weather condition has changed
 	 * @param data data of current weather
 	 */
-	public void weatherChanged(Metar data);
+	public void weatherChanged(Weather w);
 }
 

@@ -918,7 +918,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		WeatherDAB weatherDab = null;
 		
 		if (opt.weatherURIService.compareToIgnoreCase("fake") == 0)
-			weather = new Fake("XXXX 191400Z 30005KT 250V320 9999 FEW046 BKN250 24/11 Q1020 NOSIG");
+			weather = new Fake("ZZZZ 191400Z 30005KT 250V320 9999 FEW046 BKN250 24/11 Q1020 NOSIG");
 		else{
 			weatherDab = new WeatherDAB(opt.weatherURIService, opt.weatherUDPAddress, opt.weatherUDPPort);
 			weather = weatherDab.getWeather();
