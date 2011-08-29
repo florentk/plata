@@ -78,13 +78,13 @@ public class WeatherWidget extends Canvas implements PaintListener {
 
 		if (wc.isDrizzle()) {
 			set.add(rain);
-			if (wc.isShowers()) set.add(rainfall);
-		} else if (wc.isRain() || wc.isHail() || wc.isSmallHail()) {
+			if (wc.isHeavy()) set.add(rainfall);
+		} else if (wc.isShowers() || wc.isRain() || wc.isHail() || wc.isSmallHail()) {
 			set.add(rain);
-			set.add(rainfall);
+			if (wc.isHeavy()) set.add(rainfall);
 		} else if (wc.isSnow() || wc.isSnowGrains() || wc.isIceCrystals() || wc.isIcePellets()) {
 			set.add(snow);
-			if (wc.isShowers()) set.add(snowfall);
+			if (wc.isHeavy()) set.add(snowfall);
 		} else if (wc.isMist() || wc.isFog()) {
 			set.add(fog);
 		} 
@@ -124,16 +124,20 @@ public class WeatherWidget extends Canvas implements PaintListener {
       Set<Image> set = new HashSet<Image>();
       boolean up = true;
   
-	if (m.getWeatherConditions() != null) {
-		Iterator i = m.getWeatherConditions().iterator();
-		while (i.hasNext()) 
-			addWeather(set, (WeatherCondition)i.next());
+      	if(m != null) {
+		if (m.getWeatherConditions() != null) {
+			Iterator i = m.getWeatherConditions().iterator();
+			while (i.hasNext()) 
+				addWeather(set, (WeatherCondition)i.next());
+		}
+		if (m.getSkyConditions() != null) {
+			Iterator i = m.getSkyConditions().iterator();
+			while (i.hasNext()) 
+				addSky(set, (SkyCondition)i.next());
+		}  
+		
+		
 	}
-	if (m.getSkyConditions() != null) {
-		Iterator i = m.getSkyConditions().iterator();
-		while (i.hasNext()) 
-			addSky(set, (SkyCondition)i.next());
-	}  
     
     	checkAndDraw(e.gc,set,sun);
     	checkAndDraw(e.gc,set,moon);   
@@ -150,7 +154,7 @@ public class WeatherWidget extends Canvas implements PaintListener {
     	up = !checkAndDraw(e.gc,set,snow) && up;   
     	up = !checkAndDraw(e.gc,set,snowfall) && up;	
     	
-    	drawTemp(e.gc,m,up);
+    	if(m != null) drawTemp(e.gc,m,up);
     }
 
 	@Override

@@ -129,7 +129,6 @@ public class Physics {
 	/**
 	 * Compute the Braking distance
 	 * 
-	 * Source : http://fr.wikipedia.org/wiki/Distance_d'arr%C3%AAt
 	 * @param v speed (m/s)
 	 * @param coef friction coef 
 	 * @return distance braking (m)

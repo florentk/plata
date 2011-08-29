@@ -969,16 +969,19 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			weather.addWeatherListener(db);
 			
 
+			CoefFriction cf = new CoefFriction(weather);
+			ClosestCMO closestCMO =  new ClosestCMO(loc, cmoMgt, cf);
+			
 			db.addIndicator(new Position(loc));
 			db.addIndicator(new Speed(loc));
 			db.addIndicator(new Track(loc));
-			db.addIndicator(new BrakingDistance(loc));
-			db.addIndicator(new StoppingDistance(loc));
-			
-			ClosestCMO closestCMO =  new ClosestCMO(loc, cmoMgt);
+			db.addIndicator(cf);						
+			db.addIndicator(new ReactionDistance(loc));
+			db.addIndicator(new StoppingDistance(loc,cf));
+			db.addIndicator(new WeatherIndicator(weather));
 			db.addIndicator(closestCMO);    
 			
-			db.addIndicator(new WeatherIndicator(weather));
+			
 			
 			
 			//init the gui

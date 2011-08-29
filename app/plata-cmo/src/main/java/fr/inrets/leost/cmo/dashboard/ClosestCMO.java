@@ -13,6 +13,7 @@ import fr.inrets.leost.geolocation.WGS84;
  * @author florent kaisser
  * @has 1 - - CMOManagement
  * @has 1 - - Geolocation
+ * @has 1 - - CoefFriction
  * @depend 1 closest - CMOTableEntry
  * @assoc - - - Physics
  */
@@ -29,15 +30,17 @@ public class ClosestCMO implements Indicator {
 		
 	private CMOManagement cmo;
 	private Geolocation geo;
+	private CoefFriction cf;
 	
 	private CMOTableEntry closestCMO=null;
 	private double distance=0.0;
 	
 	
-	public ClosestCMO(Geolocation geo, CMOManagement cmo) {
+	public ClosestCMO(Geolocation geo, CMOManagement cmo, CoefFriction cf) {
 		super();
 		this.cmo = cmo;
 		this.geo = geo;
+		this.cf = cf;
 	}
 	
 	/**
@@ -91,16 +94,16 @@ public class ClosestCMO implements Indicator {
 	 * @param bDistance breaking distance
 	 * @return the decision
 	 */
-	public static int computeDecision(double distance, double sDistance, double bDistance){
+	public static int computeDecision(double distance, double sDistance, double rDistance){
 		
-	    if(distance <= bDistance)
+	    if(distance <= rDistance)
 			return DECISION_HAZARD;	
 
 	    if(distance <= sDistance)
-			return DECISION_WARNING;				
+			return DECISION_WARNING;
 		
 	    return  DECISION_NONE;
-	}	
+	}
 	
 
 	public String decisionToString(){
@@ -121,8 +124,8 @@ public class ClosestCMO implements Indicator {
 		if(closestCMO !=null)
 			decision = computeDecision(
 					distance, 
-					Physics.StoppingDistance(geo.getCurrentSpeed(), Physics.COEF_FRICTION_AVG), 
-					Physics.BrakingDistance(geo.getCurrentSpeed(), Physics.COEF_FRICTION_AVG));
+					Physics.StoppingDistance(geo.getCurrentSpeed(), cf.getCoef()), 
+					Physics.ReactionDistance(geo.getCurrentSpeed()));
 		else
 			decision =  DECISION_NONE;
 	}

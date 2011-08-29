@@ -6,20 +6,17 @@ import fr.inrets.leost.geolocation.Geolocation;
 /**
  * indicator for braking distance 
  * @has 1 - - Geolocation
- * @has 1 - - CoefFriction
  * @assoc - - - Physics
  */
-public class BrakingDistance implements Indicator {
+public class ReactionDistance implements Indicator {
 
 	private Geolocation geo;
-	private CoefFriction cf;	
 	private Double dist = null;
 	
 	
 	
-	public BrakingDistance(Geolocation geo, CoefFriction cf) {
+	public ReactionDistance(Geolocation geo) {
 		this.geo = geo;
-		this.cf = cf;		
 	}
 
 
@@ -27,7 +24,7 @@ public class BrakingDistance implements Indicator {
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
-		dist = Physics.BrakingDistance(geo.getCurrentSpeed(), cf.getCoef());
+		dist = Physics.ReactionDistance(geo.getCurrentSpeed());
 	}
 
 	/**
@@ -38,7 +35,7 @@ public class BrakingDistance implements Indicator {
 	}
 
 	public String name(){
-		return "Braking distance";
+		return "Reaction distance";
 	}
 
 
