@@ -11,16 +11,53 @@ public class StringParser {
 	public static final byte INDETERMINATE = 0;	
 	public static final byte LONGITUDE = 1;
 	public static final byte LATITUDE = 2;	
+	public static final byte SPEED = 3;
+	public static final byte TRACK = 4;			
 	
 	private Double value;
 	private byte type;
-	
-	public StringParser(String pos){
-		parse(pos);
+
+
+
+	// 15m/s
+	public void parseSpeed(String pos) {
+	     pos.trim();
+				
+	     Scanner s = new Scanner(pos);
+	     s.useLocale(Locale.US);
+	     s.findInLine("([0-9.]+)m/s");
+	     MatchResult result = s.match();
+	     
+	     if(result.groupCount() != 1) throw new IllegalArgumentException();
+
+	     value = Double.parseDouble(result.group(1)) ;
+	     type = SPEED;	  
+	     	      
+	     s.close(); 			
 	}
 	
+	
+	// 14°
+	public void parseTrack(String pos) {
+	     pos.trim();
+				
+	     Scanner s = new Scanner(pos);
+	     s.useLocale(Locale.US);
+	     s.findInLine("([0-9.]+)°");
+	     MatchResult result = s.match();
+	     
+	     if(result.groupCount() != 1) throw new IllegalArgumentException();
+
+	     value = Double.parseDouble(result.group(1)) ;	
+	     type = TRACK;
+	     	      
+	     s.close(); 			
+	}
+	
+	
+	
 	// 50°37'57.41"N
-	public void parse(String pos) {
+	public void parseWGS84(String pos) {
 		pos.trim();
 		
 	   /*  Scanner s = new Scanner(pos);
@@ -70,12 +107,8 @@ public class StringParser {
 	    	 break;
  
 	     }
-	     
-	     
-	     
 	      
-	     s.close(); 		
-		
+	     s.close(); 			
 	}
 
 	public Double getValue() {

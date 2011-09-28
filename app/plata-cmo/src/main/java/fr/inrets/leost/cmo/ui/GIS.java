@@ -713,7 +713,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		public String cmoId; //CMO id (default : hostname)
 		public short cmoType = CMOHeader.CMO_TYPE_CAR; //type of CMO
 		public int beaconInterval = 500; //send interval of beacon in ms = t
-		public WGS84 fixedPosition = null; //fixed position instead GPS
+		public Fixe fixedGps = null; //fixed position instead GPS
 		
 		public String weatherURIService;
 		public InetAddress weatherUDPAddress;
@@ -782,7 +782,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		options.addOption("t", "type", true, "cmo type");
 		options.addOption("b", "beacon-inter", true, "interval between beacon sending (millisecond)");
 		options.addOption("d", "daemon", false, "run without GUI");
-		options.addOption("p", "fixed-position", true, "fixed position instead GPS. The arg is form 50°37'57.41\"N 3°5'8.26\"E");	
+		options.addOption("p", "fixed-gps", true, "fixed GPS. The arg is form 50°37'57.41\"N 3°5'8.26\"E 55 km/h 10°");	
 		options.addOption("w", "weather-uri-service", true, "URI of weather service controleur (Etch serveur). Ex : tcp://127.0.0.1:5000");
 		options.addOption("x", "weather-udp-address", true, "UDP weather address, ex : 127.0.0.1");
 		options.addOption("y", "weather-udp-port", true, "UDP weather port");							
@@ -822,7 +822,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			opt.verbose = cmd.hasOption("v");
 			
 			if(cmd.hasOption("p"))
-				opt.fixedPosition = new WGS84(cmd.getOptionValue("p", "50°37'57.41\"N 3°5'8.26\"E"));
+				opt.fixedGps = new Fixe(cmd.getOptionValue("p", "50°37'57.41\"N 3°5'8.26\"E"));
 					
 			if(!cmd.hasOption("m"))
 				opt.setAutoFwdGen();
@@ -909,10 +909,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		Geolocation loc = null;
 		
-		if(opt.fixedPosition==null)
+		if(opt.fixedGps==null)
 			loc = new Gps();
 		else
-			loc = new Fixe(opt.fixedPosition, 0.0, 0.0);
+			loc = opt.fixedGps;
 		
 		Weather weather = null;
 		WeatherDAB weatherDab = null;
@@ -990,7 +990,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				display = new Display ();
 				
 				shell = new Shell(display);
-				shell.setText("Global Information System");
+				shell.setText("Geographic Information System");
 				shell.setSize(1245, 700);
 				shell.setLocation(30, 10);
 				shell.setLayout (new FillLayout());

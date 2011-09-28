@@ -65,7 +65,9 @@ public class WGS84 {
 		for ( String coord:tokens ){
 
 			//parse coordinate
-			StringParser p = new StringParser(coord);
+			StringParser p = new StringParser();
+			
+			p.parseWGS84(coord);
 			
 			//init corresponding value
 			if(p.getType() == StringParser.LATITUDE)
