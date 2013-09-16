@@ -22,12 +22,12 @@ public class BeaconForward implements BeaconRecvListener {
 
 
 	
-	private JpcapSender sender;
+	private BeaconSender sender;
 
 	/** init the logger */
 	private static Logger logger = Logger.getLogger(BeaconForward.class);		
 	
-	public BeaconForward(JpcapSender sender) {
+	public BeaconForward(BeaconSender sender) {
 		this.sender = sender;
 		
 
@@ -45,7 +45,7 @@ public class BeaconForward implements BeaconRecvListener {
 		
 		logger.info("forward_cmo_packet: " + stat.getCmoID() + " " + stat.getSeq()+ " " + stat.getTTL());
 		
-		sender.sendPacket(BeaconGenerator.createCMOStatPacket( (byte)((int)stat.getTTL()-1), stat.getSeq(), stat.getLifetime(), stat.getCmoID(), stat.getCmoType(), stat.getLongitude(), stat.getLatitude(), stat.getH(), stat.getSpeed(), stat.getTrack(), stat.getTime()));
+		sender.broadcastData(BeaconGenerator.createCMOStatPacket( (byte)((int)stat.getTTL()-1), stat.getSeq(), stat.getLifetime(), stat.getCmoID(), stat.getCmoType(), stat.getLongitude(), stat.getLatitude(), stat.getH(), stat.getSpeed(), stat.getTrack(), stat.getTime()));
 	
 
 		
@@ -67,7 +67,7 @@ public class BeaconForward implements BeaconRecvListener {
 	    	 
 	    	 
 	    	BeaconRecv recv =  new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20), "");
-	    	BeaconForward f = new BeaconForward(JpcapSender.openDevice(device));
+	    	BeaconForward f = new BeaconForward(new BeaconSenderEthernet(JpcapSender.openDevice(device)));
 	    	
 			recv.addListener(f);
 			recv.start();

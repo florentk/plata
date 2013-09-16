@@ -9,7 +9,8 @@ java $JAVA_ARG -d -n "V2 CC" -t spot -p "50°37'5.12\"N 3°07'49.23\"E" -i lo &
 P2=$!
 java $JAVA_ARG -d -n "AA-357-DF" -p "50°37'02.83\"N 3°07'35.93\"E 6m/s 318°" -i lo  &
 P3=$!
-java $JAVA_ARG -i lo  -w "tcp://127.0.0.1:5000" -p "50°36'58.93\"N 3°07'41.37\"E 12m/s 316°"
+#java $JAVA_ARG -i lo  -w "tcp://127.0.0.1:5000" -p "50°36'58.93\"N 3°07'41.37\"E 12m/s 316°"
+java $JAVA_ARG -i lo -p "50°36'58.93\"N 3°07'41.37\"E 12m/s 316°"
 
 kill $P1
 kill $P2

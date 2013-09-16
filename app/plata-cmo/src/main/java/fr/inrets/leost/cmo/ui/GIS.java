@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Date;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -13,10 +14,8 @@ import jpcap.JpcapCaptor;
 import jpcap.JpcapSender;
 import jpcap.NetworkInterface;
 
-
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Font;
@@ -54,13 +53,16 @@ import fr.inrets.leost.cmo.beaconning.BeaconRecv;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvEthernet;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvFake;
 import fr.inrets.leost.cmo.beaconning.BeaconRecvListener;
+import fr.inrets.leost.cmo.beaconning.BeaconRecvUDP;
+import fr.inrets.leost.cmo.beaconning.BeaconSender;
+import fr.inrets.leost.cmo.beaconning.BeaconSenderEthernet;
+import fr.inrets.leost.cmo.beaconning.BeaconSenderUDP;
 import fr.inrets.leost.cmo.dashboard.*;
 import fr.inrets.leost.cmo.management.CMOManagement;
 import fr.inrets.leost.cmo.management.CMOTableEntry;
 import fr.inrets.leost.cmo.management.CMOTableListener;
 import fr.inrets.leost.cmo.utils.PcapsTool;
 import fr.inrets.leost.cmo.beaconning.packet.*;
-
 import fr.inrets.leost.geolocation.*;
 import fr.inrets.leost.weather.*;
 import fr.inrets.leost.weather.dab.*;
@@ -706,6 +708,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	//record for Gis option
 	public static final class GisOptions{
 		public String strInterface = "fake"; //network interface  (default : lo)
+		public boolean udp = false; //use UDP instead Ehternet
+		public int udpListenPort = BeaconSenderUDP.DEFAULT_PORT; //UDP port used to listen UDP packets
+		public int udpSenderPort = BeaconSenderUDP.DEFAULT_PORT; //UDP port used to send UDP packets		
 		
 		public boolean gen = true; //run beacon generator generator
 		public boolean fwd = true; //run beacon forwarder
@@ -775,6 +780,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		Options options = new Options();
 		options.addOption("i","interface", true, "network interface");
+		options.addOption("u","udp", false, "use UDP protocol instead Ethernet");
 		options.addOption("g","generator", false, "run beacon generator (with manual option)");
 		options.addOption("f", "forwarder", false, "run beacon forwarder (with manual option)");
 		options.addOption("m","manual", false, "don't determine generator and forwarder with CMO type");
@@ -783,6 +789,8 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		options.addOption("b", "beacon-inter", true, "interval between beacon sending (millisecond)");
 		options.addOption("d", "daemon", false, "run without GUI");
 		options.addOption("p", "fixed-gps", true, "fixed GPS. The arg is form 50°37'57.41\"N 3°5'8.26\"E 55 km/h 10°");	
+		options.addOption("l", "udp-listen-port", true, "port using by UDP to receive packets");	
+		options.addOption("s", "udp-sender-port", true, "port using by UDP to send packets");	
 		options.addOption("w", "weather-uri-service", true, "URI of weather service controleur (Etch serveur). Ex : tcp://127.0.0.1:5000");
 		options.addOption("x", "weather-udp-address", true, "UDP weather address, ex : 127.0.0.1");
 		options.addOption("y", "weather-udp-port", true, "UDP weather port");							
@@ -802,6 +810,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			}catch (UnknownHostException e){}		
 			
 			opt.strInterface = cmd.getOptionValue("i", "fake");
+			opt.udp = cmd.hasOption("u");
 			opt.gen = cmd.hasOption("g");
 			opt.fwd = cmd.hasOption("f");
 			opt.cmoType = CMOHeader.typeFromString(cmd.getOptionValue("t", "car"));
@@ -813,6 +822,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		    }
 			
 			opt.beaconInterval = Integer.parseInt(cmd.getOptionValue("b", "500"));
+			
+			opt.udpListenPort = Integer.parseInt(cmd.getOptionValue("l", "0"));
+			opt.udpSenderPort = Integer.parseInt(cmd.getOptionValue("s", String.valueOf(BeaconSenderUDP.DEFAULT_PORT)));
 			
 			opt.weatherURIService = cmd.getOptionValue("w", "fake");
 			opt.weatherUDPAddress = InetAddress.getByName(cmd.getOptionValue("x", "localhost"));	
@@ -877,6 +889,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 	public static void startGIS(GisOptions opt) throws IOException,SecurityException, InterruptedException{
 		//System.out.println(opt);
 		NetworkInterface device = null;
+		DatagramSocket socket = null;
 		BeaconRecv recv = null;
 		
 		//point separator for reel number
@@ -887,32 +900,46 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		org.apache.log4j.PropertyConfigurator.configure("log.config");
 
 
-		//if fake, create a fake recv
-		if(opt.strInterface.compareToIgnoreCase("fake") == 0){
-			recv = createBeaconRecvFake();
-		}
-		else
-		{
-			//else create a recv with Ethernet
-			device = PcapsTool.toNetworkInterface(opt.strInterface);
-		
-		    if(device==null){
-		    	System.err.println("The interface " + opt.strInterface + " doesn't exist");
-		    	PcapsTool.printDevice();
-		    	return;
-		    }
-		    
-		    //create the Ethernet beacon receiver
-			recv = new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20), opt.cmoId);
 
-		}
+
+	    if(opt.udp){
+	    	logger.info("UDP receiver");
+		    //create the UDP beacon receiver
+	    	if(opt.udpListenPort == 0)
+	    		socket = BeaconSenderUDP.initUDP();
+	    	else
+	    		socket = BeaconSenderUDP.initUDP(opt.udpListenPort);
+			recv = new BeaconRecvUDP(socket,opt.cmoId);
+	    }else{
+			//if fake, create a fake recv
+			if(opt.strInterface.compareToIgnoreCase("fake") == 0){
+				logger.info("Fake receiver");
+				recv = createBeaconRecvFake();
+			}else{
+			//else create a recv with Ethernet
+				device = PcapsTool.toNetworkInterface(opt.strInterface);
+			
+			    if(device==null){
+			    	System.err.println("The interface " + opt.strInterface + " doesn't exist");
+			    	PcapsTool.printDevice();
+			    	return;
+			    }
+			    
+			    logger.info("Ethernet receiver");
+			    //create the Ethernet beacon receiver
+				recv = new BeaconRecvEthernet(JpcapCaptor.openDevice(device, 2000, false, 20), opt.cmoId);	
+			}
+	    }
 		
 		Geolocation loc = null;
 		
-		if(opt.fixedGps==null)
+		if(opt.fixedGps==null) {
+			if (opt.verbose) log("Init","Run Gps");
 			loc = new Gps();
-		else
+		} else {
+			if (opt.verbose) log("Init","Fixed GPS");
 			loc = opt.fixedGps;
+		}
 		
 		Weather weather = null;
 		WeatherDAB weatherDab = null;
@@ -928,8 +955,16 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		BeaconGenerator gen = null;
 		BeaconForward fwd = null;
 		
-		if((device != null) && (opt.gen || opt.fwd)){
-			JpcapSender sender = JpcapSender.openDevice(device);
+		if(opt.gen || opt.fwd){
+			BeaconSender sender;
+			
+			if (opt.udp || (device == null)){
+				logger.info("UDP sender");
+				sender = new BeaconSenderUDP(socket,opt.udpSenderPort, opt.strInterface);
+			}else{
+				logger.info("Ethernet sender");
+				sender = new BeaconSenderEthernet(JpcapSender.openDevice(device));
+			}
 			
 			if(opt.gen){
 				gen = new BeaconGenerator(sender, loc, opt.cmoId, opt.cmoType, opt.beaconInterval);
@@ -1053,7 +1088,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			if(gen !=null) gen.interrupt();
 		}else{
 			loc.join();
-			recv.join();
+			//recv.join();
 			if(gen !=null) gen.join();	
 		}
 		

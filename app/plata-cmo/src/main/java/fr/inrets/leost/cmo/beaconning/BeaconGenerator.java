@@ -4,8 +4,6 @@ package fr.inrets.leost.cmo.beaconning;
 import org.apache.log4j.Logger;
 
 import jpcap.*;
-import jpcap.packet.EthernetPacket;
-import jpcap.packet.Packet;
 
 import fr.inrets.leost.geolocation.Geolocation;
 import fr.inrets.leost.geolocation.Gps;
@@ -48,9 +46,9 @@ public class BeaconGenerator extends Thread{
 	private String id;
 	private short type;
 	private int beaconFreq;
-	
+	private BeaconSender sender;
 	private Geolocation loc;
-	private JpcapSender sender;
+
 
 	/**
 	 * 
@@ -60,7 +58,7 @@ public class BeaconGenerator extends Thread{
 	 * @param type CMO type
 	 * @param beaconFreq interval between two beacon
 	 */
-	public BeaconGenerator(JpcapSender sender, Geolocation loc,String id, short type, int beaconFreq) {
+	public BeaconGenerator(BeaconSender sender, Geolocation loc,String id, short type, int beaconFreq) {
 		this.id = id;
 		this.type = type;
 		this.beaconFreq = beaconFreq;
@@ -74,33 +72,21 @@ public class BeaconGenerator extends Thread{
 	 * @param id CMO id
 	 * @param type CMO type
 	 */
-	public BeaconGenerator(JpcapSender sender, Geolocation loc, String id, short type){
+	public BeaconGenerator(BeaconSender sender, Geolocation loc, String id, short type){
 		this(sender, loc, id, type, BEACON_FREQ_DEFAULT);
 	}
 	
-	public static  Packet createCMOStatPacket(byte ttl, int seq, int lifetime, String cmoID,
+	public static  byte[] createCMOStatPacket(byte ttl, int seq, int lifetime, String cmoID,
 			short cmoType,Float longitude, Float latitude, Float h, Float speed,
 			Float track, int time){
-		Packet p = new Packet();
-
+		
 		CMOHeader cmo_header = new CMOHeader(ttl, seq,lifetime, cmoID, cmoType);
-		
 		CMOState cmo_stat = new CMOState (cmo_header,longitude, latitude, h, speed, track, time);
-		
-		EthernetPacket ether=new EthernetPacket();
-		ether.frametype=CMOHeader.ETHERTYPE_CMO;
-		//set source and destination MAC addresses
-		ether.src_mac=new byte[]{(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0};
-		ether.dst_mac=new byte[]{(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF};		
-		
-		
-		p.datalink = ether;
-		p.data = cmo_stat.toByteArray();
-		
-		return p;		
+
+		return cmo_stat.toByteArray();		
 	}
 	
-	private Packet createCMOStatPacket(Float longitude, Float latitude, Float h, Float speed,
+	private byte[] createCMOStatPacket(Float longitude, Float latitude, Float h, Float speed,
 			Float track, int time){
 		return createCMOStatPacket((byte)TTL_INIT, seq++, beaconFreq * BEACON_LIFETIME, id, type,longitude, latitude, h, speed, track, time);
 	}
@@ -113,14 +99,15 @@ public class BeaconGenerator extends Thread{
 
 		logger.info("send_cmo_packet: " + t + " " + position + " " +  speed + " " + track);
 		
-		sender.sendPacket(createCMOStatPacket(
+		byte[] data = createCMOStatPacket(
 				new Float(position.longitude()), 
 				new Float(position.latitude()), 
 				new Float(position.h()),
 				new Float(speed),
 				new Float(track),
-				t
-				));
+				t);
+		
+		sender.broadcastData(data);
 		
 	}	
 	
@@ -192,7 +179,7 @@ public class BeaconGenerator extends Thread{
 			loc.start();
 
 			
-	    	BeaconGenerator gen = new BeaconGenerator(sender, loc, strId,type,beaconInter);
+	    	BeaconGenerator gen = new BeaconGenerator(new BeaconSenderEthernet(sender), loc, strId,type,beaconInter);
 	    	gen.run();	  
 	    	
 	    	loc.dispose();
