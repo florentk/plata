@@ -4,9 +4,10 @@ package fr.inrets.leost.cmo.beaconning;
 import org.apache.log4j.Logger;
 
 import jpcap.*;
-
 import fr.inrets.leost.geolocation.Geolocation;
+import fr.inrets.leost.geolocation.GeolocationListener;
 import fr.inrets.leost.geolocation.Gps;
+import fr.inrets.leost.geolocation.Trace;
 import fr.inrets.leost.geolocation.WGS84;
 import fr.inrets.leost.cmo.utils.PcapsTool;
 import fr.inrets.leost.cmo.beaconning.packet.*;
@@ -128,6 +129,16 @@ public class BeaconGenerator extends Thread{
 	        } catch (InterruptedException ie) {}
 	    }		
 	}
+	
+	public void listen(){
+		loc.addPositionListener(new GeolocationListener() {
+
+			public void positionChanged(WGS84 position, Double speed, Double track) {
+				broadcastCMOStatPacket();
+			}
+
+		});
+	}
 
 	/**
 	 * @return the curent sequence number
@@ -164,7 +175,7 @@ public class BeaconGenerator extends Thread{
 	 */
 	
 
-	public static void runGenerator(JpcapSender sender,String strId, short type, int beaconInter){
+	public static void runGenerator(JpcapSender sender, Geolocation loc, String strId, short type, int beaconInter){
 
 	    
 	    if(type==-1){		    
@@ -172,26 +183,22 @@ public class BeaconGenerator extends Thread{
 	    	System.out.println("\tCMO type available " + CMOHeader.getTypeAvailable());
 	    	return;
 	    }
-	    
-	    
-		try{
-			Geolocation loc = new Gps();
-			loc.start();
 
-			
-	    	BeaconGenerator gen = new BeaconGenerator(new BeaconSenderEthernet(sender), loc, strId,type,beaconInter);
-	    	gen.run();	  
-	    	
-	    	loc.dispose();
-		}catch(java.io.IOException e){
-			System.out.println("Cannot init the geolocation system : " + e);
-		}
-	    
-  
+		loc.start();
+
+		
+    	BeaconGenerator gen = new BeaconGenerator(new BeaconSenderEthernet(sender), loc, strId,type,beaconInter);
+    	
+    	if(loc instanceof Trace)
+    		gen.listen();
+    	else
+    		gen.run();	  
+    	
+    	loc.dispose();
 	}
 	
 	
-	public static void runGeneratorFromDevice(String strDevice, String strId, short type, int beaconInter) {
+	public static void runGeneratorFromDevice(String strDevice, String traceFile, int waitTime, String strId, short type, int beaconInter) {
 		    NetworkInterface device = PcapsTool.toNetworkInterface(strDevice);
 		    
 		    if(device==null){
@@ -201,11 +208,14 @@ public class BeaconGenerator extends Thread{
 		    }
 			
 		    try{
-
-		    	runGenerator(JpcapSender.openDevice(device), strId, type, beaconInter);
 		    	
+		    	if (traceFile==null)
+		    		runGenerator(JpcapSender.openDevice(device), new Gps(),strId, type, beaconInter);
+		    	else
+		    		runGenerator(JpcapSender.openDevice(device), Trace.traceFromFile(traceFile,waitTime),strId, type, beaconInter);
+		    		
 		    }catch (java.io.IOException e){
-		    	System.out.println("Cannot open network interface : "+e);
+		    	System.out.println("Cannot open network interface or init the geolocation system : "+e);
 		    	return;
 		    }
 	}
@@ -218,12 +228,15 @@ public class BeaconGenerator extends Thread{
 		
 		if(args.length<4){
 			System.out.println("Not enough arguments");
-			System.out.println("Usage : java BeaconGenerator <device> <cmo id> <cmo type> <beacon interval>");			
+			System.out.println("Usage : java BeaconGenerator <device> <cmo id> <cmo type> <beacon interval> [<trace file> <wait time>]");			
 			System.exit(1);
 		}
 		
-		runGeneratorFromDevice(args[0],args[1], Short.parseShort(args[2]), Integer.parseInt(args[3]) );
-
+		if(args.length>5)
+			runGeneratorFromDevice(args[0], args[4], Integer.parseInt(args[5]) ,args[1], Short.parseShort(args[2]), Integer.parseInt(args[3]));
+		else
+			runGeneratorFromDevice(args[0], null, 0 ,args[1], Short.parseShort(args[2]), Integer.parseInt(args[3]));
+			
 	}
 
 

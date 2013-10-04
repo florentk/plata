@@ -1,7 +1,9 @@
 package fr.inrets.leost.cmo.management;
 
 import java.util.Date;
+
 import fr.inrets.leost.cmo.beaconning.packet.CMOHeader;
+import fr.inrets.leost.cmo.utils.Physics;
 
 /**
  * Entry of a CMO (mutable)
@@ -29,6 +31,9 @@ public class CMOTableEntry {
 	 * altitude (in meters)
 	 */
 	private Double altitude;
+	
+	
+	private Double lastLong=null, lastLati=null, lastAlti=null;
 	
 	/** speed in meter per second*/
 	private Double speed;
@@ -58,6 +63,10 @@ public class CMOTableEntry {
 	private void setEntry(String cmoID, short cmoType, Double longitude,
 			Double latitude, Double altitude, Double speed, Double track,
 			int lifetime, int dateLastState){
+		lastLong = this.longitude;
+		lastLati = this.latitude;		
+		lastAlti = this.altitude;			
+	
 		this.cmoID = cmoID;
 		this.cmoType = cmoType;
 		this.longitude = longitude;
@@ -74,7 +83,7 @@ public class CMOTableEntry {
 		return ((double)((new Date()).getTime() - sysDateLastState.getTime()))/1000.0;
 	}
 	
-	private void computeVelocity(double longitude, double latitude, double altitude, double dt) {	
+	private void computeVelocity(double longitude, double latitude, double altitude, double dt) {		
 		vLongitude = new Double((longitude - this.longitude) / dt);
 		vLatitude  = new Double((latitude - this.latitude) / dt);
 		vAltitude  = new Double((altitude - this.altitude) / dt);
@@ -104,6 +113,40 @@ public class CMOTableEntry {
 	}
 
 
+	
+	public double crossPosX(double longitude, double latitude, 
+			double lastLongitude, double lastLatitude){
+		
+
+		
+		if(this.lastLong == null) return 0.0;
+
+
+		
+		double xCross = Physics.CrossPosX(
+				lastLongitude, lastLatitude, 
+				longitude, latitude, 
+				this.lastLong, this.lastLati, 
+				this.longitude, this.latitude);
+		
+		System.out.println(
+				"xa1 " + lastLongitude + " " +
+				"ya1 " + lastLatitude + " " +
+				"xa2 " + longitude + " " +
+				"ya2 " + latitude + " " +
+				"xb1 " + this.lastLong + " " +
+				"yb1 " + this.lastLati + " " + 
+				"xb2 " + this.longitude + " " +
+				"yb2 " + this.latitude + " " +
+				" = " + xCross
+				);			
+		
+		/*if(xCross==0.0) return 0.0;
+		
+		return (xCross - lastLongitude) / vLongitude;*/
+		
+		return xCross;
+	}	
 
 	/**
 	 * @return the CMO identity

@@ -1,5 +1,6 @@
 package fr.inrets.leost.cmo.ui;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -295,7 +296,9 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		column = new TableColumn(table, SWT.NONE);
 		column.setText("Track");
-		column.setWidth(50);			
+		column.setWidth(50);
+		
+		
 		
 		return table;
 	}	
@@ -552,6 +555,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			//extrapolate continue position
 			WGS84 currentPos = geo.getCurrentPos();
 			
+			if(currentPos == null) return;
 			
 			//last pos in pixel
 			Point lastPos;
@@ -719,6 +723,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		public short cmoType = CMOHeader.CMO_TYPE_CAR; //type of CMO
 		public int beaconInterval = 500; //send interval of beacon in ms = t
 		public Fixe fixedGps = null; //fixed position instead GPS
+		public Trace traceGpsFile = null; //trace GPS file instead device GPS
 		
 		public String weatherURIService;
 		public InetAddress weatherUDPAddress;
@@ -789,6 +794,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		options.addOption("b", "beacon-inter", true, "interval between beacon sending (millisecond)");
 		options.addOption("d", "daemon", false, "run without GUI");
 		options.addOption("p", "fixed-gps", true, "fixed GPS. The arg is form 50°37'57.41\"N 3°5'8.26\"E 55 km/h 10°");	
+		options.addOption("c", "trace-gps-file", true, "trace GPS file");			
 		options.addOption("l", "udp-listen-port", true, "port using by UDP to receive packets");	
 		options.addOption("s", "udp-sender-port", true, "port using by UDP to send packets");	
 		options.addOption("w", "weather-uri-service", true, "URI of weather service controleur (Etch serveur). Ex : tcp://127.0.0.1:5000");
@@ -835,7 +841,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			
 			if(cmd.hasOption("p"))
 				opt.fixedGps = new Fixe(cmd.getOptionValue("p", "50°37'57.41\"N 3°5'8.26\"E"));
-					
+
+			if(cmd.hasOption("c"))
+				opt.traceGpsFile = Trace.traceFromFile(cmd.getOptionValue("c", ""),opt.beaconInterval);
+
 			if(!cmd.hasOption("m"))
 				opt.setAutoFwdGen();
 			
@@ -843,7 +852,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			System.err.println(e.getMessage());
 			new HelpFormatter().printHelp( "gis", options );
 			System.exit(1);
-		}catch (UnknownHostException e){
+		}catch (FileNotFoundException  e){
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}catch (IOException  e){
 			System.err.println(e.getMessage());
 			System.exit(1);
 		}
@@ -933,9 +945,12 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		
 		Geolocation loc = null;
 		
-		if(opt.fixedGps==null) {
+		if(opt.fixedGps==null && opt.traceGpsFile==null) {
 			if (opt.verbose) log("Init","Run Gps");
 			loc = new Gps();
+		} else if(opt.fixedGps==null){
+			if (opt.verbose) log("Init","Trace GPS");
+			loc = opt.traceGpsFile;
 		} else {
 			if (opt.verbose) log("Init","Fixed GPS");
 			loc = opt.fixedGps;
@@ -968,7 +983,10 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			
 			if(opt.gen){
 				gen = new BeaconGenerator(sender, loc, opt.cmoId, opt.cmoType, opt.beaconInterval);
-				gen.start();
+				if (loc instanceof Trace) 
+					gen.listen();
+				else
+					gen.start();
 				if (opt.verbose) log("Init","Run generator");
 			}
 			if(opt.fwd){
@@ -1006,6 +1024,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 
 			CoefFriction cf = new CoefFriction(weather);
 			ClosestCMO closestCMO =  new ClosestCMO(loc, cmoMgt, cf);
+			CrossingCMO crossingCMO = new CrossingCMO(loc,cmoMgt);
 			
 			db.addIndicator(new Position(loc));
 			db.addIndicator(new Speed(loc));
@@ -1015,6 +1034,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 			db.addIndicator(new StoppingDistance(loc,cf));
 			db.addIndicator(new WeatherIndicator(weather));
 			db.addIndicator(closestCMO);    
+			db.addIndicator(crossingCMO);    			
 			
 			
 			
@@ -1089,7 +1109,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}else{
 			loc.join();
 			//recv.join();
-			if(gen !=null) gen.join();	
+			if(gen !=null && !(loc instanceof Trace)) gen.join();	
 		}
 		
 	

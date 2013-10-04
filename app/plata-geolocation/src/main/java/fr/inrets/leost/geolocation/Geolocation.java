@@ -25,7 +25,10 @@ public abstract class  Geolocation extends Thread {
 	
 	
 	/** current position in WGC84 format */
-	private WGS84 currentPos = null;
+	private WGS84 lastPos = null;
+	
+	/** current position in WGC84 format */
+	private WGS84 prevPos = null;	
 	
 	/** velocity in unit by second   */
 	private WGS84 velocity = null;
@@ -66,7 +69,7 @@ public abstract class  Geolocation extends Thread {
 	private void positionChanged(){
 		//call the method positionChanged of each registered listener
 		for (GeolocationListener l : gpsListeners)
-			l.positionChanged(currentPos,currentSpeed,currentTrack);
+			l.positionChanged(lastPos,currentSpeed,currentTrack);
 	}	
 	
 
@@ -81,6 +84,28 @@ public abstract class  Geolocation extends Thread {
 	}
 	
 	
+	public WGS84 getVelocity() {
+		return velocity;
+	}
+	
+	/**
+	 * compute the time to reach a target point on the trajectory
+	 * @param longitude longitude of target point
+	 * @return the time to reach the target
+	 */
+	public double getPreditedTimeFromLongitude(double longitude) {
+		if(velocity == null)
+			return 0.0;
+		
+		//time elapsed since last pos
+		final double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;	
+		//distance beetween the last pos and the target point
+		final double d = Math.abs(longitude - lastPos.longitude());
+		
+		//minus the computed time by the elapsed time
+		return (d / velocity.longitude()) - dt;
+	}
+
 	private WGS84 getPredictPos() {
 		if(! ready){
 			return new WGS84();
@@ -88,17 +113,17 @@ public abstract class  Geolocation extends Thread {
 		
 		if(velocity == null)
 			//no velocity, assume no moving
-			return currentPos;
+			return lastPos;
 		
 		//compute the time since the last data acquisition
-		double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;	
+		final double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;	
 		
 		//if(acc == null)
 			//no acceleration, assume a constant velocity
 			return new WGS84(
-				currentPos.longitude() +  (velocity.longitude() * dt) ,
-				currentPos.latitude() +  (velocity.latitude() * dt) , 
-				currentPos.h() + (velocity.h() * dt)
+					lastPos.longitude() +  (velocity.longitude() * dt) ,
+					lastPos.latitude() +  (velocity.latitude() * dt) , 
+					lastPos.h() + (velocity.h() * dt)
 				);
 		/*
 		//full equation with velocity and acceleration
@@ -120,8 +145,18 @@ public abstract class  Geolocation extends Thread {
 		if(! ready)
 			return new WGS84();
 		
-		return currentPos;
+		return lastPos;
 	}
+	
+	/**
+	 * get the previous pos recevied by the device
+	 * it is the old last pos.
+	 * @return
+	 */
+	public WGS84 getPrevPos() {
+		return prevPos;
+	}
+	
 	
 
 
@@ -178,13 +213,13 @@ public abstract class  Geolocation extends Thread {
 		
 		
 		//if no current piosition, can't compute the velocity
-		if(this.currentPos!=null){
+		if(this.lastPos!=null){
 			
 			//System.out.println(n++ + " " + getPredictPos().sub(currentPos) + " " + velocity);
 
 			double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;
 			//System.out.println(dt);
-			WGS84 newVelocity = computeDerivate(this.currentPos,currentPos, dt/*, velocities, VELOCITIES_SIZE_MAX*/);
+			WGS84 newVelocity = computeDerivate(lastPos,currentPos, dt/*, velocities, VELOCITIES_SIZE_MAX*/);
 			
 			//if no velocity, can't compute the acceleration
 			/*if(velocity != null){
@@ -201,12 +236,14 @@ public abstract class  Geolocation extends Thread {
 		
 		
 		//update the current position
-		this.currentPos = currentPos;
+		prevPos = lastPos;
+		lastPos = currentPos;
 		sysTime = new Date();
 		positionChanged();
 		ready = true;
 	}	
 	
+
 	/**
 	 * register a new listener
 	 * @param l

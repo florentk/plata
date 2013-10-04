@@ -31,19 +31,16 @@ import org.apache.log4j.Logger;
  * 
  * @author Florent Kaisser <florent.kaisser@free.fr>
  */
-public class Gps  extends Geolocation  {
+public class Gps  extends GpsJSON {
 
 
 	public static final int GPSD_PORT = 2947;
 	
-
-	/** reader buffer for read the data from gpsd*/
-	private BufferedReader gpsBR;
+	
 	/** writer buffer for read the data from gpsd*/
 	private BufferedWriter gpsBW;	
 	
-	/** init the logger */
-	private static Logger logger = Logger.getLogger(Gps.class);
+
 
 
 	/**
@@ -67,21 +64,7 @@ public class Gps  extends Geolocation  {
 		return new Socket( addr, port);	
 	}	
 	
-	/**
-	 * convert a speed in knot unit to SI unit
-	 * @param speed in knot
-	 * @return speed in meter per second
-	 */
-	/*static private Double knotToSI(Double speed){
-		return new Double (0.514444 * speed.doubleValue());
-	}*/
-	
-	static private Double checkDoubleNull(Double val){
-		if (val == null)
-			return new Double(0.0);
-		
-		return val;
-	}
+
 	
 	/**
 	 * 
@@ -107,46 +90,10 @@ public class Gps  extends Geolocation  {
 		}
 	}		
 	
-	/**
-	 * decode a json gps data.
-	 * @param str json string
-	 * @return the geographical position in WGS84 format
-	 */
-	static private GpsData decodeGPSDataJson(String str){
-		
-		logger.info("receive_gps_data: " + str);
-		
-		try{
-			//convert JSON string in Java Map
-			Map dict=(Map)(new JSONParser()).parse(str);
-			
-			//TPV class for get position, speed and track (see gpsd spec)
-			String fClass = (String)dict.get("class");
-			if (fClass.compareToIgnoreCase("TPV") == 0){
-				
-				//get the geographical position
-				Double lat   = checkDoubleNull((Double)dict.get("lat"));
-				Double lon   = checkDoubleNull((Double)dict.get("lon"));		
-				Double alt   = checkDoubleNull((Double)dict.get("alt"));	
-				Double speed = checkDoubleNull((Double)dict.get("speed"));		
-				Double track = checkDoubleNull((Double)dict.get("track"));	
-				Double t = checkDoubleNull((Double)dict.get("time"));	
-				
-				
-				return new GpsData(t,new WGS84(lon,lat,alt),speed,track);
-			}
-		}
-		catch(ParseException pe){
-			System.err.println("JSon parsing error: " + pe.getPosition());
-			System.err.println(pe);
-		}
-		
-		
-		return null;
-	}
+
 	
 	public Gps()  throws IOException{
-		super();
+		super(0);
 		
 		//connection to gpsd
 		connectGPS();
@@ -195,39 +142,7 @@ public class Gps  extends Geolocation  {
 	}
 
 	
-	/**
-	 * read a line from gpsd and decode the data
-	 */
-	public void run() {
-		if (gpsBR == null) return;
 
-		
-		while(true) {
-			// for each line in the buffer
-			try {
-				//reads a line (passive wait) and decodes
-				GpsData data = decodeGPSDataJson(gpsBR.readLine());
-
-				//System.out.println("Read a line : " + data);
-				
-				//if needed, update the current position
-				if(data!= null  && (   !getLastPos().equals(data.getPosition())
-						|| !getCurrentSpeed().equals(data.getSpeed())
-						|| !getCurrentTrack().equals(data.getTrack())))
-				{
-					//setCurrentTime(data.getTime());
-					setCurrentPos(data.getPosition());
-					setCurrentSpeed(data.getSpeed());	
-					setCurrentTrack(data.getTrack());						
-				}
-
-
-			} catch(IOException ioe) {
-				System.err.println("Connection error with gps service");
-			}
-		}
-		
-	}
 	
 	//Unit testing
 	public static void main (String[] args) throws IOException{

@@ -118,7 +118,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 		StringBuffer s=new StringBuffer();
 		
 		for (Indicator i : indicators)
-			s.append(i.toString()+";");
+			s.append(i.name() + " : " + i.toString()+"\n");
 			
 		return s.toString();
 	}
@@ -133,7 +133,8 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 	public static void startDashboard(String device)  throws IOException,InterruptedException {
 		
 		//Geolocation geo = new Fixe(new WGS84(),1.0,45.0);
-		Geolocation loc = new Gps();
+		//Geolocation loc = new Gps();
+		Geolocation loc = Trace.traceFromFile("/home/florent/tmp/v1",500);
 		BeaconRecv recv = BeaconRecvEthernet.loopPacketFromDevice(device);
 		Weather weather = new Fake("XXXX 191400Z 30005KT 250V320 9999 FEW046 BKN250 24/11 Q1020 NOSIG");
 		
@@ -170,6 +171,7 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 		//create the indicator of the dashboard	
 		CoefFriction cf = new CoefFriction(weather);
 		ClosestCMO closestCMO =  new ClosestCMO(loc, cmoMgt, cf);
+		CrossingCMO crossingCMO = new CrossingCMO(loc,cmoMgt);
 			
 		db.addIndicator(new Position(loc));
 		db.addIndicator(new Speed(loc));
@@ -178,7 +180,9 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 		db.addIndicator(new ReactionDistance(loc));
 		db.addIndicator(new StoppingDistance(loc,cf));
 		db.addIndicator(new WeatherIndicator(weather));
-		db.addIndicator(closestCMO);    
+		db.addIndicator(closestCMO);  
+		db.addIndicator(crossingCMO);  		
+		
   
 		
 		for (Indicator id : db.getIndicators())
@@ -203,7 +207,10 @@ public class Dashboard implements CMOTableListener, GeolocationListener, Weather
 		//GpsMonitor.gpsGUI(geo);
 		
 		//wait the end
-		loc.join();recv.join();weather.join();
+		
+		loc.join();
+		recv.join();
+		weather.join();
 		
 		loc.dispose();
 		weather.dispose();

@@ -156,4 +156,31 @@ public class Physics {
 		return BrakingDistance(v,coef) + ReactionDistance(v);
 	}
 	
+	/**
+	 * compute the X pos when two line (A(A1,A2) and B(B1,B2)) are crossing
+	 * @param xa1 x pos of A1
+	 * @param ya1 y pos of A1
+	 * @param xa2 x pos of A2
+	 * @param ya2 y pos of A2
+	 * @param xb1 x pos of B1
+	 * @param yb1 y pos of B1
+	 * @param xb2 x pos of B2
+	 * @param yb2 y pos of B2
+	 * @return the x pos when A and B are crossing
+	 */
+	static public double CrossPosX(double xa1, double ya1, double xa2, double ya2,
+			double xb1, double yb1, double xb2, double yb2){
+		
+			if ((xa2==xb2) || (xb2==xb1)) return 0.0;
+		
+			final double da = (ya2-ya1) / (xa2-xa1);
+			final double db = (yb2-yb1) / (xb2-xb1);
+			final double a  = ya1 - da*xa1;
+			final double b  = yb1 - db*xb1;
+
+			if(da==db) return 0.0;
+			
+			return (b - a) / (da - db);
+	}
+	
 }
