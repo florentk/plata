@@ -370,7 +370,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 		}
 	}		
 	
-	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Weather weather, Dashboard db, ClosestCMO closestCMO, Composite parent, int style){
+	public GIS(Display display, Geolocation geo, CMOManagement cmoMgt, Weather weather, Dashboard db, ClosestCMO closestCMO, CrossingCMO crossingCMO, Composite parent, int style){
 		super(parent, style);
 		
 		this.display = display;
@@ -413,7 +413,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
   
         
         //create the alert icon
-		alert = new AlertWidget(alertInfo, SWT.PUSH, closestCMO);
+		alert = new AlertWidget(alertInfo, SWT.PUSH, closestCMO, crossingCMO);
 		alert.setImg(loadSemaphoreGreen(), 0);
 		alert.setImg(loadSemaphoreOrange(), 1);
 		alert.setImg(loadSemaphoreRed(), 2);
@@ -1051,7 +1051,7 @@ public class GIS extends Composite  implements DashboardListener, CMOTableListen
 				shell.setLayout (new FillLayout());
 
 				//create the GIS window
-				gis= new GIS(display, loc, cmoMgt, weather, db, closestCMO,   shell, SWT.NONE);
+				gis= new GIS(display, loc, cmoMgt, weather, db, closestCMO, crossingCMO , shell, SWT.NONE);
 				
 				//alow receive the dashboardUpdate
 				db.addListener(gis);

@@ -129,7 +129,7 @@ public class CMOTableEntry {
 				this.lastLong, this.lastLati, 
 				this.longitude, this.latitude);
 		
-		System.out.println(
+		/*System.out.println(
 				"xa1 " + lastLongitude + " " +
 				"ya1 " + lastLatitude + " " +
 				"xa2 " + longitude + " " +
@@ -139,7 +139,7 @@ public class CMOTableEntry {
 				"xb2 " + this.longitude + " " +
 				"yb2 " + this.latitude + " " +
 				" = " + xCross
-				);			
+				);	*/		
 		
 		/*if(xCross==0.0) return 0.0;
 		

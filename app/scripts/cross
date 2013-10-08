@@ -1,0 +1,7 @@
+./scripts/gis -c ~/tmp/v2 -b 1000  -n florent  -i lo &
+P1=$!
+sleep 2.5 
+./scripts/gen lo v1 18 1000 ~/tmp/v1 1000 &
+P2=$?
+wait $P1
+kill $P2

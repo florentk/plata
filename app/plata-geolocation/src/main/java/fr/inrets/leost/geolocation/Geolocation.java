@@ -95,15 +95,19 @@ public abstract class  Geolocation extends Thread {
 	 */
 	public double getPreditedTimeFromLongitude(double longitude) {
 		if(velocity == null)
-			return 0.0;
+			return -1.0;
 		
 		//time elapsed since last pos
 		final double dt = ((double)((new Date()).getTime() - sysTime.getTime()))/1000.0;	
 		//distance beetween the last pos and the target point
-		final double d = Math.abs(longitude - lastPos.longitude());
+		final double d = longitude - lastPos.longitude();
 		
 		//minus the computed time by the elapsed time
-		return (d / velocity.longitude()) - dt;
+		final double t = (d / velocity.longitude()) - dt;
+		
+		if (t<0) return -1.0;
+		
+		return t;
 	}
 
 	private WGS84 getPredictPos() {

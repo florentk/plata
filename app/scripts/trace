@@ -1,0 +1,3 @@
+#!/bin/bash
+. scripts/classpath
+java -classpath $CP fr.inrets.leost.geolocation.Trace "$@" 
