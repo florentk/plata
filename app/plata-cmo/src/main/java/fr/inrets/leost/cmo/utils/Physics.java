@@ -183,4 +183,26 @@ public class Physics {
 			return (b - a) / (da - db);
 	}
 	
+	static public double computeAzimuth(double longi1, double lati1, double longi2, double lati2){
+		double dx = longi2-longi1;
+		double dy = lati2-lati1;
+		double a = 0;
+		
+		if (dx >= 0 && dy < 0) {
+			a = 180 - Math.toDegrees(Math.atan(dx/-dy)) ;
+		} else if (dx < 0 && dy > 0) {
+			a = 360 - Math.toDegrees(Math.atan(-dx/dy));
+		} else if (dx <= 0 && dy < 0) {
+			a = 180 + Math.toDegrees(Math.atan(dx/dy));
+		} else if (dy != 0) {
+			//dx >= 0 && dy > 0 
+			a = Math.toDegrees(Math.atan(dx/dy));
+		} else {
+			//dy==0
+			if (dx>0) a = 90; else a = 270;
+		}
+		
+		return a;
+	}
+	
 }

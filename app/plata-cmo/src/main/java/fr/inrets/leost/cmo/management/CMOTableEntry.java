@@ -112,7 +112,27 @@ public class CMOTableEntry {
 		return ( now.getTime() > (getDateEntry().getTime() + getLifetime()) );
 	}
 
-
+	/**
+	 * compute the time to reach a target point on the trajectory
+	 * @param longitude longitude of target point
+	 * @return the time to reach the target
+	 */
+	public double getPreditedTimeFromLongitude(double longitude) {
+		if(vLongitude == null)
+			return -1.0;
+		
+		//time elapsed since last pos
+		final double dt = ((double)((new Date()).getTime() - sysDateLastState.getTime()))/1000.0;	
+		//distance beetween the last pos and the target point
+		final double d = longitude - this.longitude;
+		
+		//minus the computed time by the elapsed time
+		final double t = (d / vLongitude) - dt;
+		
+		if (t<0) return -1.0;
+		
+		return t;
+	}
 	
 	public double crossPosX(double longitude, double latitude, 
 			double lastLongitude, double lastLatitude){
@@ -147,6 +167,14 @@ public class CMOTableEntry {
 		
 		return xCross;
 	}	
+	
+	public double distance(double longitude, double latitude){
+		return Physics.cartesianDistance(longitude, latitude, getLongitude(), getLatitude());
+	}
+	
+	public double azimuth(double longitude, double latitude) {
+		return Physics.computeAzimuth(longitude, latitude, getLongitude(), getLatitude());
+	}
 
 	/**
 	 * @return the CMO identity

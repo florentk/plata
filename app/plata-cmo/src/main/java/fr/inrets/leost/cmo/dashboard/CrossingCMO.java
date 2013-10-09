@@ -1,5 +1,6 @@
 package fr.inrets.leost.cmo.dashboard;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
@@ -13,6 +14,27 @@ import fr.inrets.leost.geolocation.WGS84;
 
 public class CrossingCMO implements Indicator {
 
+	public class CrossingCMOEntry {
+		final Double t; //predicted time before reach the cross point
+		final Double t_cmo; //predicted time before the cmo reach the cross point
+		final Double d; // distance to the CMO
+		final Double azimuth; //track for reach CMO
+		final DecimalFormat format = new DecimalFormat("#.##");
+		public CrossingCMOEntry(Double t, Double t_cmo, Double d, Double azimuth) {
+			this.t = t;
+			this.t_cmo = t_cmo;
+			this.d = d;
+			this.azimuth = azimuth;
+		}
+		@Override
+		public String toString() {
+			return  "t=" + format.format(t) + 
+				" s, t_cmo=" + format.format(t_cmo) + 
+				" s, d=" + format.format(d) + " m" +
+				" m, a=" + format.format(azimuth) + " °";			
+		}
+	}
+	
 	/**none hazard*/
 	public static final int DECISION_NONE = 0;
 	/**warning*/
@@ -36,9 +58,9 @@ public class CrossingCMO implements Indicator {
 	final private CMOManagement cmo;
 	final private Geolocation geo;
 	
-	final private Hashtable<CMOTableEntry,Double> cmoTable = new Hashtable<CMOTableEntry,Double>();
+	final private Hashtable<CMOTableEntry,CrossingCMOEntry> cmoTable = new Hashtable<CMOTableEntry,CrossingCMOEntry>();
 	
-	public void updateCrossingCMO(){
+	public void updateCrossingCMO(){		
 		final WGS84 pos = geo.getLastPos();
 		final WGS84 prevPos = geo.getPrevPos();		
 		
@@ -52,10 +74,14 @@ public class CrossingCMO implements Indicator {
 						prevPos.longitude(), prevPos.latitude());
 				
 				if (x != 0.0) {
+					final WGS84 currentPos = geo.getLastPos();
 					final double t = geo.getPreditedTimeFromLongitude(x);
-					cmoTable.put(e,t);
+					final double t_cmo = e.getPreditedTimeFromLongitude(x);
+					final double d = e.distance(currentPos.longitude(),currentPos.latitude());
+					final double a = e.azimuth(currentPos.longitude(),currentPos.latitude());
+					cmoTable.put(e,new CrossingCMOEntry(t, t_cmo, d, geo.getCurrentTrack() - a));
 					
-					if(t >= 0.0) {
+					if(t >= 0.0 && t_cmo >= 0.0 && Math.abs(t-t_cmo) < LIMIT_HAZARD) {
 						if (t < LIMIT_WARNING && newDecision < DECISION_WARNING) 
 							newDecision = DECISION_WARNING;
 						
@@ -79,7 +105,7 @@ public class CrossingCMO implements Indicator {
 			}
 		}
 		
-		System.out.println(toString());
+		//System.out.println(toString());
 	}
 	
 	public CrossingCMO(Geolocation geo, CMOManagement cmo) {
@@ -99,7 +125,7 @@ public class CrossingCMO implements Indicator {
 		return decision;
 	}
 
-	public Map<CMOTableEntry, Double> getCrossingTimeTable() {
+	public Map<CMOTableEntry, CrossingCMOEntry> getCrossingTimeTable() {
 		return cmoTable;
 	}
 
@@ -112,8 +138,8 @@ public class CrossingCMO implements Indicator {
 	public String toString() {
 		StringBuffer s=new StringBuffer();
 		
-		for(Entry<CMOTableEntry,Double> e:cmoTable.entrySet())
-			s.append(e.getKey().getCmoID() + " " + e.getValue() + " s;");
+		for(Entry<CMOTableEntry,CrossingCMOEntry> e:cmoTable.entrySet())
+			s.append(e.getKey().getCmoID() + " " + e.getValue());
 		
 		return s.toString();
 	}
